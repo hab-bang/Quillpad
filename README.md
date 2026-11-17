@@ -2,7 +2,7 @@
 
 A lightweight text editor for Windows, for writing. Quillpad is a fork of [Notepads](https://github.com/0x7c13/Notepads) by Jackie (Jiaqi) Liu.
 
-I use Quillpad mostly for my own writing. So it changes a lot, and the changes follow my own needs. There's no release or installer yet, but if it sounds useful to you, you can build it and run it yourself. The steps are below.
+I use Quillpad mostly for my own writing. So it changes a lot, and the changes follow my own needs. But if it sounds useful to you, you can install a release or build it yourself. The steps are below.
 
 **What's different from Notepads**
 
@@ -10,7 +10,15 @@ I use Quillpad mostly for my own writing. So it changes a lot, and the changes f
 - No analytics. Quillpad doesn't collect or send anything.
 - It installs under its own name, so it runs next to Notepads.
 
-**What you need**
+**Install a release**
+
+1. Download `Quillpad_<version>_install.zip` from [Releases](https://github.com/hab-bang/Quillpad/releases) and unzip it.
+2. Right-click `Install.ps1` and choose **Run with PowerShell**.
+3. Say yes when it asks to install the certificate. That needs admin rights, but only the first time.
+
+Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there. After that, you can update by double-clicking the newer `.msixbundle`.
+
+**Build it yourself: what you need**
 
 - Windows 10 or 11, with Developer Mode on. In Settings, search for "developer settings".
 - Build Tools for Visual Studio 2022, with the UWP build tools and the Windows 11 SDK (10.0.22621):
