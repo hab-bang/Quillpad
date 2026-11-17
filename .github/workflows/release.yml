@@ -54,6 +54,7 @@ jobs:
             /p:Configuration=Production /p:Platform=x64 `
             /p:AppxBundle=Always "/p:AppxBundlePlatforms=x64|arm64" `
             /p:UapAppxPackageBuildMode=SideloadOnly /p:AppxSymbolPackageEnabled=false `
+            /p:AppxLogTelemetryFromSideloadingScript=false `
             "/p:AppxPackageDir=$env:RUNNER_TEMP\packages\" `
             /p:AppxPackageSigningEnabled=true `
             "/p:PackageCertificateKeyFile=$env:RUNNER_TEMP\signing.pfx" `
