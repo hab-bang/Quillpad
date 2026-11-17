@@ -67,10 +67,6 @@ namespace Notepads.Controls.Dialog
 
             PrimaryButtonClick += (sender, args) => TryRename();
 
-            AnalyticsService.TrackEvent("FileRenameDialogOpened", new Dictionary<string, string>()
-            {
-                { "FileExists", fileExists.ToString() },
-            });
         }
 
         private bool TryRename()

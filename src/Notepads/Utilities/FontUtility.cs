@@ -144,10 +144,7 @@ namespace Notepads.Utilities
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("FailedToGetSystemFontFamilies", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() }
-                });
+                LoggingService.LogException(ex);
                 return DefaultFonts.Where(font => !SymbolFonts.Contains(font)).OrderBy(font => font).ToArray();
             }
         }

@@ -26,23 +26,7 @@ namespace Notepads.Utilities
             }
             catch (Exception ex)
             {
-                var activeDialogTitle = string.Empty;
-                var pendingDialogTitle = string.Empty;
-                if (ActiveDialog?.Title is string activeTitle)
-                {
-                    activeDialogTitle = activeTitle;
-                }
-                if (dialog?.Title is string pendingTitle)
-                {
-                    pendingDialogTitle = pendingTitle;
-                }
-                AnalyticsService.TrackEvent("FailedToOpenDialog", new Dictionary<string, string>()
-                {
-                    { "Message", ex.Message },
-                    { "Exception", ex.ToString() },
-                    { "ActiveDialogTitle", activeDialogTitle },
-                    { "PendingDialogTitle", pendingDialogTitle }
-                });
+                LoggingService.LogError($"[{nameof(DialogManager)}] Failed to open dialog \"{dialog?.Title}\" (active dialog: \"{ActiveDialog?.Title}\"): {ex}");
             }
 
             return null;

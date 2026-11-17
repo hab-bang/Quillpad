@@ -43,12 +43,6 @@ namespace Notepads.Utilities
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(FutureAccessListUtility)}] Failed to add file [{file.Path}] to future access list: {ex.Message}");
-                AnalyticsService.TrackEvent("FailedToAddTokenInFutureAccessList",
-                    new Dictionary<string, string>()
-                    {
-                        { "ItemCount", GetFutureAccessListItemCount().ToString() },
-                        { "Exception", ex.Message }
-                    });
             }
             return false;
         }

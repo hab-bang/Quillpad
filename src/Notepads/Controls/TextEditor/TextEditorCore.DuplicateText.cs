@@ -68,8 +68,6 @@ namespace Notepads.Controls.TextEditor
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(TextEditorCore)}] Failed to duplicate text: {ex}");
-                AnalyticsService.TrackEvent("TextEditorCore_FailedToDuplicateText",
-                    new Dictionary<string, string> { { "Exception", ex.ToString() } });
             }
         }
     }

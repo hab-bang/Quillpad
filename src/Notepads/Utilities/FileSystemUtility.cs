@@ -453,16 +453,11 @@ namespace Notepads.Utilities
                 }
                 else if (stream.Length > 0) // We do not care about empty file
                 {
-                    AnalyticsService.TrackEvent("UnableToDetectEncoding");
                 }
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("TryGuessEncodingFailedWithException", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() },
-                    { "Message", ex.Message }
-                });
+                LoggingService.LogException(ex);
             }
 
             return false;
@@ -681,13 +676,6 @@ namespace Notepads.Utilities
                 {
                     // Track retry attempts to better understand the failed scenarios
                     // File name, path and content are not included to respect/protect user privacy
-                    AnalyticsService.TrackEvent(operationName, new Dictionary<string, string>()
-                    {
-                        { "RetryAttempts", retryAttempts.ToString() },
-                        { "DeferUpdatesUsed" , deferUpdatesUsed.ToString() },
-                        { "ErrorCodes", string.Join(", ", errorCodes) },
-                        { "FileUpdateStatus", fileUpdateStatus }
-                    });
                 }
             }
         }
@@ -701,10 +689,6 @@ namespace Notepads.Utilities
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(FileSystemUtility)}] Failed to get or create file, Exception: {ex.Message}");
-                AnalyticsService.TrackEvent("GetOrCreateFileAsync_Failed", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() },
-                });
                 throw; // Rethrow
             }
         }

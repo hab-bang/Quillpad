@@ -60,8 +60,6 @@ namespace Notepads.Controls.TextEditor
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(TextEditorCore)}] Failed to join text: {ex}");
-                AnalyticsService.TrackEvent("TextEditorCore_FailedToJoinText",
-                    new Dictionary<string, string> { { "Exception", ex.ToString() } });
             }
         }
     }

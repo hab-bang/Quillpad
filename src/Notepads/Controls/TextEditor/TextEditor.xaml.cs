@@ -506,7 +506,6 @@
                 CloseSideBySideDiffViewer();
                 HideGoToControl();
                 FileReloaded?.Invoke(this, EventArgs.Empty);
-                AnalyticsService.TrackEvent(encoding == null ? "OnFileReloaded" : "OnFileReopenedWithEncoding");
             }
         }
 
@@ -599,7 +598,6 @@
             SplitPanelColumnDefinition.MinWidth = 100.0f;
             SplitPanel.Visibility = Visibility.Visible;
             GridSplitter.Visibility = Visibility.Visible;
-            AnalyticsService.TrackEvent("MarkdownContentPreview_Opened");
             _isContentPreviewPanelOpened = true;
         }
 
@@ -649,7 +647,6 @@
             SideBySideDiffViewer.Visibility = Visibility.Visible;
             SideBySideDiffViewer.RenderDiff(LastSavedSnapshot.Content, TextEditorCore.GetText(), ThemeSettingsService.ThemeMode);
             SideBySideDiffViewer.Focus();
-            AnalyticsService.TrackEvent("SideBySideDiffViewer_Opened");
         }
 
         public void CloseSideBySideDiffViewer()

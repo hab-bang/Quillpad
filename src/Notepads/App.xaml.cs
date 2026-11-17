@@ -120,7 +120,6 @@ namespace Notepads
             };
 
             LoggingService.LogInfo($"[{nameof(App)}] Launch settings: \n{string.Join("\n", appLaunchSettings.Select(x => x.Key + "=" + x.Value).ToArray())}.");
-            AnalyticsService.TrackEvent("AppLaunch_Settings", appLaunchSettings);
 
             var appLaunchEditorSettings = new Dictionary<string, string>()
             {
@@ -138,23 +137,8 @@ namespace Notepads
             };
 
             LoggingService.LogInfo($"[{nameof(App)}] Editor settings: \n{string.Join("\n", appLaunchEditorSettings.Select(x => x.Key + "=" + x.Value).ToArray())}.");
-            AnalyticsService.TrackEvent("AppLaunch_Editor_Settings", appLaunchEditorSettings);
 
-            try
-            {
-                await ActivationService.ActivateAsync(rootFrame, e);
-            }
-            catch (Exception ex)
-            {
-                var diagnosticInfo = new Dictionary<string, string>()
-                {
-                    { "Message", ex?.Message },
-                    { "Exception", ex?.ToString() },
-                };
-                AnalyticsService.TrackEvent("AppFailedToActivate", diagnosticInfo);
-                AnalyticsService.TrackError(ex, diagnosticInfo);
-                throw;
-            }
+            await ActivationService.ActivateAsync(rootFrame, e);
 
             try
             {
@@ -208,11 +192,6 @@ namespace Notepads
         {
             var exception = new Exception($"[{nameof(App)}] Failed to load Page: {e.SourcePageType.FullName} Exception: {e.Exception.Message}");
             LoggingService.LogException(exception);
-            AnalyticsService.TrackEvent("FailedToLoadPage", new Dictionary<string, string>()
-            {
-                { "Page", e.SourcePageType.FullName },
-                { "Exception", e.Exception.Message }
-            });
             throw exception;
         }
 
@@ -248,22 +227,6 @@ namespace Notepads
         {
             LoggingService.LogError($"[{nameof(App)}] OnUnhandledException: {e.Exception}");
 
-            var diagnosticInfo = new Dictionary<string, string>()
-            {
-                { "Message", e.Message },
-                { "Exception", e.Exception?.ToString() },
-                { "Culture", SystemInformation.Instance.Culture.EnglishName },
-                { "AvailableMemory", SystemInformation.Instance.AvailableMemory.ToString("F0") },
-                { "FirstUseTimeUTC", SystemInformation.Instance.FirstUseTime.ToUniversalTime().ToString("MM/dd/yyyy HH:mm:ss") },
-                { "OSArchitecture", SystemInformation.Instance.OperatingSystemArchitecture.ToString() },
-                { "OSVersion", SystemInformation.Instance.OperatingSystemVersion.ToString() },
-                { "IsShadowWindow", (!IsPrimaryInstance && !IsGameBarWidget).ToString() },
-                { "IsGameBarWidget", IsGameBarWidget.ToString() }
-            };
-
-            AnalyticsService.TrackEvent("OnUnhandledException", diagnosticInfo);
-            AnalyticsService.TrackError(e.Exception, diagnosticInfo);
-
             // suppress and handle it manually.
             e.Handled = true;
         }
@@ -273,17 +236,6 @@ namespace Notepads
         private static void OnUnobservedException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             LoggingService.LogError($"[{nameof(App)}] OnUnobservedException: {e.Exception}");
-
-            var diagnosticInfo = new Dictionary<string, string>()
-            {
-                { "Message", e.Exception?.Message },
-                { "Exception", e.Exception?.ToString() },
-                { "InnerException", e.Exception?.InnerException?.ToString() },
-                { "InnerExceptionMessage", e.Exception?.InnerException?.Message }
-            };
-
-            AnalyticsService.TrackEvent("OnUnobservedException", diagnosticInfo);
-            AnalyticsService.TrackError(e.Exception, diagnosticInfo);
 
             // suppress and handle it manually.
             e.SetObserved();

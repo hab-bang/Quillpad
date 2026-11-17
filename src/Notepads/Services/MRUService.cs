@@ -23,10 +23,7 @@ namespace Notepads.Services
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("MRUService_FailedToAddStorageItemToMRU", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() }
-                });
+                LoggingService.LogException(ex);
                 return false;
             }
         }
@@ -57,10 +54,7 @@ namespace Notepads.Services
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("MRUService_FailedToGetMRU", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() }
-                });
+                LoggingService.LogException(ex);
             }
 
             return items;
@@ -74,10 +68,7 @@ namespace Notepads.Services
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("MRUService_FailedToClearMRU", new Dictionary<string, string>()
-                {
-                    { "Exception", ex.ToString() }
-                });
+                LoggingService.LogException(ex);
             }
         }
     }

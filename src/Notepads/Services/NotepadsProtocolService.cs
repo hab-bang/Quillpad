@@ -49,11 +49,6 @@ namespace Notepads.Services
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(NotepadsProtocolService)}] Failed to parse protocol: {uri}, exception: {ex}");
-                AnalyticsService.TrackEvent("NotepadsProtocolService_FailedToParseProtocol", new Dictionary<string, string>()
-                {
-                    { "Protocol", uri.ToString() },
-                    { "Exception", ex.ToString() }
-                });
             }
 
             return NotepadsOperationProtocol.Unrecognized;
@@ -81,11 +76,6 @@ namespace Notepads.Services
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(NotepadsProtocolService)}] Failed to execute protocol: {operation}, Exception: {ex}");
-                AnalyticsService.TrackEvent("NotepadsProtocolService_FailedToExecuteProtocol", new Dictionary<string, string>()
-                {
-                    { "Protocol", operation.ToString() },
-                    { "Exception", ex.Message }
-                });
                 return false;
             }
         }

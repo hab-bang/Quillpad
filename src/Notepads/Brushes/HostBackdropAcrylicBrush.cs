@@ -281,12 +281,7 @@ namespace Notepads.Brushes
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("FailedToBuildAcrylicBrushInternal",
-                    new Dictionary<string, string>
-                    {
-                        { "Exception", ex.ToString() },
-                        { "FailedAtStage", stage.ToString() },
-                    });
+                LoggingService.LogError($"[{nameof(HostBackdropAcrylicBrush)}] Failed to build the acrylic brush at stage {stage}: {ex}");
                 throw; // rethrow here
             }
         }
@@ -329,7 +324,7 @@ namespace Notepads.Brushes
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("FailedToLoadImageBrush", new Dictionary<string, string> { { "Exception", ex.ToString() } });
+                LoggingService.LogException(ex);
                 return null;
             }
         }

@@ -34,11 +34,7 @@ namespace Notepads.Utilities
             }
             catch (Exception ex)
             {
-                AnalyticsService.TrackEvent("FailedToCreateAcrylicBrush", new Dictionary<string, string>
-                {
-                    { "Exception", ex.ToString() },
-                    { "Message", ex.Message },
-                });
+                LoggingService.LogException(ex);
                 return new SolidColorBrush(color);
             }
             finally

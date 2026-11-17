@@ -794,7 +794,6 @@ namespace Notepads.Core
                 }
 
                 deferral.Complete();
-                AnalyticsService.TrackEvent("OnSetDropped");
             }
             catch (Exception ex)
             {

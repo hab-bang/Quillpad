@@ -169,7 +169,6 @@ namespace Notepads.Views.MainPage
         {
             if (!await NotepadsProtocolService.LaunchProtocolAsync(NotepadsOperationProtocol.OpenNewInstance))
             {
-                AnalyticsService.TrackEvent("FailedToOpenNewAppInstance");
             }
         }
 
@@ -221,12 +220,6 @@ namespace Notepads.Views.MainPage
 
                     LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] {numberOfRecoveredFiles} file(s) recovered from last session backup.");
 
-                    AnalyticsService.TrackEvent("SessionManager_FailedToLoadLastSession_SessionDataCorruptedException",
-                        new Dictionary<string, string>()
-                        {
-                            { "Exception", ex.Message },
-                            { "NumberOfRecoveredFiles", numberOfRecoveredFiles.ToString() }
-                        });
 
                     // Show session recovery dialog if there are any recovered files
                     if (numberOfRecoveredFiles > 0)
@@ -242,7 +235,6 @@ namespace Notepads.Views.MainPage
                 catch (Exception ex) // Catch all other exceptions
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
-                    AnalyticsService.TrackEvent("SessionManager_FailedToLoadLastSession_UnhandledException", new Dictionary<string, string>() { { "Exception", ex.Message } });
                 }
             }
 
@@ -506,7 +498,6 @@ namespace Notepads.Views.MainPage
                 {
                     if (!await ApplicationView.GetForCurrentView().TryConsolidateAsync())
                     {
-                        AnalyticsService.TrackEvent("FailedToConsolidateOnExit");
                     }
 
                     Application.Current.Exit();
@@ -620,7 +611,6 @@ namespace Notepads.Views.MainPage
                 if (storageItem is StorageFile file)
                 {
                     await OpenFileAsync(file);
-                    AnalyticsService.TrackEvent("OnStorageFileDropped");
                 }
             }
         }

@@ -56,7 +56,6 @@ namespace Notepads.Views.MainPage
                 if (!modeSwitched)
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to enter CompactOverlay view mode.");
-                    AnalyticsService.TrackEvent("FailedToEnterCompactOverlayViewMode");
                 }
             }
             else if (ApplicationView.GetForCurrentView().ViewMode == ApplicationViewMode.CompactOverlay)
@@ -66,7 +65,6 @@ namespace Notepads.Views.MainPage
                 if (!modeSwitched)
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to enter Default view mode.");
-                    AnalyticsService.TrackEvent("FailedToEnterDefaultViewMode");
                 }
             }
         }
@@ -91,7 +89,6 @@ namespace Notepads.Views.MainPage
                 else
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to enter full screen view mode.");
-                    AnalyticsService.TrackEvent("FailedToEnterFullScreenViewMode");
                 }
             }
         }

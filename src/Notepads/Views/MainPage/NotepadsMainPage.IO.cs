@@ -105,10 +105,6 @@ namespace Notepads.Views.MainPage
                     {
                         extension = "<NoExtension>";
                     }
-                    AnalyticsService.TrackEvent("UnsupportedFileExtension", new Dictionary<string, string>()
-                    {
-                        { "Extension", extension },
-                    });
                 }
             }
             catch (Exception)
