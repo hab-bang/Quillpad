@@ -18,8 +18,15 @@ namespace Notepads.Controls.TextEditor
     /// </summary>
     public sealed partial class TextEditor
     {
+        // Width of the vertical scroll bar when it expands on hover. It overlays the text instead of taking
+        // its own space, so a narrowed column reserves room for it to keep it from covering the line ends.
+        private const double ExpandedScrollBarWidth = 16;
+
+        private Thickness _fullWidthEditorPadding;
+
         private void HookTextWidthEvents()
         {
+            _fullWidthEditorPadding = TextEditorCore.Padding;
             ApplyTextWidth(AppSettingsService.EditorTextWidth);
             AppSettingsService.OnTextWidthChanged += AppSettingsService_OnTextWidthChanged;
         }
@@ -42,6 +49,14 @@ namespace Notepads.Controls.TextEditor
             TextWidthLeftMarginColumnDefinition.Width = new GridLength(marginFraction, GridUnitType.Star);
             TextWidthEditorColumnDefinition.Width = new GridLength(editorFraction, GridUnitType.Star);
             TextWidthRightMarginColumnDefinition.Width = new GridLength(marginFraction, GridUnitType.Star);
+
+            TextEditorCore.Padding = textWidth == TextWidth.Full
+                ? _fullWidthEditorPadding
+                : new Thickness(
+                    _fullWidthEditorPadding.Left,
+                    _fullWidthEditorPadding.Top,
+                    _fullWidthEditorPadding.Right + ExpandedScrollBarWidth,
+                    _fullWidthEditorPadding.Bottom);
         }
 
         // The side margins are not part of the editor control, so forward mouse wheel scrolling to it
