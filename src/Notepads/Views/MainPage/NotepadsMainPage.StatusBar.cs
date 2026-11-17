@@ -30,6 +30,7 @@ namespace Notepads.Views.MainPage
         {
             ShowHideStatusBar(AppSettingsService.ShowStatusBar);
             AppSettingsService.OnStatusBarVisibilityChanged += OnStatusBarVisibilityChanged;
+            AppSettingsService.OnTextWidthChanged += OnTextWidthChanged;
         }
 
         private void SetupStatusBar(ITextEditor textEditor)
@@ -41,6 +42,7 @@ namespace Notepads.Views.MainPage
             UpdateEditorModificationIndicator(textEditor);
             UpdateLineColumnIndicator(textEditor);
             UpdateFontZoomIndicator(textEditor);
+            UpdateTextWidthIndicator(AppSettingsService.EditorTextWidth);
             UpdateLineEndingIndicator(textEditor.GetLineEnding());
             UpdateEncodingIndicator(textEditor.GetEncoding());
             UpdateShadowWindowIndicator();
@@ -74,6 +76,11 @@ namespace Notepads.Views.MainPage
             {
                 if (ApplicationView.GetForCurrentView().ViewMode != ApplicationViewMode.CompactOverlay) ShowHideStatusBar(visible);
             });
+        }
+
+        private async void OnTextWidthChanged(object sender, TextWidth textWidth)
+        {
+            await Dispatcher.CallOnUIThreadAsync(() => UpdateTextWidthIndicator(textWidth));
         }
 
         private void UpdateFileModificationStateIndicator(ITextEditor textEditor)
@@ -167,6 +174,14 @@ namespace Notepads.Views.MainPage
             var fontZoomFactor = Math.Round(textEditor.GetFontZoomFactor());
             FontZoomIndicator.Text = fontZoomFactor.ToString(CultureInfo.InvariantCulture) + "%";
             FontZoomSlider.Value = fontZoomFactor;
+        }
+
+        private void UpdateTextWidthIndicator(TextWidth textWidth)
+        {
+            if (StatusBar == null) return;
+            // Reuses the flyout item labels so the indicator and its menu always read the same
+            TextWidthIndicator.Text = _resourceLoader.GetString($"TextEditor_TextWidthIndicator_FlyoutItem_{textWidth}/Text");
+            ToolTipService.SetToolTip(TextWidthIndicator, _resourceLoader.GetString("TextEditor_TextWidthIndicator_ToolTip"));
         }
 
         private void UpdateShadowWindowIndicator()
@@ -321,6 +336,16 @@ namespace Notepads.Views.MainPage
             }
         }
 
+        private void TextWidthSelection_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is MenuFlyoutItem item)) return;
+
+            if (Enum.TryParse((string)item.Tag, out TextWidth textWidth))
+            {
+                AppSettingsService.EditorTextWidth = textWidth;
+            }
+        }
+
         private void StatusBarComponent_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             var selectedEditor = NotepadsCore.GetSelectedTextEditor();
@@ -345,6 +370,10 @@ namespace Notepads.Views.MainPage
             else if (sender == FontZoomIndicator)
             {
                 FontZoomIndicatorClicked(selectedEditor);
+            }
+            else if (sender == TextWidthIndicator)
+            {
+                TextWidthIndicator?.ContextFlyout.ShowAt(TextWidthIndicator);
             }
             else if (sender == LineEndingIndicator)
             {

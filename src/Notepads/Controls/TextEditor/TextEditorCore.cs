@@ -525,6 +525,17 @@ namespace Notepads.Controls.TextEditor
         }
 
         /// <summary>
+        /// Scrolls the content vertically by the given amount (positive moves the view down)
+        /// </summary>
+        public void ScrollVerticallyBy(double delta)
+        {
+            _contentScrollViewer?.ChangeView(
+                horizontalOffset: null,
+                verticalOffset: _contentScrollViewer.VerticalOffset + delta,
+                zoomFactor: null);
+        }
+
+        /// <summary>
         /// Thread safe way of getting the current document selection position
         /// </summary>
         public void GetTextSelectionPosition(out int startPosition, out int endPosition)

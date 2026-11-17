@@ -493,6 +493,22 @@
     <value>Zoom Out</value>
     <comment>TextEditor: FontZoomIndicator "ZoomOut" FlyoutItem display text. Zooms out selected text editor text.</comment>
   </data>
+  <data name="TextEditor_TextWidthIndicator_FlyoutItem_Full.Text" xml:space="preserve">
+    <value>Full width</value>
+    <comment>TextEditor: TextWidthIndicator "Full" FlyoutItem display text, also shown in the status bar. Text uses the whole window width.</comment>
+  </data>
+  <data name="TextEditor_TextWidthIndicator_FlyoutItem_ThreeQuarters.Text" xml:space="preserve">
+    <value>3/4 width</value>
+    <comment>TextEditor: TextWidthIndicator "ThreeQuarters" FlyoutItem display text, also shown in the status bar. Text uses a centered column of three quarters of the window width.</comment>
+  </data>
+  <data name="TextEditor_TextWidthIndicator_FlyoutItem_Half.Text" xml:space="preserve">
+    <value>1/2 width</value>
+    <comment>TextEditor: TextWidthIndicator "Half" FlyoutItem display text, also shown in the status bar. Text uses a centered column of half the window width.</comment>
+  </data>
+  <data name="TextEditor_TextWidthIndicator_ToolTip" xml:space="preserve">
+    <value>Text width</value>
+    <comment>TextEditor: TextWidthIndicator tooltip in the status bar.</comment>
+  </data>
   <data name="GoTo_GoToBarLabel.Text" xml:space="preserve">
     <value>Go To:</value>
     <comment>GoTo: Go to bar label</comment>

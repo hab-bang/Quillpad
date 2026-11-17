@@ -202,6 +202,8 @@
 
             ThemeSettingsService.OnThemeChanged += ThemeSettingsService_OnThemeChanged;
 
+            HookTextWidthEvents();
+
             base.Loaded += TextEditor_Loaded;
             base.Unloaded += TextEditor_Unloaded;
             base.KeyDown += TextEditor_KeyDown;
@@ -231,6 +233,8 @@
             }
 
             ThemeSettingsService.OnThemeChanged -= ThemeSettingsService_OnThemeChanged;
+
+            UnhookTextWidthEvents();
 
             Unloaded?.Invoke(this, new RoutedEventArgs());
 

@@ -27,6 +27,7 @@ namespace Notepads.Services
         public static event EventHandler<bool> OnStatusBarVisibilityChanged;
         public static event EventHandler<bool> OnSessionBackupAndRestoreOptionChanged;
         public static event EventHandler<bool> OnHighlightMisspelledWordsChanged;
+        public static event EventHandler<TextWidth> OnTextWidthChanged;
 
         private static string _editorFontFamily;
 
@@ -90,6 +91,19 @@ namespace Notepads.Services
                 _editorDefaultTextWrapping = value;
                 OnDefaultTextWrappingChanged?.Invoke(null, value);
                 ApplicationSettingsStore.Write(SettingsKey.EditorDefaultTextWrappingStr, value.ToString());
+            }
+        }
+
+        private static TextWidth _editorTextWidth;
+
+        public static TextWidth EditorTextWidth
+        {
+            get => _editorTextWidth;
+            set
+            {
+                _editorTextWidth = value;
+                OnTextWidthChanged?.Invoke(null, value);
+                ApplicationSettingsStore.Write(SettingsKey.EditorTextWidthStr, value.ToString());
             }
         }
 
@@ -307,6 +321,8 @@ namespace Notepads.Services
 
             InitializeTextWrappingSettings();
 
+            InitializeTextWidthSettings();
+
             InitializeSpellingSettings();
 
             InitializeDisplaySettings();
@@ -391,6 +407,19 @@ namespace Notepads.Services
             else
             {
                 _editorDefaultTextWrapping = TextWrapping.NoWrap;
+            }
+        }
+
+        private static void InitializeTextWidthSettings()
+        {
+            if (ApplicationSettingsStore.Read(SettingsKey.EditorTextWidthStr) is string textWidthStr &&
+                Enum.TryParse(typeof(TextWidth), textWidthStr, out var textWidth))
+            {
+                _editorTextWidth = (TextWidth)textWidth;
+            }
+            else
+            {
+                _editorTextWidth = TextWidth.Full;
             }
         }
 
