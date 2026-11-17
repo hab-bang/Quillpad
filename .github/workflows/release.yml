@@ -1,0 +1,91 @@
+# Builds the signed Quillpad package (x64 and ARM64).
+#   Push a tag like v0.1.0  -> builds version 0.1.0.0 and publishes a GitHub Release with it.
+#   Run it by hand          -> builds version 0.0.0.<run number> and only keeps it as a workflow artifact.
+# Needs the secrets SIGNING_PFX_BASE64 and SIGNING_PFX_PASSWORD: a self-signed certificate for CN=hab-bang,
+# the Publisher in src/Notepads/Package.appxmanifest.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: microsoft/setup-msbuild@v3
+
+      - name: Set the package version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $version = $env:GITHUB_REF_NAME.TrimStart('v') + '.0'
+          } else {
+            $version = "0.0.0.$env:GITHUB_RUN_NUMBER"
+          }
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw "A release tag must look like v1.2.3, not $env:GITHUB_REF_NAME" }
+
+          $manifest = Join-Path $env:GITHUB_WORKSPACE 'src/Notepads/Package.appxmanifest'
+          [xml]$xml = Get-Content $manifest
+          $xml.Package.Identity.Version = $version
+          $xml.Save($manifest)
+          "VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Write the signing certificate
+        shell: pwsh
+        env:
+          PFX_BASE64: ${{ secrets.SIGNING_PFX_BASE64 }}
+        run: |
+          if (-not $env:PFX_BASE64) { throw 'The SIGNING_PFX_BASE64 secret is missing.' }
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\signing.pfx", [Convert]::FromBase64String($env:PFX_BASE64))
+
+      - name: Build and sign the package
+        shell: pwsh
+        env:
+          PFX_PASSWORD: ${{ secrets.SIGNING_PFX_PASSWORD }}
+        run: |
+          msbuild src/Notepads.sln /restore /m /nologo /verbosity:minimal `
+            /p:Configuration=Production /p:Platform=x64 `
+            /p:AppxBundle=Always "/p:AppxBundlePlatforms=x64|arm64" `
+            /p:UapAppxPackageBuildMode=SideloadOnly /p:AppxSymbolPackageEnabled=false `
+            "/p:AppxPackageDir=$env:RUNNER_TEMP\packages\" `
+            /p:AppxPackageSigningEnabled=true `
+            "/p:PackageCertificateKeyFile=$env:RUNNER_TEMP\signing.pfx" `
+            "/p:PackageCertificatePassword=$env:PFX_PASSWORD"
+          if ($LASTEXITCODE -ne 0) { throw "MSBuild failed with exit code $LASTEXITCODE" }
+
+      - name: Collect the release files
+        shell: pwsh
+        run: |
+          Remove-Item "$env:RUNNER_TEMP\signing.pfx" -Force
+          $folder = Get-ChildItem "$env:RUNNER_TEMP\packages" -Directory | Select-Object -First 1
+          $out = New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\release"
+          $name = "Quillpad_$env:VERSION"
+
+          Copy-Item (Get-ChildItem $folder.FullName -Filter *.msixbundle).FullName "$out\$name.msixbundle"
+          Copy-Item (Get-ChildItem $folder.FullName -Filter *.cer).FullName "$out\$name.cer"
+          Compress-Archive -Path "$($folder.FullName)\*" -DestinationPath "$out\${name}_install.zip"
+          Get-ChildItem $out | Format-Table Name, Length
+
+      - name: Keep the package as a workflow artifact
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quillpad_${{ env.VERSION }}
+          path: ${{ runner.temp }}/release/
+
+      - name: Publish the GitHub Release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME (Get-ChildItem "$env:RUNNER_TEMP\release").FullName `
+            --title "Quillpad $env:GITHUB_REF_NAME" --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw "gh release create failed with exit code $LASTEXITCODE" }
