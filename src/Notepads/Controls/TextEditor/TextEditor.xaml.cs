@@ -694,6 +694,11 @@
                 GetLineEnding());
         }
 
+        public void GetTextSelectionPosition(out int startPosition, out int endPosition)
+        {
+            TextEditorCore.GetTextSelectionPosition(out startPosition, out endPosition);
+        }
+
         public double GetFontZoomFactor()
         {
             return TextEditorCore.GetFontZoomFactor();

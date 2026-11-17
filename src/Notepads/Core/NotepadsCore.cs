@@ -39,6 +39,7 @@ namespace Notepads.Core
         public event EventHandler<ITextEditor> TextEditorRenamed;
         public event EventHandler<ITextEditor> TextEditorClosing;
         public event EventHandler<ITextEditor> TextEditorSelectionChanged;
+        public event EventHandler<ITextEditor> TextEditorTextChanging;
         public event EventHandler<ITextEditor> TextEditorFontZoomFactorChanged;
         public event EventHandler<ITextEditor> TextEditorEncodingChanged;
         public event EventHandler<ITextEditor> TextEditorLineEndingChanged;
@@ -199,6 +200,7 @@ namespace Notepads.Core
             textEditor.Loaded += TextEditor_Loaded;
             textEditor.Unloaded += TextEditor_Unloaded;
             textEditor.SelectionChanged += TextEditor_OnSelectionChanged;
+            textEditor.TextChanging += TextEditor_OnTextChanging;
             textEditor.FontZoomFactorChanged += TextEditor_OnFontZoomFactorChanged;
             textEditor.KeyDown += TextEditorKeyDown;
             textEditor.ModificationStateChanged += TextEditor_OnEditorModificationStateChanged;
@@ -238,6 +240,7 @@ namespace Notepads.Core
             textEditor.Unloaded -= TextEditor_Unloaded;
             textEditor.KeyDown -= TextEditorKeyDown;
             textEditor.SelectionChanged -= TextEditor_OnSelectionChanged;
+            textEditor.TextChanging -= TextEditor_OnTextChanging;
             textEditor.FontZoomFactorChanged -= TextEditor_OnFontZoomFactorChanged;
             textEditor.ModificationStateChanged -= TextEditor_OnEditorModificationStateChanged;
             textEditor.ModeChanged -= TextEditor_OnModeChanged;
@@ -519,6 +522,12 @@ namespace Notepads.Core
         {
             if (!(sender is ITextEditor textEditor)) return;
             TextEditorSelectionChanged?.Invoke(this, textEditor);
+        }
+
+        private void TextEditor_OnTextChanging(object sender, EventArgs e)
+        {
+            if (!(sender is ITextEditor textEditor)) return;
+            TextEditorTextChanging?.Invoke(this, textEditor);
         }
 
         private void TextEditor_OnFontZoomFactorChanged(object sender, EventArgs e)

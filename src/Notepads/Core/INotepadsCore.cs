@@ -28,6 +28,7 @@ namespace Notepads.Core
         event EventHandler<ITextEditor> TextEditorClosing;
         event EventHandler<ITextEditor> TextEditorRenamed;
         event EventHandler<ITextEditor> TextEditorSelectionChanged;
+        event EventHandler<ITextEditor> TextEditorTextChanging;
         event EventHandler<ITextEditor> TextEditorFontZoomFactorChanged;
         event EventHandler<ITextEditor> TextEditorEncodingChanged;
         event EventHandler<ITextEditor> TextEditorLineEndingChanged;

@@ -290,6 +290,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid Column="0">
                 <Grid x:Name="FileModificationStateIndicator"
@@ -465,7 +466,36 @@
                     </TextBlock.ContextFlyout>
                 </TextBlock>
             </Grid>
-            <Grid Column="3" x:Name="LineColumnIndicatorButton"
+            <Grid Column="3"
+                  ui:FrameworkElementExtensions.Cursor="Hand">
+                <Interactivity:Interaction.Behaviors>
+                    <Core:EventTriggerBehavior EventName="PointerEntered">
+                        <Core:ChangePropertyAction PropertyName="Background">
+                            <Core:ChangePropertyAction.Value>
+                                <SolidColorBrush Color="{ThemeResource SystemRevealListLowColor}"/>
+                            </Core:ChangePropertyAction.Value>
+                        </Core:ChangePropertyAction>
+                    </Core:EventTriggerBehavior>
+
+                    <Core:EventTriggerBehavior EventName="PointerExited">
+                        <Core:ChangePropertyAction PropertyName="Background">
+                            <Core:ChangePropertyAction.Value>
+                                <SolidColorBrush Color="Transparent"/>
+                            </Core:ChangePropertyAction.Value>
+                        </Core:ChangePropertyAction>
+                    </Core:EventTriggerBehavior>
+                </Interactivity:Interaction.Behaviors>
+                <TextBlock x:Name="WordCountIndicator" Style="{StaticResource StatusBarTextBlockStyle}"
+                           IsTapEnabled="True"
+                           Tapped="StatusBarComponent_OnTapped">
+                    <FlyoutBase.AttachedFlyout>
+                        <Flyout x:Name="WordCountFlyout" Placement="TopEdgeAlignedRight" Closing="StatusBarFlyout_OnClosing">
+                            <TextBlock x:Name="WordCountFlyoutText" FontSize="12" LineHeight="20" IsTextSelectionEnabled="True"/>
+                        </Flyout>
+                    </FlyoutBase.AttachedFlyout>
+                </TextBlock>
+            </Grid>
+            <Grid Column="4" x:Name="LineColumnIndicatorButton"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
@@ -489,7 +519,7 @@
                            Tapped="StatusBarComponent_OnTapped">
                 </TextBlock>
             </Grid>
-            <Grid Column="4"
+            <Grid Column="5"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
@@ -581,7 +611,7 @@
                     </TextBlock.ContextFlyout>
                 </TextBlock>
             </Grid>
-            <Grid Column="5"
+            <Grid Column="6"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
@@ -618,7 +648,7 @@
                     </TextBlock.ContextFlyout>
                 </TextBlock>
             </Grid>
-            <Grid Column="6"
+            <Grid Column="7"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
@@ -655,7 +685,7 @@
                     </TextBlock.ContextFlyout>
                 </TextBlock>
             </Grid>
-            <Grid Column="7"
+            <Grid Column="8"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
@@ -689,7 +719,7 @@
                     </TextBlock.ContextFlyout>
                 </TextBlock>
             </Grid>
-            <Grid Column="8"
+            <Grid Column="9"
                   ui:FrameworkElementExtensions.Cursor="Hand">
                 <Interactivity:Interaction.Behaviors>
                     <Core:EventTriggerBehavior EventName="PointerEntered">
