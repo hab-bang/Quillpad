@@ -54,7 +54,7 @@ namespace Notepads.Controls.TextEditor
                 var newContent = document.Remove(startLineInitialIndex, endLineFinalIndex - startLineInitialIndex)
                     .Insert(startLineInitialIndex, joinedLines);
 
-                Document.SetText(TextSetOptions.None, newContent);
+                SetText(newContent);
                 Document.Selection.SetRange(start, end);
             }
             catch (Exception ex)

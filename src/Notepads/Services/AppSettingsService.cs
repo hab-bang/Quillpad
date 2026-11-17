@@ -406,7 +406,7 @@ namespace Notepads.Services
             }
             else
             {
-                _editorDefaultTextWrapping = TextWrapping.NoWrap;
+                _editorDefaultTextWrapping = TextWrapping.Wrap; // Quillpad is mostly for prose, so wrap unless the user turned it off
             }
         }
 

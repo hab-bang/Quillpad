@@ -99,6 +99,8 @@
                 FileType = FileTypeUtility.GetFileTypeByFileName(EditingFile.Name);
             }
 
+            TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile;
+
             // Hide content preview if current file type is not supported for previewing
             if (!FileTypeUtility.IsPreviewSupported(FileType))
             {
@@ -692,6 +694,11 @@
                 out selected,
                 out lineCount,
                 GetLineEnding());
+        }
+
+        public void GetTextSelectionPosition(out int startPosition, out int endPosition)
+        {
+            TextEditorCore.GetTextSelectionPosition(out startPosition, out endPosition);
         }
 
         public double GetFontZoomFactor()

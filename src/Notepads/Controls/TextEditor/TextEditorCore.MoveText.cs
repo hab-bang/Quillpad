@@ -85,7 +85,7 @@ namespace Notepads.Controls.TextEditor
             selectionEnd += selectionMoveAmount;
             if (selectionStart < 0) selectionStart = 0;
 
-            Document.SetText(TextSetOptions.None, newContent);
+            SetText(newContent);
             Document.Selection.SetRange(selectionStart, selectionEnd);
 
             // After SetText() and SetRange(), RichEdit will scroll selection into view
@@ -224,7 +224,7 @@ namespace Notepads.Controls.TextEditor
             selectionStart += selectionMoveAmount;
             selectionEnd += selectionMoveAmount;
 
-            Document.SetText(TextSetOptions.None, document);
+            SetText(document);
             Document.Selection.SetRange(selectionStart, selectionEnd);
 
             // After SetText() and SetRange(), RichEdit will scroll selection into view

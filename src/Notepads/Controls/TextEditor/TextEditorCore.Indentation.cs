@@ -74,7 +74,7 @@ namespace Notepads.Controls.TextEditor
             var newContent = document.Remove(startLineInitialIndex, endLineFinalIndex - startLineInitialIndex)
                 .Insert(startLineInitialIndex, indentedStringBuilder.ToString());
 
-            Document.SetText(TextSetOptions.None, newContent);
+            SetText(newContent);
             Document.Selection.SetRange(start, end);
 
             // After SetText() and SetRange(), RichEdit will scroll selection into view and change scroll viewer's position even if it was already in the viewport
@@ -197,7 +197,7 @@ namespace Notepads.Controls.TextEditor
             var newContent = document.Remove(startLineInitialIndex, endLineFinalIndex - startLineInitialIndex)
                 .Insert(startLineInitialIndex, indentedStringBuilder.ToString());
 
-            Document.SetText(TextSetOptions.None, newContent);
+            SetText(newContent);
             Document.Selection.SetRange(start, end);
 
             // After SetText() and SetRange(), RichEdit will scroll selection into view and change scroll viewer's position even if it was already in the viewport

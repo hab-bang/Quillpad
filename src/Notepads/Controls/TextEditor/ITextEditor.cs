@@ -113,6 +113,11 @@ namespace Notepads.Controls.TextEditor
             out int selectedCount,
             out int lineCount);
 
+        /// <summary>
+        /// Returns 0-based positions of the selection in the text returned by GetText()
+        /// </summary>
+        void GetTextSelectionPosition(out int startPosition, out int endPosition);
+
         double GetFontZoomFactor();
 
         void SetFontZoomFactor(double fontZoomFactor);

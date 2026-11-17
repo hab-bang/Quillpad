@@ -41,6 +41,7 @@ namespace Notepads.Views.MainPage
             UpdatePathIndicator(textEditor);
             UpdateEditorModificationIndicator(textEditor);
             UpdateLineColumnIndicator(textEditor);
+            UpdateWordCountIndicator(textEditor);
             UpdateFontZoomIndicator(textEditor);
             UpdateTextWidthIndicator(AppSettingsService.EditorTextWidth);
             UpdateLineEndingIndicator(textEditor.GetLineEnding());
@@ -166,6 +167,84 @@ namespace Notepads.Views.MainPage
                 ? string.Format(_resourceLoader.GetString("TextEditor_LineColumnIndicator_ShortText"), startLineIndex, startColumn)
                 : string.Format(_resourceLoader.GetString("TextEditor_LineColumnIndicator_FullText"), startLineIndex, startColumn,
                     selectedCount, wordSelected);
+        }
+
+        private DispatcherTimer _wordCountUpdateTimer;
+
+        // Typing fires a text change and a selection change for every key, so the count waits
+        // until typing pauses. This keeps long drafts responsive.
+        private void ScheduleWordCountIndicatorUpdate()
+        {
+            if (StatusBar == null) return;
+
+            if (_wordCountUpdateTimer == null)
+            {
+                _wordCountUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+                _wordCountUpdateTimer.Tick += (sender, args) =>
+                {
+                    _wordCountUpdateTimer.Stop();
+                    var selectedEditor = NotepadsCore.GetSelectedTextEditor();
+                    if (selectedEditor != null) UpdateWordCountIndicator(selectedEditor);
+                };
+            }
+
+            _wordCountUpdateTimer.Stop();
+            _wordCountUpdateTimer.Start();
+        }
+
+        private void GetWordCountStatistics(ITextEditor textEditor, out TextStatistics document, out TextStatistics? selection)
+        {
+            var text = textEditor.GetText();
+            document = WordCountUtility.Count(text);
+            selection = null;
+
+            textEditor.GetTextSelectionPosition(out var start, out var end);
+            if (end > start) selection = WordCountUtility.Count(text, start, end - start);
+        }
+
+        private void UpdateWordCountIndicator(ITextEditor textEditor)
+        {
+            if (StatusBar == null) return;
+
+            GetWordCountStatistics(textEditor, out var document, out var selection);
+
+            var total = WordCountUtility.FormatNumber(document.Words);
+
+            if (selection.HasValue)
+            {
+                WordCountIndicator.Text = string.Format(_resourceLoader.GetString("TextEditor_WordCountIndicator_SelectionText"),
+                    WordCountUtility.FormatNumber(selection.Value.Words), total);
+            }
+            else
+            {
+                WordCountIndicator.Text = string.Format(document.Words == 1
+                    ? _resourceLoader.GetString("TextEditor_WordCountIndicator_SingularText")
+                    : _resourceLoader.GetString("TextEditor_WordCountIndicator_PluralText"), total);
+            }
+        }
+
+        private void WordCountIndicatorClicked(ITextEditor selectedEditor)
+        {
+            GetWordCountStatistics(selectedEditor, out var document, out var selection);
+
+            var builder = new StringBuilder();
+            if (selection.HasValue)
+            {
+                AppendWordCountDetails(builder, _resourceLoader.GetString("TextEditor_WordCountFlyout_SelectionTitle"), selection.Value);
+                builder.Append('\n');
+            }
+            AppendWordCountDetails(builder, _resourceLoader.GetString("TextEditor_WordCountFlyout_DocumentTitle"), document);
+
+            WordCountFlyoutText.Text = builder.ToString().TrimEnd('\n');
+            FlyoutBase.ShowAttachedFlyout(WordCountIndicator);
+        }
+
+        private void AppendWordCountDetails(StringBuilder builder, string title, TextStatistics stats)
+        {
+            builder.Append(title).Append('\n');
+            builder.Append(string.Format(_resourceLoader.GetString("TextEditor_WordCountFlyout_Words"), WordCountUtility.FormatNumber(stats.Words))).Append('\n');
+            builder.Append(string.Format(_resourceLoader.GetString("TextEditor_WordCountFlyout_Characters"), WordCountUtility.FormatNumber(stats.Characters))).Append('\n');
+            builder.Append(string.Format(_resourceLoader.GetString("TextEditor_WordCountFlyout_CharactersWithoutSpaces"), WordCountUtility.FormatNumber(stats.CharactersWithoutSpaces))).Append('\n');
         }
 
         private void UpdateFontZoomIndicator(ITextEditor textEditor)
@@ -366,6 +445,10 @@ namespace Notepads.Views.MainPage
             else if (sender == LineColumnIndicator)
             {
                 LineColumnIndicatorClicked(selectedEditor);
+            }
+            else if (sender == WordCountIndicator)
+            {
+                WordCountIndicatorClicked(selectedEditor);
             }
             else if (sender == FontZoomIndicator)
             {

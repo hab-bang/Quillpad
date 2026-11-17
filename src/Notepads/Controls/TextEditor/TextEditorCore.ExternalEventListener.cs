@@ -64,6 +64,7 @@ namespace Notepads.Controls.TextEditor
             await Dispatcher.CallOnUIThreadAsync(() =>
             {
                 FontStyle = fontStyle;
+                RequestFullMarkdownRestyle();
             });
         }
 
@@ -72,6 +73,7 @@ namespace Notepads.Controls.TextEditor
             await Dispatcher.CallOnUIThreadAsync(() =>
             {
                 FontWeight = fontWeight;
+                RequestFullMarkdownRestyle();
             });
         }
 
