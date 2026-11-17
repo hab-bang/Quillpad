@@ -224,6 +224,7 @@ namespace Notepads.Controls.Markdown
             try
             {
                 var uri = new Uri(e.Link);
+                if (!Notepads.Utilities.MarkdownLiveStyleParser.IsOpenableLink(uri)) return;
                 await Windows.System.Launcher.LaunchUriAsync(uri);
             }
             catch (Exception ex)
