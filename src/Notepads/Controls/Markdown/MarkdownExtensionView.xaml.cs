@@ -40,6 +40,8 @@ namespace Notepads.Controls.Markdown
 
         private TextEditorCore _editorCore;
 
+        private string _lastRenderedText;
+
         public MarkdownExtensionView()
         {
             InitializeComponent();
@@ -155,7 +157,9 @@ namespace Notepads.Controls.Markdown
 
         private void OnTextChanged(object sender, RoutedEventArgs e)
         {
-            if (IsExtensionEnabled)
+            // TextChanged also fires for every format change of the editor's live markdown styling.
+            // GetText() returns a new string only when the text changes, so skip when it is the same one.
+            if (IsExtensionEnabled && !ReferenceEquals(_lastRenderedText, _editorCore.GetText()))
             {
                 UpdateText();
             }
@@ -196,7 +200,8 @@ namespace Notepads.Controls.Markdown
             if (_editorCore != null)
             {
                 MarkdownTextBlock.ImageMaxWidth = ActualWidth;
-                MarkdownTextBlock.Text = _editorCore.GetText();
+                _lastRenderedText = _editorCore.GetText();
+                MarkdownTextBlock.Text = _lastRenderedText;
             }
         }
 

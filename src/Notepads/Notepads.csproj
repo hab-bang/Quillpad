@@ -266,6 +266,8 @@
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
+    <Compile Include="Utilities\MarkdownLiveStyleParser.cs" />
+    <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />
     <Compile Include="Utilities\SessionUtility.cs" />
     <Compile Include="Models\TextFile.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />

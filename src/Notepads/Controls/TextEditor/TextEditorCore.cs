@@ -155,6 +155,7 @@ namespace Notepads.Controls.TextEditor
             _mouseCommandHandler = GetMouseCommandHandler();
 
             HookExternalEvents();
+            HookMarkdownStylingEvents();
 
             Window.Current.CoreWindow.Activated += OnCoreWindowActivated;
         }
@@ -201,6 +202,7 @@ namespace Notepads.Controls.TextEditor
             PointerWheelChanged -= OnPointerWheelChanged;
             LostFocus -= OnLostFocus;
             Loaded -= OnLoaded;
+            UnhookMarkdownStylingEvents();
 
             if (_contentScrollViewer != null)
             {
@@ -253,6 +255,7 @@ namespace Notepads.Controls.TextEditor
             {
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Z, (args) => Undo()),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.Z, (args) => Redo()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Y, (args) => Redo()),
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.Z, (args) => TextWrapping = TextWrapping == TextWrapping.Wrap ? TextWrapping.NoWrap : TextWrapping.Wrap),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Add, (args) => IncreaseFontSize(0.1)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, (VirtualKey)187, (args) => IncreaseFontSize(0.1)), // (VirtualKey)187: =
@@ -379,11 +382,18 @@ namespace Notepads.Controls.TextEditor
                 Document.GetText(TextGetOptions.None, out var document);
                 _document = TrimRichEditBoxText(document);
                 _isDocumentLinesCachePendingUpdate = true;
+                ScheduleMarkdownRestyle();
             }
         }
 
         private void OnTextChanged(object sender, RoutedEventArgs _)
         {
+            if (IsFormatOnlyTextChange())
+            {
+                ScheduleLineNumbersRenderingAfterFormatChange();
+                return;
+            }
+
             UpdateLineNumbersRendering();
         }
 
@@ -476,7 +486,7 @@ namespace Notepads.Controls.TextEditor
         {
             if (Document.CanUndo() && IsEnabled)
             {
-                Document.Undo();
+                UndoSkippingFormatChanges();
             }
         }
 
@@ -484,12 +494,16 @@ namespace Notepads.Controls.TextEditor
         {
             if (Document.CanRedo() && IsEnabled)
             {
-                Document.Redo();
+                RedoSkippingFormatChanges();
             }
         }
 
         public void SetText(string text)
         {
+            if (TryReplaceChangedTextOnly(text)) return;
+
+            RequestFullMarkdownRestyle(); // The new text takes one format for all of it
+            _markdownLoadedFromRtf = false;
             Document.SetText(TextSetOptions.None, text);
         }
 
