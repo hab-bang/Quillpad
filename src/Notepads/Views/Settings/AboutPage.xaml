@@ -75,7 +75,7 @@
                     FontWeight="Normal"/>
                 <RichTextBlock IsTextSelectionEnabled="False" MaxWidth="600" Margin="0,10,0,0" >
                     <Paragraph Margin="0,10,0,10">
-                        <Hyperlink NavigateUri="https://github.com/hab-bang/Quillpad/commits/master">Quillpad commit history</Hyperlink>
+                        <Hyperlink NavigateUri="https://github.com/hab-bang/Quillpad/commits/main">Quillpad commit history</Hyperlink>
                     </Paragraph>
                 </RichTextBlock>
 
