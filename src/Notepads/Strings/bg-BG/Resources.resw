@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>Към този момент Notepads не поддържа файл, по-голям от 1MB.</value>
+    <value>Към този момент Quillpad не поддържа файл, по-голям от 1MB.</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>Отвори с Notepads</value>
+    <value>Отвори с Quillpad</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>Това е прозорец за сянка на Notepads. Снимката и настройките на сесията са деактивирани.</value>
+    <value>Това е прозорец за сянка на Quillpad. Снимката и настройките на сесията са деактивирани.</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">

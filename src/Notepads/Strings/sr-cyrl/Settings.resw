@@ -133,10 +133,6 @@
     <value>Бесплатан и open source уређивач текста дизајниран и имплементиран од стране Jackie (Jiaqi) Liu</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>Да контактирате ауторе:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>За пријављивање проблема и предлоге могућности:</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>Изворни код је доступан на GitHub-у:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>За још информација, молимо посетите наш веб-сајт:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>Изјава о приватности</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>О апликацији</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>Кад је активно, Notepads ће памтити тренутну сесију за следеће покретање и редовно чувати сигурносне копије снимака сесија, да би се спречио случајни губитак података због неспремљених промена. Notepads вас НЕЋЕ подсећати да спремите свој рад кад се програм затвара, ако је ова функција активирана. Имајте у виду да снимање сесије ради само у првом или главном прозору програма.</value>
+    <value>Кад је активно, Quillpad ће памтити тренутну сесију за следеће покретање и редовно чувати сигурносне копије снимака сесија, да би се спречио случајни губитак података због неспремљених промена. Quillpad вас НЕЋЕ подсећати да спремите свој рад кад се програм затвара, ако је ова функција активирана. Имајте у виду да снимање сесије ради само у првом или главном прозору програма.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>Када је активно, Notepads ће увек отварати фајлове у новом прозору, уместо да отвори нову картицу.</value>
+    <value>Када је активно, Quillpad ће увек отварати фајлове у новом прозору, уместо да отвори нову картицу.</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Изаберите сопствени језик да премостите системски језик који се користи у Notepads-у. Поновно покретање је неопходно за завршетак промена.</value>
+    <value>Изаберите сопствени језик да премостите системски језик који се користи у Quillpad-у. Поновно покретање је неопходно за завршетак промена.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*Поново покрените Notepads за завршетак промена.</value>
+    <value>*Поново покрените Quillpad за завршетак промена.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>Када је активно, Notepads ће паметно опсећи размаке, табулаторе и празне редове на почетку и крају пре копирања текста у оставу.</value>
+    <value>Када је активно, Quillpad ће паметно опсећи размаке, табулаторе и празне редове на почетку и крају пре копирања текста у оставу.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

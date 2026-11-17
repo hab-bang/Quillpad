@@ -133,10 +133,6 @@
     <value>Éditeur de texte gratuit et open source conçu et réalisé par Jackie (Jiaqi) Liu</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>Pour contacter les auteurs :</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Pour les rapports de problèmes et les demandes de fonctionnalités :</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>Code source disponible sur GitHub :</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>Pour plus d'infos, visitez notre site :</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>Déclaration de confidentialité</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>À propos</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>Une fois activé, Notepads mémorisera la session en cours pour le prochain lancement et effectuera une sauvegarde périodique de la session pour éviter toute perte de données accidentelle liée à des modifications non validées. Notepads NE vous rappellera PAS d'enregistrer votre travail à la fermeture de l'application si cette fonctionnalité est activée. N'oubliez pas non plus que l'instantané de session ne fonctionne que dans la première fenêtre ou dans la fenêtre principale de Notepads.</value>
+    <value>Une fois activé, Quillpad mémorisera la session en cours pour le prochain lancement et effectuera une sauvegarde périodique de la session pour éviter toute perte de données accidentelle liée à des modifications non validées. Quillpad NE vous rappellera PAS d'enregistrer votre travail à la fermeture de l'application si cette fonctionnalité est activée. N'oubliez pas non plus que l'instantané de session ne fonctionne que dans la première fenêtre ou dans la fenêtre principale de Quillpad.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -324,7 +312,7 @@ la restauration de session</value>
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>Une fois activé, Notepads ouvrira toujours les fichiers dans une nouvelle fenêtre au lieu de créer un nouvel onglet.</value>
+    <value>Une fois activé, Quillpad ouvrira toujours les fichiers dans une nouvelle fenêtre au lieu de créer un nouvel onglet.</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -392,11 +380,11 @@ la restauration de session</value>
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Choisir une langue personalisée pour remplacer la langue par défaut du système. Le redémarrage de Notepads est nécessaire pour prendre en compte cette modification.</value>
+    <value>Choisir une langue personalisée pour remplacer la langue par défaut du système. Le redémarrage de Quillpad est nécessaire pour prendre en compte cette modification.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*Redémarrer Notepads pour prendre en compte les modifications.</value>
+    <value>*Redémarrer Quillpad pour prendre en compte les modifications.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -404,7 +392,7 @@ la restauration de session</value>
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>Une fois activé, Notepads supprimera les espaces, tabulations et lignes vides en début et fin avant l'envoi au presse-papier.</value>
+    <value>Une fois activé, Quillpad supprimera les espaces, tabulations et lignes vides en début et fin avant l'envoi au presse-papier.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

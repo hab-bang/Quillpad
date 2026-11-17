@@ -133,10 +133,6 @@
     <value>محرر نص مجاني ومفتوح المصدر من تصميم وتنفيذ Jackie (Jiaqi) Liu</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>للتواصل مع المؤلفين:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>للتبليغ عن مشكلة و طلب ميزة:</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>الأكواد البرمجية متاحة على Github:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>للمزيد من المعلومات قم بزيارة موقعنا:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>بيان سياسة الخصوصية</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>عن البرنامج</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>عند التفعيل سيقوم Notepads بتذكر الجلسة الحالية لفتحها في المرة القائمة تلقائياً وسيقوم بعمل نسخ إحتياطية تلقائياً بشكل دوري لتفادي فقدان البيانات المفاجئ لما لم يتم حفظه. لن يقوم Notepads بتذكيرك لحفظ عملك عند إغلاق البرنامج إذا كانت هذه الميزة مفعلة. يرجى تذكر أن النسخ الإحتياطي للجلسات تعمل في أو أو النافذة الرئيسية في Notepads.</value>
+    <value>عند التفعيل سيقوم Quillpad بتذكر الجلسة الحالية لفتحها في المرة القائمة تلقائياً وسيقوم بعمل نسخ إحتياطية تلقائياً بشكل دوري لتفادي فقدان البيانات المفاجئ لما لم يتم حفظه. لن يقوم Quillpad بتذكيرك لحفظ عملك عند إغلاق البرنامج إذا كانت هذه الميزة مفعلة. يرجى تذكر أن النسخ الإحتياطي للجلسات تعمل في أو أو النافذة الرئيسية في Quillpad.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>عند التفعيل سيقوم Notepads دائماً بفتح المستند في نافذة جديدة بدلاً من إنشاء تبويب جديد.</value>
+    <value>عند التفعيل سيقوم Quillpad دائماً بفتح المستند في نافذة جديدة بدلاً من إنشاء تبويب جديد.</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>اختر لغة واجهة Notepads بدلاً من اللغة الإفتراضية للنظام. إعادة التشغيل مطلوب لتطبيق التغييرات.</value>
+    <value>اختر لغة واجهة Quillpad بدلاً من اللغة الإفتراضية للنظام. إعادة التشغيل مطلوب لتطبيق التغييرات.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>* قم بإعادة تشغيل Notepads لتطبيق التغييرات.</value>
+    <value>* قم بإعادة تشغيل Quillpad لتطبيق التغييرات.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>عند التفعيل سيقوم Notepads بشكل ذكي التخلص من المسافات الموجودة في بداية ونهاية النص و حروف Tabs والأسطر الفارغة قبل نسخ النص المحدد إلى الحافظة.</value>
+    <value>عند التفعيل سيقوم Quillpad بشكل ذكي التخلص من المسافات الموجودة في بداية ونهاية النص و حروف Tabs والأسطر الفارغة قبل نسخ النص المحدد إلى الحافظة.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

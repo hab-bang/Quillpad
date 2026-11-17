@@ -133,10 +133,6 @@
     <value>一款由柒才设计的简约轻量级文本编辑器</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>您也可以通过电子邮件联系作者：</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>如果您有什么问题或者建议，请点击：</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>项目源代码已开源至Github：</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>更多信息，请访问Notepads官网：</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>隐私声明</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>关于</value>
@@ -218,7 +206,7 @@
     <comment>TextAndEditorPage DecodingSettings AnsiRadioButton content display text.</comment>
   </data>
   <data name="TextAndEditorPage_DecodingSettings_Description.Text" xml:space="preserve">
-    <value>如果文件开头不含有BOM(字节顺序标记)，Notepads将使用此编码作为默认读取编码。如果选择自动猜测识别编码，Notepads将会猜测文件编码并打开。</value>
+    <value>如果文件开头不含有BOM(字节顺序标记)，Quillpad将使用此编码作为默认读取编码。如果选择自动猜测识别编码，Quillpad将会猜测文件编码并打开。</value>
     <comment>TextAndEditorPage DecodingSettings Description display text.</comment>
   </data>
   <data name="TextAndEditorPage_DecodingSettings_Title.Text" xml:space="preserve">
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>开启此设置后，Notepads会定期保存当前应用状态并在下一次启动时自动恢复。当此设置打开后，关闭应用时Notepads将不会提醒你保存文件。另外请注意，快照备份在影子窗口中将会被禁用，此设置只会作用于第一个被打开的窗口。</value>
+    <value>开启此设置后，Quillpad会定期保存当前应用状态并在下一次启动时自动恢复。当此设置打开后，关闭应用时Quillpad将不会提醒你保存文件。另外请注意，快照备份在影子窗口中将会被禁用，此设置只会作用于第一个被打开的窗口。</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>选中此设置后，Notepads将会在新窗口中打开文件而不是在新标签栏中。</value>
+    <value>选中此设置后，Quillpad将会在新窗口中打开文件而不是在新标签栏中。</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,7 +378,7 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>选择Notepads应用显示语言，选择后需要重启应用才会生效。</value>
+    <value>选择Quillpad应用显示语言，选择后需要重启应用才会生效。</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>开启后，当复制选中文字时（Ctrl+C），Notepads会智能的帮你剪裁起始和结尾处的多余空格，制表符以及空白行。</value>
+    <value>开启后，当复制选中文字时（Ctrl+C），Quillpad会智能的帮你剪裁起始和结尾处的多余空格，制表符以及空白行。</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

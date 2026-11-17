@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>Notepads chưa hỗ trợ file có kích cỡ lớn hơn 1MB。</value>
+    <value>Quillpad chưa hỗ trợ file có kích cỡ lớn hơn 1MB。</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>Mở bằng Notepads</value>
+    <value>Mở bằng Quillpad</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>Đây là cửa sổ mờ của Notepads. Chế độ sao lưu và cài đặt bị vô hiệu hóa</value>
+    <value>Đây là cửa sổ mờ của Quillpad. Chế độ sao lưu và cài đặt bị vô hiệu hóa</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">
@@ -686,7 +686,7 @@
     <comment>TextEditor: Notification message when file has been renamed successfully.</comment>
   </data>
   <data name="FileRenameError_EmptyFileExtension" xml:space="preserve">
-    <value>Notepads chưa hỗ trợ định dạng tệp trống</value>
+    <value>Quillpad chưa hỗ trợ định dạng tệp trống</value>
     <comment>FileRenameError: Empty file extension is not currently supported.</comment>
   </data>
   <data name="FileRenameError_UnsupportedFileExtension" xml:space="preserve">

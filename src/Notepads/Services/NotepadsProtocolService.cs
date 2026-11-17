@@ -29,12 +29,12 @@ namespace Notepads.Services
             {
                 var uriStr = uri.ToString().Trim();
 
-                if (string.IsNullOrEmpty(uriStr) || !uriStr.StartsWith("notepads://", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrEmpty(uriStr) || !uriStr.StartsWith("quillpad://", StringComparison.OrdinalIgnoreCase))
                 {
                     return NotepadsOperationProtocol.Unrecognized;
                 }
 
-                var operation = uriStr.Substring("notepads://".Length);
+                var operation = uriStr.Substring("quillpad://".Length);
 
                 if (operation.EndsWith("/"))
                 {
@@ -69,7 +69,7 @@ namespace Notepads.Services
                 }
                 else if (operation == NotepadsOperationProtocol.OpenNewInstance)
                 {
-                    var uriToLaunch = $"notepads://{NewInstanceProtocolStr}";
+                    var uriToLaunch = $"quillpad://{NewInstanceProtocolStr}";
                     var launchOptions = new LauncherOptions { TargetApplicationPackageFamilyName = Package.Current.Id.FamilyName };
                     return await Launcher.LaunchUriAsync(new Uri(uriToLaunch.ToLower()), launchOptions);
                 }

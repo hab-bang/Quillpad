@@ -133,10 +133,6 @@
     <value>Darmowy, otwartożródłowy edytor tekstu stworzony przez Jackie (Jiaqi) Liu</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>Kontakt z autorami:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Zgłoś błąd lub zaproponuj funkcję:</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>Kod źródłowy dostępny jest w serwisie Github:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>Po więcej informacji, odwiedź naszą stronę:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>Polityka prywatności</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>O programie</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>Gdy włączone, Notepads zapamięta obecną sesję do następnego uruchomienia programu. Zrobi także kopię okresowej migawki sesji aby zapobiec przypadkowej utracie danych w przypadku niezapisania zmian. Notepads NIE BĘDZIE przypominał o zapisie Twojej pracy przy zamykaniu aplikacji gdy ta opcja jest włączona. UWAGA: Migawka sesji działa tylko w pierwszym lub głównym oknie Notepads.</value>
+    <value>Gdy włączone, Quillpad zapamięta obecną sesję do następnego uruchomienia programu. Zrobi także kopię okresowej migawki sesji aby zapobiec przypadkowej utracie danych w przypadku niezapisania zmian. Quillpad NIE BĘDZIE przypominał o zapisie Twojej pracy przy zamykaniu aplikacji gdy ta opcja jest włączona. UWAGA: Migawka sesji działa tylko w pierwszym lub głównym oknie Quillpad.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Wybierz niestandardowy język wyświetlania do nadpisania języka systemu używanego przez Notepads. Wymagane jest uruchomienie aplikacji ponownie w celu dokonania zmian.</value>
+    <value>Wybierz niestandardowy język wyświetlania do nadpisania języka systemu używanego przez Quillpad. Wymagane jest uruchomienie aplikacji ponownie w celu dokonania zmian.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*Uruchom ponownie Notepads, aby zastosować zmiany.</value>
+    <value>*Uruchom ponownie Quillpad, aby zastosować zmiany.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>Gdy włączone, Notepads będzie inteligentnie przycinał wiodące i końcowe spacje, wcięcia, oraz puste linie przed skopiowaniem zaznaczonego tekstu do schowka.</value>
+    <value>Gdy włączone, Quillpad będzie inteligentnie przycinał wiodące i końcowe spacje, wcięcia, oraz puste linie przed skopiowaniem zaznaczonego tekstu do schowka.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

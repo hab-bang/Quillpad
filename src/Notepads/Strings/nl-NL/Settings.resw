@@ -133,10 +133,6 @@
     <value>Gratis en open source teksteditor ontworpen en geïmplementeerd door Jackie (Jiaqi) Liu</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>Contact met de auteurs:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Voor probleemrapportage en verzoeken :</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>Broncode is beschikbaar op Github:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>Voor meer informatie, bezoek de website:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>Privacyverklaring</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>Over</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>Indien ingeschakeld, onthoudt Notepads de huidige sessie voor de volgende keer opstarten en wordt er periodiek een momentopname van de sessie gemaakt om onbedoeld gegevensverlies door niet-vastgelegde wijzigingen te voorkomen. Notepads herinnert u er NIET aan om uw werk op te slaan bij het sluiten van de app als deze functie is ingeschakeld. Houd er ook rekening mee dat een sessie-momentopname alleen werkt in het eerste of hoofdvenster van Notepads.</value>
+    <value>Indien ingeschakeld, onthoudt Quillpad de huidige sessie voor de volgende keer opstarten en wordt er periodiek een momentopname van de sessie gemaakt om onbedoeld gegevensverlies door niet-vastgelegde wijzigingen te voorkomen. Quillpad herinnert u er NIET aan om uw werk op te slaan bij het sluiten van de app als deze functie is ingeschakeld. Houd er ook rekening mee dat een sessie-momentopname alleen werkt in het eerste of hoofdvenster van Quillpad.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>Indien ingeschakeld, opent Notepads altijd het bestand in een nieuw venster in plaats van een nieuw tabblad aan te maken.</value>
+    <value>Indien ingeschakeld, opent Quillpad altijd het bestand in een nieuw venster in plaats van een nieuw tabblad aan te maken.</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Kies een aangepaste taal om de standaardtaal van het systeem te overschrijven die wordt gebruikt in Notepads. Een herstart is vereist om deze wijziging door te voeren.</value>
+    <value>Kies een aangepaste taal om de standaardtaal van het systeem te overschrijven die wordt gebruikt in Quillpad. Een herstart is vereist om deze wijziging door te voeren.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*Notepads opnieuw starten om wijzigingen door te voeren.</value>
+    <value>*Quillpad opnieuw starten om wijzigingen door te voeren.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>Eenmaal ingeschakeld, zal Notepads voorloop- en achterliggende spaties, tabs en lege regels slim inkorten voordat de geselecteerde tekst naar het klembord wordt gekopieerd.</value>
+    <value>Eenmaal ingeschakeld, zal Quillpad voorloop- en achterliggende spaties, tabs en lege regels slim inkorten voordat de geselecteerde tekst naar het klembord wordt gekopieerd.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

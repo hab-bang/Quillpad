@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>Notepads لا يدعم الملفات ذات الحجم 1 م.ب أو أكثر.</value>
+    <value>Quillpad لا يدعم الملفات ذات الحجم 1 م.ب أو أكثر.</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>فتح باستخدام Notepads</value>
+    <value>فتح باستخدام Quillpad</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>هذه نافذة ظل لـ Notepads. النسخ الإحتياطية للجلسة والأعدادات معطلين.</value>
+    <value>هذه نافذة ظل لـ Quillpad. النسخ الإحتياطية للجلسة والأعدادات معطلين.</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">

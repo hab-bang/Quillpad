@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>Notepads 暂时不支持打开 1MB 以上的文件。</value>
+    <value>Quillpad 暂时不支持打开 1MB 以上的文件。</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>在Notepads中打开</value>
+    <value>在Quillpad中打开</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>这是Notepads的一个影子窗口，快照备份功能和设置已被禁用。</value>
+    <value>这是Quillpad的一个影子窗口，快照备份功能和设置已被禁用。</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">
@@ -686,11 +686,11 @@
     <comment>TextEditor: Notification message when file has been renamed successfully.</comment>
   </data>
   <data name="FileRenameError_EmptyFileExtension" xml:space="preserve">
-    <value>Notepads暂时不支持无文件后缀名</value>
+    <value>Quillpad暂时不支持无文件后缀名</value>
     <comment>FileRenameError: Empty file extension is not currently supported.</comment>
   </data>
   <data name="FileRenameError_UnsupportedFileExtension" xml:space="preserve">
-    <value>Notepads暂时不支持文件后缀名 "{0}"</value>
+    <value>Quillpad暂时不支持文件后缀名 "{0}"</value>
     <comment>FileRenameError: Extension is not currently supported. {0} stands for the file extension string.</comment>
   </data>
   <data name="SessionCorruptionErrorDialog_CloseButtonText" xml:space="preserve">

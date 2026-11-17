@@ -133,10 +133,6 @@
     <value>जैकी (जियाकी) लियू द्वारा डिजाइन और लागू किए गए स्वतंत्र और खुले स्रोत पाठ संपादक</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>लेखकों से संपर्क करने के लिए:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>रिपोर्टिंग और सुविधा अनुरोध जारी करने के लिए:</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>स्रोत कोड Github पर उपलब्ध है:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>अधिक जानकारी के लिए, कृपया हमारी वेबसाइट पर जाएं:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>गोपनीयता विवरण</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>करीबन</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>एक बार सक्षम होने के बाद, Notepads अगले लॉन्च के लिए वर्तमान सत्र को याद रखेगा और अप्रतिबद्ध परिवर्तनों के लिए आकस्मिक डेटा हानि को रोकने के लिए एक आवधिक सत्र स्नैपशॉट बैकअप करेगा। यदि यह सुविधा सक्षम है तो Notepads आपको ऐप क्लोज पर अपने काम को बचाने के लिए याद नहीं दिलाएंगे। कृपया यह भी याद रखें कि सत्र स्नैपशॉट केवल Notepads की पहली या मुख्य खिड़की में काम करता है।</value>
+    <value>एक बार सक्षम होने के बाद, Quillpad अगले लॉन्च के लिए वर्तमान सत्र को याद रखेगा और अप्रतिबद्ध परिवर्तनों के लिए आकस्मिक डेटा हानि को रोकने के लिए एक आवधिक सत्र स्नैपशॉट बैकअप करेगा। यदि यह सुविधा सक्षम है तो Quillpad आपको ऐप क्लोज पर अपने काम को बचाने के लिए याद नहीं दिलाएंगे। कृपया यह भी याद रखें कि सत्र स्नैपशॉट केवल Quillpad की पहली या मुख्य खिड़की में काम करता है।</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>एक बार सक्षम होने के बाद,  Notepads हमेशा एक नया टैब बनाने के बजाय एक नई विंडो में फ़ाइल खोलेंगे।</value>
+    <value>एक बार सक्षम होने के बाद,  Quillpad हमेशा एक नया टैब बनाने के बजाय एक नई विंडो में फ़ाइल खोलेंगे।</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Notepads में प्रयुक्त सिस्टम डिफ़ॉल्ट भाषा को ओवरराइड करने के लिए एक विशेष रूप से भाषा चुनें। परिवर्तनों को पूरा करने के लिए पुनरारंभ आवश्यक है।</value>
+    <value>Quillpad में प्रयुक्त सिस्टम डिफ़ॉल्ट भाषा को ओवरराइड करने के लिए एक विशेष रूप से भाषा चुनें। परिवर्तनों को पूरा करने के लिए पुनरारंभ आवश्यक है।</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*परिवर्तनों को पूरा करने के लिए Notepads को पुनरारंभ करें।</value>
+    <value>*परिवर्तनों को पूरा करने के लिए Quillpad को पुनरारंभ करें।</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>एक बार सक्षम होने के बाद, Notepads चयनित टेक्स्ट को क्लिपबोर्ड पर कॉपी करने से पहले प्रमुख और अनुगामी रिक्त स्थान, टैब और खाली लाइनों को स्मार्ट ट्रिम करेगा।</value>
+    <value>एक बार सक्षम होने के बाद, Quillpad चयनित टेक्स्ट को क्लिपबोर्ड पर कॉपी करने से पहले प्रमुख और अनुगामी रिक्त स्थान, टैब और खाली लाइनों को स्मार्ट ट्रिम करेगा।</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

@@ -1,4 +1,4 @@
-# Build and run the Notepads dev app from the terminal, without the Visual Studio IDE.
+# Build and run the Quillpad dev app from the terminal, without the Visual Studio IDE.
 # Requirements are listed at the top of build.ps1.
 #
 #   make build      Compile, but only if a file under src/ changed since the last build
@@ -6,7 +6,7 @@
 #   make dev        Always run MSBuild (it is incremental itself), then install and open the dev app
 #   make uninstall  Remove the installed dev app
 #
-# The dev app installs as "Notepads-Dev", next to (not over) a Store copy of Notepads.
+# The dev app installs as "Quillpad-Dev", next to (not over) an installed Quillpad or Notepads.
 
 BUILD_SCRIPT := powershell -NoProfile -ExecutionPolicy Bypass -File build.ps1
 BUILD_STAMP  := src/Notepads/bin/x64/Debug/.make-build-stamp

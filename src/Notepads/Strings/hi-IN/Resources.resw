@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>Notepads इस समय 1MB से अधिक दस्तावेज़ का सपोर्ट नहीं करता है।</value>
+    <value>Quillpad इस समय 1MB से अधिक दस्तावेज़ का सपोर्ट नहीं करता है।</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>Notepads के साथ खोलें</value>
+    <value>Quillpad के साथ खोलें</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>यह Notepads की शैडो विन्डों है। सत्र स्नैपशॉट और सेटिंग्स अक्षम हैं।</value>
+    <value>यह Quillpad की शैडो विन्डों है। सत्र स्नैपशॉट और सेटिंग्स अक्षम हैं।</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">

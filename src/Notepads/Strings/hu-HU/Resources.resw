@@ -150,7 +150,7 @@
     <comment>DiffViewer: Header's text for old text (Before changes).</comment>
   </data>
   <data name="ErrorMessage_NotepadsFileSizeLimit" xml:space="preserve">
-    <value>A Notepads nem támogatja az 1MB-nál nagyobb fájlokat jelenleg.</value>
+    <value>A Quillpad nem támogatja az 1MB-nál nagyobb fájlokat jelenleg.</value>
     <comment>ErrorMessage: NotepadsFileSizeLimit text.</comment>
   </data>
   <data name="FileOpenErrorDialog_Content" xml:space="preserve">
@@ -434,11 +434,11 @@
     <comment>App: DragAndDrop UIOverride Caption: "Move tab here" display text</comment>
   </data>
   <data name="App_DragAndDrop_UIOverride_Caption_OpenWithNotepads" xml:space="preserve">
-    <value>Megnyitás Notepads-el</value>
+    <value>Megnyitás Quillpad-el</value>
     <comment>App: DragAndDrop UIOverride Caption: "Open with Notepads" display text</comment>
   </data>
   <data name="App_ShadowWindowIndicator_Description" xml:space="preserve">
-    <value>Ez egy árnyék ablaka a Notepads-nek. Munkamenet mentés és beállítások le vannak tiltva.</value>
+    <value>Ez egy árnyék ablaka a Quillpad-nek. Munkamenet mentés és beállítások le vannak tiltva.</value>
     <comment>App: ShadowWindowIndicator Description display text.</comment>
   </data>
   <data name="TextEditor_NotificationMsg_FileAlreadyOpened" xml:space="preserve">

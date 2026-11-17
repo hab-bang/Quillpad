@@ -72,7 +72,7 @@ namespace Notepads.Services
         private static JumpListItem GetNewWindowItem()
         {
             string packageId = Package.Current.Id.Name;
-            var item = JumpListItem.CreateWithArguments("notepads://newinstance", $"ms-resource://{packageId}/Resources/JumpList_Tasks_NewWindow_Title");
+            var item = JumpListItem.CreateWithArguments("quillpad://newinstance", $"ms-resource://{packageId}/Resources/JumpList_Tasks_NewWindow_Title");
             item.Description = $"ms-resource://{packageId}/Resources/JumpList_Tasks_NewWindow_Description";
             item.Logo = new Uri($"ms-appx:///Assets/Square44x44Logo.png");
             return item;

@@ -336,7 +336,7 @@ namespace Notepads.Controls.Print
         private static void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs e)
         {
             PrintTask printTask = null;
-            printTask = e.Request.CreatePrintTask("Notepads", sourceRequestedArgs =>
+            printTask = e.Request.CreatePrintTask(App.ApplicationName, sourceRequestedArgs =>
             {
                 var deferral = sourceRequestedArgs.GetDeferral();
                 PrintTaskOptionDetails printDetailedOptions = PrintTaskOptionDetails.GetFromPrintTaskOptions(printTask.Options);

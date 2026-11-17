@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Builds, installs and opens the Notepads dev app from the command line, without the Visual Studio IDE.
+    Builds, installs and opens the Quillpad dev app from the command line, without the Visual Studio IDE.
 
 .DESCRIPTION
     Tasks:
@@ -15,8 +15,8 @@
         "Universal Windows Platform build tools" workload and the Windows 11 SDK (10.0.22621).
       - Windows Developer Mode turned on.
 
-    Debug builds install as "Notepads-Dev" (see src/Notepads/Package.targets), so they run
-    side by side with a Store copy of Notepads and keep their own settings.
+    Debug builds install as "Quillpad-Dev" (see src/Notepads/Package.targets), so they run
+    side by side with an installed Quillpad or Notepads and keep their own settings.
 
     Written for Windows PowerShell 5.1, because the Appx cmdlets do not load reliably in PowerShell 7.
 
@@ -37,7 +37,7 @@ $Platform = 'x64'
 $Solution = Join-Path $PSScriptRoot 'src\Notepads.sln'
 $PackageDir = Join-Path $PSScriptRoot "src\Notepads\AppPackages\*_${Platform}_${Configuration}_Test"
 $LayoutDir = Join-Path $PSScriptRoot "src\Notepads\bin\$Platform\$Configuration\Layout"
-$DevPackageName = 'Notepads-Dev' # Set for non-Production builds by src/Notepads/Package.targets
+$DevPackageName = 'Quillpad-Dev' # Set for non-Production builds by src/Notepads/Package.targets
 $AppId = 'App'                   # <Application Id> in src/Notepads/Package.appxmanifest
 
 function Find-MSBuild {

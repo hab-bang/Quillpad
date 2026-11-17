@@ -133,10 +133,6 @@
     <value>Jackie (Jiaqi) Liu tarafından oluşturulmuş, özgür ve açık kaynak bir metin düzenleyicisi</value>
     <comment>AboutPage NotepadsShortDescription display text.</comment>
   </data>
-  <data name="AboutPage_Notepads_AuthorContactsTitle.Text" xml:space="preserve">
-    <value>Yazarlara ulaşmak için:</value>
-    <comment>AboutPage Notepads AuthorContacts Title display text.</comment>
-  </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Hata bildirimleri ve özellik istekleri için:</value>
     <comment>AboutPage Notepads IssueAndFeatureRequests Title display text.</comment>
@@ -144,14 +140,6 @@
   <data name="AboutPage_Notepads_SourceCodeTitle.Text" xml:space="preserve">
     <value>Uygulamanın kaynak kodu Github vasıtasıyla ulaşılabilir:</value>
     <comment>AboutPage Notepads SourceCode Title display text.</comment>
-  </data>
-  <data name="AboutPage_Notepads_WebsiteTitle.Text" xml:space="preserve">
-    <value>Daha fazla bilgi için, web sitemizi ziyaret edin:</value>
-    <comment>AboutPage Notepads Website Title display text.</comment>
-  </data>
-  <data name="AboutPage_PrivacyStatementTitle.Text" xml:space="preserve">
-    <value>Gizlilik Beyanı</value>
-    <comment>AboutPage PrivacyStatementTitle display text.</comment>
   </data>
   <data name="AboutPage_Title.Content" xml:space="preserve">
     <value>Hakkında</value>
@@ -294,7 +282,7 @@
     <comment>AboutPage Changelog Title display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_Description.Text" xml:space="preserve">
-    <value>Notepads şu anki oturumu sonraki açılışta hatırlayacak ve olası veri kayıpları için periyodik yedeklemeler yapacak. Notepads bu seçenek etkinken size uygulama kapanırken çalışmalarınızı kaydetmenizle alakalı bir hatırlatma YAPMAYACAK.</value>
+    <value>Quillpad şu anki oturumu sonraki açılışta hatırlayacak ve olası veri kayıpları için periyodik yedeklemeler yapacak. Quillpad bu seçenek etkinken size uygulama kapanırken çalışmalarınızı kaydetmenizle alakalı bir hatırlatma YAPMAYACAK.</value>
     <comment>AdvancedPage SessionSnapshotSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SessionSnapshotSettings_OnOffToggleSwitch.OffContent" xml:space="preserve">
@@ -322,7 +310,7 @@
     <comment>TextAndEditorPage SpellingSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_AlwaysOpenNewWindow_Description.Text" xml:space="preserve">
-    <value>Etkinleştirildiğinde, Notepads dosyayı yeni bir sekme oluşturmak yerine her zaman yeni bir pencerede açar.</value>
+    <value>Etkinleştirildiğinde, Quillpad dosyayı yeni bir sekme oluşturmak yerine her zaman yeni bir pencerede açar.</value>
     <comment>AdvancedPage LaunchPreferenceSettings AlwaysOpenNewWindow Description display text.</comment>
   </data>
   <data name="AdvancedPage_LaunchPreferenceSettings_AlwaysOpenNewWindowToggleSwitch.OffContent" xml:space="preserve">
@@ -390,11 +378,11 @@
     <comment>TextAndEditorPage FontWeightSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Description.Text" xml:space="preserve">
-    <value>Notepads'te kullanılan sistem varsayılan dilini değiştirmek için özel bir dil seçin. Değişiklikleri tamamlamak için yeniden başlatma gereklidir.</value>
+    <value>Quillpad'te kullanılan sistem varsayılan dilini değiştirmek için özel bir dil seçin. Değişiklikleri tamamlamak için yeniden başlatma gereklidir.</value>
     <comment>AdvancedPage LanguagePreferenceSettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_RestartPrompt.Text" xml:space="preserve">
-    <value>*Değişiklikleri tamamlamak için Notepads'i yeniden başlat.</value>
+    <value>*Değişiklikleri tamamlamak için Quillpad'i yeniden başlat.</value>
     <comment>AdvancedPage LanguagePreferenceSettings RestartPrompt display text.</comment>
   </data>
   <data name="AdvancedPage_LanguagePreferenceSettings_Title.Text" xml:space="preserve">
@@ -402,7 +390,7 @@
     <comment>AdvancedPage LanguagePreferenceSettings Title display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_Description.Text" xml:space="preserve">
-    <value>Etkinleştirildiğinde, Notepads seçilen metni panoya kopyalamadan önce baştaki ve sondaki boşlukları, satır aralarını ve boş satırları akıllıca kırpar.</value>
+    <value>Etkinleştirildiğinde, Quillpad seçilen metni panoya kopyalamadan önce baştaki ve sondaki boşlukları, satır aralarını ve boş satırları akıllıca kırpar.</value>
     <comment>AdvancedPage SmartCopySettings Description display text.</comment>
   </data>
   <data name="AdvancedPage_SmartCopySettings_EnableSmartCopyToggleSwitch.OffContent" xml:space="preserve">

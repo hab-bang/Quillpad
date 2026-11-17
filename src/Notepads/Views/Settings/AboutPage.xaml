@@ -44,34 +44,25 @@
                     <Paragraph>
                         <Run x:Uid="/Settings/AboutPage_NotepadsShortDescription"/>
                     </Paragraph>
-                    <Paragraph Margin="0,15,0,0">
-                        <Run x:Uid="/Settings/AboutPage_Notepads_SourceCodeTitle"/>
-                    </Paragraph>
                     <Paragraph>
                         <Hyperlink NavigateUri="https://github.com/0x7c13/Notepads">
                             https://github.com/0x7c13/Notepads
                         </Hyperlink>
                     </Paragraph>
                     <Paragraph Margin="0,15,0,0">
-                        <Run x:Uid="/Settings/AboutPage_Notepads_WebsiteTitle"/>
+                        <Run x:Uid="/Settings/AboutPage_Notepads_SourceCodeTitle"/>
                     </Paragraph>
                     <Paragraph>
-                        <Hyperlink NavigateUri="https://www.NotepadsApp.com">
-                            https://www.NotepadsApp.com
-                        </Hyperlink>
-                    </Paragraph>
-                    <Paragraph Margin="0,15,0,0">
-                        <Run x:Uid="/Settings/AboutPage_Notepads_AuthorContactsTitle"/>
-                        <Hyperlink NavigateUri="mailto:NotepadsApp@outlook.com">
-                            mailto:NotepadsApp@outlook.com
+                        <Hyperlink NavigateUri="https://github.com/hab-bang/Quillpad">
+                            https://github.com/hab-bang/Quillpad
                         </Hyperlink>
                     </Paragraph>
                     <Paragraph Margin="0,15,0,0">
                         <Run x:Uid="/Settings/AboutPage_Notepads_IssueAndFeatureRequestsTitle"/>
                     </Paragraph>
                     <Paragraph>
-                        <Hyperlink NavigateUri="https://github.com/0x7c13/Notepads/issues">
-                            https://github.com/0x7c13/Notepads/issues
+                        <Hyperlink NavigateUri="https://github.com/hab-bang/Quillpad/issues">
+                            https://github.com/hab-bang/Quillpad/issues
                         </Hyperlink>
                     </Paragraph>
                 </RichTextBlock>
@@ -84,7 +75,7 @@
                     FontWeight="Normal"/>
                 <RichTextBlock IsTextSelectionEnabled="False" MaxWidth="600" Margin="0,10,0,0" >
                     <Paragraph Margin="0,10,0,10">
-                        <Hyperlink NavigateUri="https://github.com/0x7c13/Notepads/releases">Notepads Releases</Hyperlink>
+                        <Hyperlink NavigateUri="https://github.com/hab-bang/Quillpad/commits/master">Quillpad commit history</Hyperlink>
                     </Paragraph>
                 </RichTextBlock>
 
@@ -128,11 +119,7 @@
                     </Paragraph>
                     <Paragraph>
                         <LineBreak /> Copyright (c) 2019-2024 Jackie (Jiaqi) Liu.
-                    </Paragraph>
-                    <Paragraph Margin="0,10,0,10">
-                        <Hyperlink NavigateUri="https://github.com/0x7c13/Notepads/blob/master/PRIVACY.md" >
-                            <Run x:Uid="/Settings/AboutPage_PrivacyStatementTitle"/>
-                        </Hyperlink>
+                        <LineBreak /> Copyright (c) 2026 hab-bang.
                     </Paragraph>
                 </RichTextBlock>
             </StackPanel>
