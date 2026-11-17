@@ -1,19 +1,8 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    # default location of `.github/workflows`
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
-      prefix: 'action-deps: '
-
-  - package-ecosystem: "nuget"
-    # location of package manifests
-    directory: "/src/Notepads"
-    schedule:
-      interval: "daily"
-    commit-message:
-      prefix: 'nuget-deps: '
-
-# Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
+      prefix: "ci: "

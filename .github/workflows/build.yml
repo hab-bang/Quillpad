@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: microsoft/setup-msbuild@v3
+
+      - name: Build Debug x64
+        run: >
+          msbuild src/Notepads.sln /restore /m /nologo /verbosity:minimal
+          /p:Configuration=Debug /p:Platform=x64
+          /p:AppxBundle=Never /p:AppxPackageSigningEnabled=false
