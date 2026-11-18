@@ -113,10 +113,34 @@ function Expand-DevPackage {
     }
 }
 
+function Get-PackageIdentity([string] $Path) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    try {
+        $reader = New-Object System.IO.StreamReader($zip.GetEntry('AppxManifest.xml').Open())
+        try { [xml] $manifest = $reader.ReadToEnd() } finally { $reader.Dispose() }
+    }
+    finally {
+        $zip.Dispose()
+    }
+    return $manifest.Package.Identity
+}
+
 # Installs the framework packages the app depends on (.NET Core runtime, VCLibs, ...).
 # MSBuild copies them from the Windows SDK next to the package it generates.
+# A framework that is already installed in the same or a newer version is skipped: adding it again
+# makes Windows service a package that many other apps share, and when that servicing fails half way
+# the framework disappears for the user and apps such as Snipping Tool and the Store stop starting.
 function Install-FrameworkDependencies {
     foreach ($dependency in (Get-ChildItem -Path (Join-Path $PackageDir "Dependencies\$Platform\*.appx"))) {
+        $identity = Get-PackageIdentity $dependency.FullName
+        $installed = @(Get-AppxPackage -Name $identity.Name |
+            Where-Object { $_.Architecture.ToString() -eq $identity.ProcessorArchitecture -and [version] $_.Version -ge [version] $identity.Version })
+        if ($installed.Count -gt 0) {
+            continue
+        }
+
+        Write-Host "Installing $($identity.Name) $($identity.Version)"
         try {
             Add-AppxPackage -Path $dependency.FullName
         }
@@ -137,7 +161,7 @@ function Register-DevPackage {
     }
 
     Write-Host "Installing $DevPackageName"
-    Add-AppxPackage -Register (Join-Path $LayoutDir 'AppxManifest.xml') -ForceApplicationShutdown
+    Add-AppxPackage -Register (Join-Path $LayoutDir 'AppxManifest.xml') -ForceTargetApplicationShutdown
 }
 
 function Start-DevApp {
