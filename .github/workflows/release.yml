@@ -75,7 +75,7 @@ jobs:
           # The install zip ships our own Install.ps1, not the Add-AppDevPackage.ps1 that MSBuild
           # generates: that one re-services shared frameworks and force-closes every app using them.
           $zip = New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\install"
-          Copy-Item "$env:GITHUB_WORKSPACE\tools\release\Install.ps1" $zip
+          Copy-Item "$env:GITHUB_WORKSPACE\tools\install\Install.ps1" $zip
           Copy-Item "$out\$name.msixbundle", "$out\$name.cer" $zip
           Copy-Item "$($folder.FullName)\Dependencies" $zip -Recurse
           Compress-Archive -Path "$zip\*" -DestinationPath "$out\${name}_install.zip"
