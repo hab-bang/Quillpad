@@ -14,9 +14,11 @@ I use Quillpad mostly for my own writing. So it changes a lot, and the changes f
 
 1. Download `Quillpad_<version>_install.zip` from [Releases](https://github.com/hab-bang/Quillpad/releases) and unzip it.
 2. Right-click `Install.ps1` and choose **Run with PowerShell**.
-3. Say yes to the admin prompt. It only adds my certificate, and only the first time.
+3. Say yes when it asks to install the certificate. That needs admin rights, but only the first time.
 
-Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there. The script installs only the system parts Quillpad needs that are missing, and closes only Quillpad (if it's open), never other apps. After the first install, you can also update by double-clicking the newer `.msixbundle`.
+Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there. After that, you can update by double-clicking the newer `.msixbundle`.
+
+Quillpad also needs two system parts, VCLibs and .NET Native, which almost every Windows PC already has. If the install says it "depends on a framework that could not be found", double-click the `.msixbundle` instead. App Installer then gets the missing part from the Microsoft Store.
 
 **Build it yourself: what you need**
 

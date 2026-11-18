@@ -72,15 +72,16 @@ jobs:
           Copy-Item (Get-ChildItem $folder.FullName -Filter *.msixbundle).FullName "$out\$name.msixbundle"
           Copy-Item (Get-ChildItem $folder.FullName -Filter *.cer).FullName "$out\$name.cer"
 
-          # The install zip ships our own Install.ps1, not the Add-AppDevPackage.ps1 that MSBuild
-          # generates: that one re-services shared frameworks and force-closes every app using them.
-          $zip = New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\install"
-          Copy-Item "$env:GITHUB_WORKSPACE\tools\install\Install.ps1" $zip
-          Copy-Item "$out\$name.msixbundle", "$out\$name.cer" $zip
-          Copy-Item "$($folder.FullName)\Dependencies" $zip -Recurse
-          Compress-Archive -Path "$zip\*" -DestinationPath "$out\${name}_install.zip"
+          # Leave the framework packages (VCLibs, .NET Native) out of the install zip. Given them,
+          # Add-AppDevPackage.ps1 installs them again with -ForceApplicationShutdown even when the
+          # same version is installed. Windows then services frameworks that many apps share and
+          # force-closes those apps, and if that servicing fails, apps such as Snipping Tool and the
+          # Store stop starting. Almost every PC already has both frameworks; where one is missing,
+          # double-clicking the .msixbundle gets it from the Store.
+          Remove-Item "$($folder.FullName)\Dependencies" -Recurse -Force
+          Compress-Archive -Path "$($folder.FullName)\*" -DestinationPath "$out\${name}_install.zip"
           Get-ChildItem $out | Format-Table Name, Length
-          Get-ChildItem $zip -Recurse -File | ForEach-Object { $_.FullName.Substring($zip.FullName.Length + 1) }
+          Get-ChildItem $folder.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($folder.FullName.Length + 1) }
 
       - name: Keep the package as a workflow artifact
         if: github.ref_type != 'tag'
