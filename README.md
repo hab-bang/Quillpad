@@ -18,6 +18,8 @@ I use Quillpad mostly for my own writing. So it changes a lot, and the changes f
 
 Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there. After that, you can update by double-clicking the newer `.msixbundle`.
 
+Quillpad also needs two system parts, VCLibs and .NET Native, which almost every Windows PC already has. If the install says it "depends on a framework that could not be found", double-click the `.msixbundle` instead. App Installer then gets the missing part from the Microsoft Store.
+
 **Build it yourself: what you need**
 
 - Windows 10 or 11, with Developer Mode on. In Settings, search for "developer settings".
