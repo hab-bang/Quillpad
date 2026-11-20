@@ -56,6 +56,18 @@ namespace Notepads.Controls.FilePicker
             return fileOpenPicker;
         }
 
+        public static FolderPicker GetFolderPicker()
+        {
+            var folderPicker = new FolderPicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
+
+            folderPicker.FileTypeFilter.Add("*"); // Required, or PickSingleFolderAsync throws
+
+            return folderPicker;
+        }
+
         public static FileSavePicker GetFileSavePicker(ITextEditor textEditor)
         {
             FileSavePicker savePicker = new FileSavePicker

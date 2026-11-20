@@ -98,6 +98,7 @@ namespace Notepads.Views.MainPage
             InitializeStatusBar();
             InitializeControls();
             InitializeMainMenu();
+            InitializeWorkspace();
             InitializeKeyboardShortcuts();
 
             // Session backup and restore toggle
@@ -239,6 +240,12 @@ namespace Notepads.Views.MainPage
                 }
             }
 
+            if (!_loaded)
+            {
+                // The session already reopens the folder's files, so only fall back to the folder's own list
+                loadedCount += await ResumeWorkspaceAsync(restoreTabs: loadedCount == 0);
+            }
+
             if (_appLaunchFiles != null && _appLaunchFiles.Count > 0)
             {
                 loadedCount += await OpenFilesAsync(_appLaunchFiles);
@@ -301,10 +308,13 @@ namespace Notepads.Views.MainPage
         {
             var deferral = e.GetDeferral();
 
+            // The session snapshot keeps unsaved text, so it goes first; the workspace write can be slow on a network folder
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
                 await SessionManager.SaveSessionAsync();
             }
+
+            await Workspace.SaveAsync();
 
             deferral.Complete();
         }
@@ -368,12 +378,15 @@ namespace Notepads.Views.MainPage
 
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
-                // Save session before app exit
+                // Save session before app exit, then the workspace, which can be slow on a network folder
                 await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
+                await Workspace.SaveAsync();
                 App.InstanceHandlerMutex?.Dispose();
                 deferral.Complete();
                 return;
             }
+
+            await Workspace.SaveAsync();
 
             if (!NotepadsCore.HaveUnsavedTextEditor())
             {
@@ -465,11 +478,13 @@ namespace Notepads.Views.MainPage
             });
         }
 
-        private static void UpdateApplicationTitle(ITextEditor activeTextEditor)
+        private void UpdateApplicationTitle(ITextEditor activeTextEditor)
         {
             if (!App.IsGameBarWidget)
             {
-                ApplicationView.GetForCurrentView().Title = activeTextEditor.EditingFileName ?? activeTextEditor.FileNamePlaceholder;
+                var title = activeTextEditor.EditingFileName ?? activeTextEditor.FileNamePlaceholder;
+                var folder = Workspace.Folder;
+                ApplicationView.GetForCurrentView().Title = folder == null ? title : $"{title} - {folder.Name}";
             }
         }
 
@@ -510,8 +525,16 @@ namespace Notepads.Views.MainPage
             }
         }
 
-        private void OnTextEditorFileModificationStateChanged(ITextEditor textEditor)
+        private async void OnTextEditorFileModificationStateChanged(ITextEditor textEditor)
         {
+            // Another app changed the file. With no unsaved edits here, nothing can be lost, so take the new text.
+            if (textEditor.FileModificationState == FileModificationState.Modified &&
+                !textEditor.IsModified &&
+                await TryReloadChangedFileAsync(textEditor))
+            {
+                return;
+            }
+
             if (textEditor.FileModificationState == FileModificationState.Modified)
             {
                 NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_FileModifiedOutsideIndicator_ToolTip"), 3500);
@@ -522,6 +545,22 @@ namespace Notepads.Views.MainPage
             }
             UpdateFileModificationStateIndicator(textEditor);
             UpdatePathIndicator(textEditor);
+        }
+
+        private async Task<bool> TryReloadChangedFileAsync(ITextEditor textEditor)
+        {
+            try
+            {
+                await textEditor.ReloadFromEditingFileAsync();
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Fall back to the "modified outside" warning, so the user can still reload by hand
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to reload a file changed outside the app: {ex.Message}");
+                return false;
+            }
         }
 
         private void OnTextEditorSaved(object sender, ITextEditor textEditor)

@@ -498,13 +498,45 @@ namespace Notepads.Controls.TextEditor
             }
         }
 
-        public void SetText(string text)
+        /// <param name="keepPosition">
+        /// True to keep the caret and the view where they were when the whole text is replaced
+        /// (a reload). Replacing only the changed part keeps them anyway.
+        /// </param>
+        public void SetText(string text, bool keepPosition = false)
         {
             if (TryReplaceChangedTextOnly(text)) return;
+
+            var oldText = GetText();
+            var selectionStart = Document.Selection.StartPosition;
+            var selectionEnd = Document.Selection.EndPosition;
+            var scrollViewer = _contentScrollViewer;
+            var horizontalOffset = scrollViewer?.HorizontalOffset;
+            var verticalOffset = scrollViewer?.VerticalOffset;
 
             RequestFullMarkdownRestyle(); // The new text takes one format for all of it
             _markdownLoadedFromRtf = false;
             Document.SetText(TextSetOptions.None, text);
+
+            if (!keepPosition) return;
+
+            // A caret after the changed part moves with the text, so it stays on the same words
+            var newText = GetText();
+            var prefix = 0;
+            var shortest = Math.Min(oldText.Length, newText.Length);
+            while (prefix < shortest && oldText[prefix] == newText[prefix]) prefix++;
+            var lengthChange = newText.Length - oldText.Length;
+            int Map(int position) => position <= prefix
+                ? Math.Min(position, newText.Length)
+                : Math.Clamp(position + lengthChange, prefix, newText.Length);
+
+            Document.Selection.SetRange(Map(selectionStart), Map(selectionEnd));
+
+            if (scrollViewer != null)
+            {
+                // The new text is laid out after this call, so scroll back once that is done
+                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low,
+                    () => scrollViewer.ChangeView(horizontalOffset, verticalOffset, zoomFactor: null, disableAnimation: true));
+            }
         }
 
         /// <summary>

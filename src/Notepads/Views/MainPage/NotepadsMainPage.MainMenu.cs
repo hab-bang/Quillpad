@@ -109,6 +109,7 @@ namespace Notepads.Views.MainPage
                     ? "App_ExitCompactOverlayMode_Text"
                     : "App_EnterCompactOverlayMode_Text");
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
+            MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async Task BuildOpenRecentButtonSubItemsAsync()
@@ -140,6 +141,17 @@ namespace Notepads.Views.MainPage
                     newItem.Click += async (sender, args) => { await OpenFileAsync(file); };
                     openRecentSubItem.Items?.Add(newItem);
                     MRUFileList.Add(file.Path);
+                }
+                else if (item is StorageFolder folder && !App.IsGameBarWidget && MRUFileList.Add(folder.Path))
+                {
+                    var newItem = new MenuFlyoutItem()
+                    {
+                        Text = folder.Path,
+                        Icon = new FontIcon { Glyph = "\xE8B7" },
+                    };
+                    ToolTipService.SetToolTip(newItem, folder.Path);
+                    newItem.Click += async (sender, args) => { await OpenFolderAsync(folder); };
+                    openRecentSubItem.Items?.Add(newItem);
                 }
             }
 

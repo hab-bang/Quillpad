@@ -126,6 +126,16 @@
                                                     <KeyboardAccelerator Key="O" Modifiers="Control" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_OpenFolder" x:Name="MenuOpenFolderButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE838;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_CloseFolder" x:Name="MenuCloseFolderButton" Visibility="Collapsed">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE8B7;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Save" x:Name="MenuSaveButton" Icon="Save">
                                                 <MenuFlyoutItem.KeyboardAccelerators>
@@ -342,7 +352,70 @@
             </Grid>
             <Grid Column="1"
                   ui:FrameworkElementExtensions.Cursor="Hand">
-                <TextBlock x:Name="PathIndicator" Style="{StaticResource StatusBarTextBlockStyle}" 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="WorkspaceIndicator"
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            Padding="8,0,4,0"
+                            Background="Transparent"
+                            Visibility="Collapsed"
+                            IsTapEnabled="True"
+                            Tapped="StatusBarComponent_OnTapped">
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:EventTriggerBehavior EventName="PointerEntered">
+                            <Core:ChangePropertyAction PropertyName="Opacity">
+                                <Core:ChangePropertyAction.Value>
+                                    0.7
+                                </Core:ChangePropertyAction.Value>
+                            </Core:ChangePropertyAction>
+                        </Core:EventTriggerBehavior>
+
+                        <Core:EventTriggerBehavior EventName="PointerExited">
+                            <Core:ChangePropertyAction PropertyName="Opacity">
+                                <Core:ChangePropertyAction.Value>
+                                    1.0
+                                </Core:ChangePropertyAction.Value>
+                            </Core:ChangePropertyAction>
+                        </Core:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                    <FontIcon Glyph="&#xE8B7;"
+                              FontSize="12"
+                              VerticalAlignment="Center"
+                              Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
+                    <TextBlock x:Name="WorkspaceIndicatorText"
+                               Style="{StaticResource StatusBarTextBlockStyle}"
+                               Padding="6,4,4,4"/>
+                    <StackPanel.ContextFlyout>
+                        <MenuFlyout x:Name="WorkspaceIndicatorFlyout" Placement="TopEdgeAlignedLeft" Closing="StatusBarFlyout_OnClosing">
+                            <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenFile"
+                                            Icon="OpenFile"
+                                            Click="WorkspaceIndicatorOpenFile_OnClick"/>
+                            <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer"
+                                            Click="WorkspaceIndicatorOpenInFileExplorer_OnClick">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xED25;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem x:Uid="MainMenu_Button_CloseFolder"
+                                            Click="WorkspaceIndicatorCloseFolder_OnClick">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE8B7;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyout.MenuFlyoutPresenterStyle>
+                                <Style TargetType="MenuFlyoutPresenter">
+                                    <Setter Property="BorderThickness" Value="0" />
+                                </Style>
+                            </MenuFlyout.MenuFlyoutPresenterStyle>
+                        </MenuFlyout>
+                    </StackPanel.ContextFlyout>
+                </StackPanel>
+                <TextBlock x:Name="PathIndicator" Style="{StaticResource StatusBarTextBlockStyle}"
+                           Grid.Column="1"
                            Padding ="4,4,8,4"
                            IsTapEnabled="True"
                            Tapped="StatusBarComponent_OnTapped">

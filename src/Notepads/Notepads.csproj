@@ -154,6 +154,8 @@
     <Compile Include="Controls\Dialog\FileSaveErrorDialog.cs" />
     <Compile Include="Controls\Dialog\RevertAllChangesConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
+    <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
+    <Compile Include="Controls\Dialog\WorkspaceSaveReminderDialog.cs" />
     <Compile Include="Controls\FindAndReplace\FindAndReplaceControl.xaml.cs">
       <DependentUpon>FindAndReplaceControl.xaml</DependentUpon>
     </Compile>
@@ -221,6 +223,10 @@
     <Compile Include="Core\TabContextFlyout.cs" />
     <Compile Include="Controls\FindAndReplace\FindAndReplaceEventArgs.cs" />
     <Compile Include="Core\SessionDataModels\TextEditorSessionData.cs" />
+    <Compile Include="Core\IWorkspaceManager.cs" />
+    <Compile Include="Core\WorkspaceDataModels\WorkspaceDataV1.cs" />
+    <Compile Include="Core\WorkspaceDataModels\WorkspaceFileDataV1.cs" />
+    <Compile Include="Core\WorkspaceManager.cs" />
     <Compile Include="Controls\DiffViewer\BrushFactory.cs" />
     <Compile Include="Controls\DiffViewer\RichTextBlockDiffContext.cs" />
     <Compile Include="Controls\DiffViewer\SideBySideDiffViewer.xaml.cs">
@@ -237,6 +243,7 @@
     <Compile Include="Views\MainPage\NotepadsMainPage.IO.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.StatusBar.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.ViewModes.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.Workspace.cs" />
     <Compile Include="Services\MRUService.cs" />
     <Compile Include="Utilities\BrushUtility.cs" />
     <Compile Include="Utilities\Downloader.cs" />
@@ -266,10 +273,12 @@
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
+    <Compile Include="Utilities\WorkspaceUtility.cs" />
     <Compile Include="Utilities\MarkdownLiveStyleParser.cs" />
     <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />
     <Compile Include="Utilities\SessionUtility.cs" />
     <Compile Include="Models\TextFile.cs" />
+    <Compile Include="Models\WorkspaceFile.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Utilities\ThreadUtility.cs" />
   </ItemGroup>
