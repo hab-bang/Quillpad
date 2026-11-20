@@ -390,6 +390,9 @@
                                Padding="6,4,4,4"/>
                     <StackPanel.ContextFlyout>
                         <MenuFlyout x:Name="WorkspaceIndicatorFlyout" Placement="TopEdgeAlignedLeft" Closing="StatusBarFlyout_OnClosing">
+                            <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenFile"
+                                            Icon="OpenFile"
+                                            Click="WorkspaceIndicatorOpenFile_OnClick"/>
                             <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer"
                                             Click="WorkspaceIndicatorOpenInFileExplorer_OnClick">
                                 <MenuFlyoutItem.Icon>

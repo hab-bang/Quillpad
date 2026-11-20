@@ -154,6 +154,7 @@
     <Compile Include="Controls\Dialog\FileSaveErrorDialog.cs" />
     <Compile Include="Controls\Dialog\RevertAllChangesConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
+    <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
     <Compile Include="Controls\Dialog\WorkspaceSaveReminderDialog.cs" />
     <Compile Include="Controls\FindAndReplace\FindAndReplaceControl.xaml.cs">
       <DependentUpon>FindAndReplaceControl.xaml</DependentUpon>
@@ -277,6 +278,7 @@
     <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />
     <Compile Include="Utilities\SessionUtility.cs" />
     <Compile Include="Models\TextFile.cs" />
+    <Compile Include="Models\WorkspaceFile.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Utilities\ThreadUtility.cs" />
   </ItemGroup>

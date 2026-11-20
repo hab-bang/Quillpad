@@ -6,17 +6,55 @@
 namespace Notepads.Utilities
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using Windows.Storage;
+    using Notepads.Models;
 
     /// <summary>
-    /// Reads and writes the workspace state file (.quillpad/workspace.json) inside a workspace folder.
+    /// File access inside a workspace folder: the state file (.quillpad/workspace.json) and the file list.
     /// </summary>
     internal static class WorkspaceUtility
     {
         private const string StateFolderName = ".quillpad";
         private const string StateFileName = "workspace.json";
+        private const int MaxListedFiles = 5000; // Keeps a huge folder from freezing the file list
+
+        /// <summary>
+        /// Returns the files in the folder and its subfolders, sorted by relative path.
+        /// Hidden folders whose name starts with "." (like .git and .quillpad) are skipped.
+        /// </summary>
+        public static async Task<IReadOnlyList<WorkspaceFile>> GetFilesAsync(StorageFolder workspaceFolder)
+        {
+            var files = new List<WorkspaceFile>();
+            var foldersToVisit = new Queue<(StorageFolder Folder, string RelativePath)>();
+            foldersToVisit.Enqueue((workspaceFolder, string.Empty));
+
+            while (foldersToVisit.Count > 0 && files.Count < MaxListedFiles)
+            {
+                var (folder, relativePath) = foldersToVisit.Dequeue();
+
+                foreach (var item in await folder.GetItemsAsync())
+                {
+                    if (item.Name.StartsWith(".", StringComparison.Ordinal)) continue;
+
+                    var itemPath = relativePath + item.Name;
+
+                    if (item is StorageFolder subfolder)
+                    {
+                        foldersToVisit.Enqueue((subfolder, itemPath + "/"));
+                    }
+                    else if (item is StorageFile file && files.Count < MaxListedFiles)
+                    {
+                        files.Add(new WorkspaceFile(itemPath, file));
+                    }
+                }
+            }
+
+            files.Sort((a, b) => string.Compare(a.RelativePath, b.RelativePath, StringComparison.OrdinalIgnoreCase));
+            return files;
+        }
 
         /// <summary>Returns the state file content, or null when the folder has no state file yet.</summary>
         public static async Task<string> ReadStateAsync(StorageFolder workspaceFolder)

@@ -6,6 +6,7 @@
 namespace Notepads.Views.MainPage
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Windows.Storage;
     using Windows.System;
@@ -14,6 +15,7 @@ namespace Notepads.Views.MainPage
     using Notepads.Controls.Dialog;
     using Notepads.Controls.FilePicker;
     using Notepads.Core;
+    using Notepads.Models;
     using Notepads.Services;
     using Notepads.Utilities;
 
@@ -177,6 +179,36 @@ namespace Notepads.Views.MainPage
             WorkspaceIndicatorText.Text = folder.Name;
             ToolTipService.SetToolTip(WorkspaceIndicator, folder.Path);
             WorkspaceIndicator.Visibility = Visibility.Visible;
+        }
+
+        private async void WorkspaceIndicatorOpenFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            var folder = Workspace.Folder;
+            if (folder == null) return;
+
+            IReadOnlyList<WorkspaceFile> files;
+
+            try
+            {
+                files = await WorkspaceUtility.GetFilesAsync(folder);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to list the workspace files: {ex.Message}");
+                files = Array.Empty<WorkspaceFile>();
+            }
+
+            var dialog = new WorkspaceFileOpenDialog(folder.Name, files);
+            await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+
+            if (dialog.FilesToOpen.Count > 0)
+            {
+                await OpenFilesAsync(dialog.FilesToOpen);
+            }
+            else if (!dialog.IsAborted)
+            {
+                NotepadsCore.FocusOnSelectedTextEditor();
+            }
         }
 
         private async void WorkspaceIndicatorOpenInFileExplorer_OnClick(object sender, RoutedEventArgs e)

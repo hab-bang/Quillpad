@@ -497,6 +497,26 @@
     <value>Close Folder</value>
     <comment>MainMenu and WorkspaceIndicator: "Close Folder" button display text.</comment>
   </data>
+  <data name="WorkspaceIndicator_MenuFlyoutItem_OpenFile.Text" xml:space="preserve">
+    <value>Open File...</value>
+    <comment>WorkspaceIndicator: flyout item that lists the workspace folder's files to open.</comment>
+  </data>
+  <data name="WorkspaceFileOpenDialog_Title" xml:space="preserve">
+    <value>Open from {0}</value>
+    <comment>WorkspaceFileOpenDialog: "Title" display text. {0} is the workspace folder name.</comment>
+  </data>
+  <data name="WorkspaceFileOpenDialog_FilterPlaceholderText" xml:space="preserve">
+    <value>Filter files</value>
+    <comment>WorkspaceFileOpenDialog: placeholder text of the filter box.</comment>
+  </data>
+  <data name="WorkspaceFileOpenDialog_NoFilesText" xml:space="preserve">
+    <value>This folder has no files.</value>
+    <comment>WorkspaceFileOpenDialog: shown when the workspace folder has no files.</comment>
+  </data>
+  <data name="WorkspaceFileOpenDialog_PrimaryButtonText" xml:space="preserve">
+    <value>Open</value>
+    <comment>WorkspaceFileOpenDialog: PrimaryButtonText.</comment>
+  </data>
   <data name="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer.Text" xml:space="preserve">
     <value>Open in File Explorer</value>
     <comment>WorkspaceIndicator: flyout item that opens the workspace folder in File Explorer.</comment>
