@@ -525,8 +525,16 @@ namespace Notepads.Views.MainPage
             }
         }
 
-        private void OnTextEditorFileModificationStateChanged(ITextEditor textEditor)
+        private async void OnTextEditorFileModificationStateChanged(ITextEditor textEditor)
         {
+            // Another app changed the file. With no unsaved edits here, nothing can be lost, so take the new text.
+            if (textEditor.FileModificationState == FileModificationState.Modified &&
+                !textEditor.IsModified &&
+                await TryReloadChangedFileAsync(textEditor))
+            {
+                return;
+            }
+
             if (textEditor.FileModificationState == FileModificationState.Modified)
             {
                 NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_FileModifiedOutsideIndicator_ToolTip"), 3500);
@@ -537,6 +545,22 @@ namespace Notepads.Views.MainPage
             }
             UpdateFileModificationStateIndicator(textEditor);
             UpdatePathIndicator(textEditor);
+        }
+
+        private async Task<bool> TryReloadChangedFileAsync(ITextEditor textEditor)
+        {
+            try
+            {
+                await textEditor.ReloadFromEditingFileAsync();
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Fall back to the "modified outside" warning, so the user can still reload by hand
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to reload a file changed outside the app: {ex.Message}");
+                return false;
+            }
         }
 
         private void OnTextEditorSaved(object sender, ITextEditor textEditor)

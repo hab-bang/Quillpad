@@ -501,7 +501,9 @@
             if (EditingFile != null)
             {
                 var textFile = await FileSystemUtility.ReadFileAsync(EditingFile, ignoreFileSizeLimit: false, encoding: encoding);
-                Init(textFile, EditingFile, clearUndoQueue: false);
+                _loaded = false; // Like Init: the new text is not a user edit
+                TextEditorCore.SetText(textFile.Content, keepPosition: true); // A reload should not jump to the top
+                Init(textFile, EditingFile, clearUndoQueue: false, resetText: false);
                 LineEndingChanged?.Invoke(this, EventArgs.Empty);
                 EncodingChanged?.Invoke(this, EventArgs.Empty);
                 StartCheckingFileStatusPeriodically();

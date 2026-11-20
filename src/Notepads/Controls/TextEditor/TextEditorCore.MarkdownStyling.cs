@@ -257,6 +257,10 @@ namespace Notepads.Controls.TextEditor
             var old = GetText();
             if (old.Length == 0 || text.Length == 0) return false;
 
+            // The document keeps "\r" line endings. Text read from a file (a reload) can have "\n" or "\r\n",
+            // which would look like a change at the first line end and replace almost the whole document.
+            text = LineEndingUtility.ApplyLineEnding(text, LineEnding.Cr);
+
             var prefix = 0;
             var shortest = Math.Min(old.Length, text.Length);
             while (prefix < shortest && old[prefix] == text[prefix]) prefix++;
