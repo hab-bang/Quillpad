@@ -8,28 +8,36 @@ namespace Notepads.Controls.Dialog
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Windows.Storage;
     using Windows.System;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Input;
     using Notepads.Models;
+    using Notepads.Services;
+    using Notepads.Utilities;
 
     /// <summary>
     /// Lists the files of the workspace folder, with a filter box, so the user can pick files to open.
     /// Unlike the Windows file picker, it always starts in the workspace folder.
+    /// It opens at once and shows a progress ring while a big folder is still being listed.
     /// </summary>
     public sealed class WorkspaceFileOpenDialog : NotepadsDialog
     {
-        private readonly IReadOnlyList<WorkspaceFile> _allFiles;
+        private readonly Task<IReadOnlyList<WorkspaceFile>> _filesTask;
         private readonly HashSet<WorkspaceFile> _selectedFiles = new HashSet<WorkspaceFile>();
         private readonly TextBox _filterTextBox;
+        private readonly ProgressRing _progressRing;
         private readonly ListView _fileListView;
+        private readonly TextBlock _messageTextBlock;
+        private IReadOnlyList<WorkspaceFile> _allFiles = Array.Empty<WorkspaceFile>();
         private bool _isRefreshing;
 
-        public WorkspaceFileOpenDialog(string folderName, IReadOnlyList<WorkspaceFile> files)
+        /// <param name="filesTask">The folder listing, already started, so the dialog can show while it runs.</param>
+        public WorkspaceFileOpenDialog(string folderName, Task<IReadOnlyList<WorkspaceFile>> filesTask)
         {
-            _allFiles = files;
+            _filesTask = filesTask;
 
             _filterTextBox = new TextBox
             {
@@ -40,29 +48,35 @@ namespace Notepads.Controls.Dialog
                 Height = 35,
             };
 
+            _progressRing = new ProgressRing
+            {
+                IsActive = true,
+                Width = 24,
+                Height = 24,
+                Margin = new Thickness(0, 16, 0, 8),
+            };
+
             _fileListView = new ListView
             {
                 SelectionMode = ListViewSelectionMode.Multiple,
                 MaxHeight = 360,
                 Margin = new Thickness(0, 8, 0, 0),
+                Visibility = Visibility.Collapsed,
+            };
+
+            _messageTextBlock = new TextBlock
+            {
+                Margin = new Thickness(4, 12, 4, 0),
+                Opacity = 0.7,
+                TextWrapping = TextWrapping.Wrap,
+                Visibility = Visibility.Collapsed,
             };
 
             var content = new StackPanel { MinWidth = 400 };
             content.Children.Add(_filterTextBox);
-
-            if (files.Count == 0)
-            {
-                content.Children.Add(new TextBlock
-                {
-                    Text = ResourceLoader.GetString("WorkspaceFileOpenDialog_NoFilesText"),
-                    Margin = new Thickness(4, 12, 4, 0),
-                    Opacity = 0.7,
-                });
-            }
-            else
-            {
-                content.Children.Add(_fileListView);
-            }
+            content.Children.Add(_progressRing);
+            content.Children.Add(_fileListView);
+            content.Children.Add(_messageTextBlock);
 
             Title = string.Format(ResourceLoader.GetString("WorkspaceFileOpenDialog_Title"), folderName);
             Content = content;
@@ -74,13 +88,50 @@ namespace Notepads.Controls.Dialog
             _filterTextBox.KeyDown += OnFilterKeyDown;
             _fileListView.SelectionChanged += OnSelectionChanged;
             PrimaryButtonClick += (sender, args) => Confirm();
-            Opened += (sender, args) => _filterTextBox.Focus(FocusState.Programmatic);
-
-            RefreshList();
+            Opened += async (sender, args) =>
+            {
+                _filterTextBox.Focus(FocusState.Programmatic);
+                await ShowFilesAsync();
+            };
         }
 
         /// <summary>The files to open, empty unless the user confirmed.</summary>
         public IReadOnlyList<StorageFile> FilesToOpen { get; private set; } = Array.Empty<StorageFile>();
+
+        private async Task ShowFilesAsync()
+        {
+            try
+            {
+                _allFiles = await _filesTask;
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(WorkspaceFileOpenDialog)}] Failed to list the workspace files: {ex.Message}");
+            }
+
+            _progressRing.IsActive = false;
+            _progressRing.Visibility = Visibility.Collapsed;
+
+            if (_allFiles.Count == 0)
+            {
+                ShowMessage(ResourceLoader.GetString("WorkspaceFileOpenDialog_NoFilesText"));
+                return;
+            }
+
+            if (_allFiles.Count >= WorkspaceUtility.MaxListedFiles)
+            {
+                ShowMessage(string.Format(ResourceLoader.GetString("WorkspaceFileOpenDialog_TooManyFilesText"), WorkspaceUtility.MaxListedFiles));
+            }
+
+            _fileListView.Visibility = Visibility.Visible;
+            RefreshList();
+        }
+
+        private void ShowMessage(string message)
+        {
+            _messageTextBlock.Text = message;
+            _messageTextBlock.Visibility = Visibility.Visible;
+        }
 
         private void RefreshList()
         {

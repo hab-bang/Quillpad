@@ -11,6 +11,7 @@ namespace Notepads.Utilities
     using System.Threading.Tasks;
     using Windows.Storage;
     using Notepads.Models;
+    using Notepads.Services;
 
     /// <summary>
     /// File access inside a workspace folder: the state file (.quillpad/workspace.json) and the file list.
@@ -19,11 +20,13 @@ namespace Notepads.Utilities
     {
         private const string StateFolderName = ".quillpad";
         private const string StateFileName = "workspace.json";
-        private const int MaxListedFiles = 5000; // Keeps a huge folder from freezing the file list
+        /// <summary>The file list stops at this many files, so a huge folder cannot freeze it.</summary>
+        public const int MaxListedFiles = 5000;
 
         /// <summary>
         /// Returns the files in the folder and its subfolders, sorted by relative path.
         /// Hidden folders whose name starts with "." (like .git and .quillpad) are skipped.
+        /// A subfolder that cannot be read is skipped too, so the rest of the list still shows.
         /// </summary>
         public static async Task<IReadOnlyList<WorkspaceFile>> GetFilesAsync(StorageFolder workspaceFolder)
         {
@@ -34,15 +37,25 @@ namespace Notepads.Utilities
             while (foldersToVisit.Count > 0 && files.Count < MaxListedFiles)
             {
                 var (folder, relativePath) = foldersToVisit.Dequeue();
+                IReadOnlyList<IStorageItem> items;
 
-                foreach (var item in await folder.GetItemsAsync())
+                try
                 {
-                    if (item.Name.StartsWith(".", StringComparison.Ordinal)) continue;
+                    items = await folder.GetItemsAsync();
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"[{nameof(WorkspaceUtility)}] Skipped a folder that cannot be read: {ex.Message}");
+                    continue;
+                }
 
+                foreach (var item in items)
+                {
                     var itemPath = relativePath + item.Name;
 
                     if (item is StorageFolder subfolder)
                     {
+                        if (subfolder.Name.StartsWith(".", StringComparison.Ordinal)) continue;
                         foldersToVisit.Enqueue((subfolder, itemPath + "/"));
                     }
                     else if (item is StorageFile file && files.Count < MaxListedFiles)

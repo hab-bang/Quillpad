@@ -7,6 +7,7 @@ namespace Notepads.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
@@ -26,6 +27,9 @@ namespace Notepads.Core
         private readonly bool _rememberFolder;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private string _lastStateJson;
+
+        // Set when the folder's state file exists but cannot be read, so it is never overwritten
+        private bool _isStateUnreadable;
 
         /// <param name="rememberFolder">
         /// True to reopen the folder on the next launch. Only one window should remember its folder.
@@ -54,7 +58,8 @@ namespace Notepads.Core
             }
             catch (Exception ex)
             {
-                // The folder was renamed, moved or deleted since the last run
+                // The folder was renamed, moved or deleted, or its drive or share is offline.
+                // Forget it, so later launches do not wait on it; it stays in Open Recent.
                 LoggingService.LogError($"[{nameof(WorkspaceManager)}] Failed to resume the last workspace folder: {ex.Message}");
                 futureAccessList.Remove(LastFolderToken);
                 return false;
@@ -83,6 +88,21 @@ namespace Notepads.Core
 
         public async Task<int> RestoreTabsAsync()
         {
+            // A save while the tabs are still opening would write a half list over the state file
+            await _semaphoreSlim.WaitAsync();
+
+            try
+            {
+                return await RestoreTabsInternalAsync();
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+        }
+
+        private async Task<int> RestoreTabsInternalAsync()
+        {
             var folder = Folder;
             if (folder == null) return 0;
 
@@ -98,7 +118,9 @@ namespace Notepads.Core
             }
             catch (Exception ex)
             {
-                LoggingService.LogError($"[{nameof(WorkspaceManager)}] Failed to read workspace state: {ex.Message}");
+                // Damaged, hand-edited badly, or written by a newer Quillpad: keep the user's file as it is
+                _isStateUnreadable = true;
+                LoggingService.LogError($"[{nameof(WorkspaceManager)}] Failed to read workspace state, it will not be overwritten: {ex.Message}");
                 return 0;
             }
 
@@ -144,7 +166,7 @@ namespace Notepads.Core
             try
             {
                 var folder = Folder;
-                if (folder == null) return;
+                if (folder == null || _isStateUnreadable) return;
 
                 var workspaceData = BuildWorkspaceData(folder);
 
@@ -199,13 +221,21 @@ namespace Notepads.Core
                 throw new NotSupportedException($"Unknown workspace state version: {version}");
             }
 
-            return JsonSerializer.Deserialize<WorkspaceDataV1>(stateJson);
+            var workspaceData = JsonSerializer.Deserialize<WorkspaceDataV1>(stateJson);
+
+            if (workspaceData?.Files == null || workspaceData.Files.Exists(file => string.IsNullOrEmpty(file?.Path)))
+            {
+                throw new InvalidDataException("The workspace state has no file list, or a file without a path.");
+            }
+
+            return workspaceData;
         }
 
         private void SetFolder(StorageFolder folder)
         {
             Folder = folder;
             _lastStateJson = null;
+            _isStateUnreadable = false;
             FolderChanged?.Invoke(this, EventArgs.Empty);
         }
     }

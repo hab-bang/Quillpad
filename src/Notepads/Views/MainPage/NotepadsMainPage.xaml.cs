@@ -308,12 +308,13 @@ namespace Notepads.Views.MainPage
         {
             var deferral = e.GetDeferral();
 
-            await Workspace.SaveAsync();
-
+            // The session snapshot keeps unsaved text, so it goes first; the workspace write can be slow on a network folder
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
                 await SessionManager.SaveSessionAsync();
             }
+
+            await Workspace.SaveAsync();
 
             deferral.Complete();
         }
@@ -375,16 +376,17 @@ namespace Notepads.Views.MainPage
         {
             var deferral = e.GetDeferral();
 
-            await Workspace.SaveAsync();
-
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
-                // Save session before app exit
+                // Save session before app exit, then the workspace, which can be slow on a network folder
                 await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
+                await Workspace.SaveAsync();
                 App.InstanceHandlerMutex?.Dispose();
                 deferral.Complete();
                 return;
             }
+
+            await Workspace.SaveAsync();
 
             if (!NotepadsCore.HaveUnsavedTextEditor())
             {

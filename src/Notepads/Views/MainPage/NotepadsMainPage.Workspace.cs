@@ -6,7 +6,6 @@
 namespace Notepads.Views.MainPage
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Windows.Storage;
     using Windows.System;
@@ -15,7 +14,6 @@ namespace Notepads.Views.MainPage
     using Notepads.Controls.Dialog;
     using Notepads.Controls.FilePicker;
     using Notepads.Core;
-    using Notepads.Models;
     using Notepads.Services;
     using Notepads.Utilities;
 
@@ -50,8 +48,17 @@ namespace Notepads.Views.MainPage
         // Called once on launch, after the app session is restored
         private async Task<int> ResumeWorkspaceAsync(bool restoreTabs)
         {
-            if (!await Workspace.TryResumeLastFolderAsync() || !restoreTabs) return 0;
-            return await Workspace.RestoreTabsAsync();
+            try
+            {
+                if (!await Workspace.TryResumeLastFolderAsync() || !restoreTabs) return 0;
+                return await Workspace.RestoreTabsAsync();
+            }
+            catch (Exception ex)
+            {
+                // Never let the workspace stop the rest of the launch
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to resume the workspace: {ex}");
+                return 0;
+            }
         }
 
         private async Task OpenFolderAsync()
@@ -141,16 +148,20 @@ namespace Notepads.Views.MainPage
             if (result == ContentDialogResult.Secondary) return true; // Don't save
             if (result != ContentDialogResult.Primary) return false; // Cancel
 
+            var allSaved = true;
+
             foreach (var editor in NotepadsCore.GetAllTextEditors())
             {
                 if (!await SaveAsync(editor, saveAs: false, ignoreUnmodifiedDocument: true, rebuildOpenRecentItems: false))
                 {
-                    return false; // The user cancelled a save picker
+                    allSaved = false; // The user cancelled a save picker, or the save failed
+                    break;
                 }
             }
 
+            // Files saved before a cancel are in the recent list too
             await BuildOpenRecentButtonSubItemsAsync();
-            return true;
+            return allSaved;
         }
 
         private void OnWorkspaceFolderChanged(object sender, EventArgs e)
@@ -186,19 +197,8 @@ namespace Notepads.Views.MainPage
             var folder = Workspace.Folder;
             if (folder == null) return;
 
-            IReadOnlyList<WorkspaceFile> files;
-
-            try
-            {
-                files = await WorkspaceUtility.GetFilesAsync(folder);
-            }
-            catch (Exception ex)
-            {
-                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to list the workspace files: {ex.Message}");
-                files = Array.Empty<WorkspaceFile>();
-            }
-
-            var dialog = new WorkspaceFileOpenDialog(folder.Name, files);
+            // The dialog shows at once and fills in when the listing ends
+            var dialog = new WorkspaceFileOpenDialog(folder.Name, WorkspaceUtility.GetFilesAsync(folder));
             await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
 
             if (dialog.FilesToOpen.Count > 0)

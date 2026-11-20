@@ -513,6 +513,10 @@
     <value>This folder has no files.</value>
     <comment>WorkspaceFileOpenDialog: shown when the workspace folder has no files.</comment>
   </data>
+  <data name="WorkspaceFileOpenDialog_TooManyFilesText" xml:space="preserve">
+    <value>Showing the first {0} files. Type in the filter box to find others.</value>
+    <comment>WorkspaceFileOpenDialog: shown when the folder has more files than the list holds. {0} is the number of files shown.</comment>
+  </data>
   <data name="WorkspaceFileOpenDialog_PrimaryButtonText" xml:space="preserve">
     <value>Open</value>
     <comment>WorkspaceFileOpenDialog: PrimaryButtonText.</comment>
