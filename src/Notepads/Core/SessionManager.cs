@@ -542,7 +542,8 @@ namespace Notepads.Core
 
             foreach (var entry in StorageApplicationPermissions.FutureAccessList.Entries)
             {
-                if (!tokens.Contains(entry.Token))
+                // Editor tokens are Guids (see ToToken). Leave other tokens, like the workspace folder, alone.
+                if (!tokens.Contains(entry.Token) && Guid.TryParseExact(entry.Token, "N", out _))
                 {
                     tokensToBeDeleted.Add(entry.Token);
                 }

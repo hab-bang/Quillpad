@@ -489,6 +489,18 @@
     <value>New Window</value>
     <comment>MainMenu: "New Window" button display text.</comment>
   </data>
+  <data name="MainMenu_Button_OpenFolder.Text" xml:space="preserve">
+    <value>Open Folder...</value>
+    <comment>MainMenu: "Open Folder" button display text. Opens a folder as the workspace and restores its tabs.</comment>
+  </data>
+  <data name="MainMenu_Button_CloseFolder.Text" xml:space="preserve">
+    <value>Close Folder</value>
+    <comment>MainMenu and WorkspaceIndicator: "Close Folder" button display text.</comment>
+  </data>
+  <data name="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer.Text" xml:space="preserve">
+    <value>Open in File Explorer</value>
+    <comment>WorkspaceIndicator: flyout item that opens the workspace folder in File Explorer.</comment>
+  </data>
   <data name="MainMenu_Button_Open_Recent.Text" xml:space="preserve">
     <value>Open Recent</value>
     <comment>MainMenu: "Open Recent" button display text.</comment>

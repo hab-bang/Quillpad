@@ -98,6 +98,7 @@ namespace Notepads.Views.MainPage
             InitializeStatusBar();
             InitializeControls();
             InitializeMainMenu();
+            InitializeWorkspace();
             InitializeKeyboardShortcuts();
 
             // Session backup and restore toggle
@@ -239,6 +240,12 @@ namespace Notepads.Views.MainPage
                 }
             }
 
+            if (!_loaded)
+            {
+                // The session already reopens the folder's files, so only fall back to the folder's own list
+                loadedCount += await ResumeWorkspaceAsync(restoreTabs: loadedCount == 0);
+            }
+
             if (_appLaunchFiles != null && _appLaunchFiles.Count > 0)
             {
                 loadedCount += await OpenFilesAsync(_appLaunchFiles);
@@ -300,6 +307,8 @@ namespace Notepads.Views.MainPage
         private async void App_EnteredBackground(object sender, Windows.ApplicationModel.EnteredBackgroundEventArgs e)
         {
             var deferral = e.GetDeferral();
+
+            await Workspace.SaveAsync();
 
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
@@ -365,6 +374,8 @@ namespace Notepads.Views.MainPage
         private async void MainPage_CloseRequested(object sender, Windows.UI.Core.Preview.SystemNavigationCloseRequestedPreviewEventArgs e)
         {
             var deferral = e.GetDeferral();
+
+            await Workspace.SaveAsync();
 
             if (AppSettingsService.IsSessionSnapshotEnabled)
             {
@@ -465,11 +476,13 @@ namespace Notepads.Views.MainPage
             });
         }
 
-        private static void UpdateApplicationTitle(ITextEditor activeTextEditor)
+        private void UpdateApplicationTitle(ITextEditor activeTextEditor)
         {
             if (!App.IsGameBarWidget)
             {
-                ApplicationView.GetForCurrentView().Title = activeTextEditor.EditingFileName ?? activeTextEditor.FileNamePlaceholder;
+                var title = activeTextEditor.EditingFileName ?? activeTextEditor.FileNamePlaceholder;
+                var folder = Workspace.Folder;
+                ApplicationView.GetForCurrentView().Title = folder == null ? title : $"{title} - {folder.Name}";
             }
         }
 

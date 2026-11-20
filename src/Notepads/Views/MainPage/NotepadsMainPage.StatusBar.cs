@@ -37,6 +37,7 @@ namespace Notepads.Views.MainPage
         {
             if (textEditor == null) return;
             UpdateApplicationTitle(textEditor);
+            UpdateWorkspaceIndicator();
             UpdateFileModificationStateIndicator(textEditor);
             UpdatePathIndicator(textEditor);
             UpdateEditorModificationIndicator(textEditor);
@@ -433,6 +434,10 @@ namespace Notepads.Views.MainPage
             if (sender == FileModificationStateIndicator)
             {
                 FileModificationStateIndicatorClicked(selectedEditor);
+            }
+            else if (sender == WorkspaceIndicator)
+            {
+                WorkspaceIndicator.ContextFlyout.ShowAt(WorkspaceIndicator);
             }
             else if (sender == PathIndicator && !string.IsNullOrEmpty(PathIndicator.Text))
             {
