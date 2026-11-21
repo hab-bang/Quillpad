@@ -21,7 +21,9 @@ namespace Notepads.Core
     using Notepads.Models;
     using Notepads.Services;
     using Notepads.Utilities;
+    using Windows.ApplicationModel.Resources;
     using Windows.System;
+    using Windows.UI.Xaml;
 
     public sealed class SessionDataCorruptedException : Exception
     {
@@ -103,6 +105,15 @@ namespace Notepads.Core
                 throw new SessionDataCorruptedException(ex.Message);
             }
 
+            try
+            {
+                await AddBackupsNewerThanSessionAsync(sessionData);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(SessionManager)}] Failed to look for backups newer than the session: {ex.Message}");
+            }
+
             IList<ITextEditor> recoveredEditor = new List<ITextEditor>();
 
             foreach (var textEditorData in sessionData.TextEditors)
@@ -136,6 +147,75 @@ namespace Notepads.Core
             return _sessionDataCache.Count;
         }
 
+        // A save writes the backup files first and the session file last. If the session file could not be
+        // written and the app then ended, backup files newer than the session file hold text the session
+        // does not point to, and the first save of this run would delete them as orphans. Point the session
+        // at them: a tab that is in the session gets the newer text, and any other tab comes back on its own.
+        private async Task AddBackupsNewerThanSessionAsync(NotepadsSessionDataV1 sessionData)
+        {
+            DateTimeOffset? sessionSavedAt = await SessionUtility.GetSessionMetaDataFileDateModifiedAsync(_sessionMetaDataFileName);
+            if (sessionSavedAt == null) return;
+
+            HashSet<string> knownPaths = sessionData.TextEditors
+                .SelectMany(editor => new[] { editor.LastSavedBackupFilePath, editor.PendingBackupFilePath })
+                .Where(path => path != null)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // Files older than the session file are left over from before the last save, not lost text
+            var newerFiles = new Dictionary<string, StorageFile>(StringComparer.OrdinalIgnoreCase);
+            foreach (StorageFile file in await SessionUtility.GetAllFilesInBackupFolderAsync(_backupFolderName))
+            {
+                if (file.Name.Contains(".") || knownPaths.Contains(file.Path)) continue;
+                if ((await file.GetBasicPropertiesAsync()).DateModified <= sessionSavedAt.Value) continue;
+                newerFiles[file.Name] = file;
+            }
+
+            foreach (StorageFile pendingFile in newerFiles.Values)
+            {
+                if (!pendingFile.Name.EndsWith(PendingBackupSuffix, StringComparison.OrdinalIgnoreCase)) continue;
+
+                string token = pendingFile.Name.Substring(0, pendingFile.Name.Length - PendingBackupSuffix.Length);
+                if (!Guid.TryParseExact(token, "N", out Guid id)) continue;
+
+                newerFiles.TryGetValue(token + LastSavedBackupSuffix, out StorageFile lastSavedFile);
+
+                TextEditorSessionDataV1 editorData = sessionData.TextEditors.FirstOrDefault(editor => editor.Id == id);
+
+                if (editorData != null) // The tab had no unsaved changes when the session file was written
+                {
+                    editorData.PendingBackupFilePath = pendingFile.Path;
+                    editorData.LastSavedBackupFilePath = editorData.LastSavedBackupFilePath ?? lastSavedFile?.Path;
+                    editorData.StateMetaData.IsModified = true;
+                }
+                else // The tab was opened after the session file was written
+                {
+                    // A save adds a tab's file to the FutureAccessList under the tab's token
+                    string fileToken = StorageApplicationPermissions.FutureAccessList.ContainsItem(token) ? token : null;
+
+                    sessionData.TextEditors.Add(new TextEditorSessionDataV1
+                    {
+                        Id = id,
+                        EditingFileFutureAccessToken = fileToken,
+                        LastSavedBackupFilePath = lastSavedFile?.Path,
+                        PendingBackupFilePath = pendingFile.Path,
+                        StateMetaData = new TextEditorStateMetaData
+                        {
+                            FileNamePlaceholder = ResourceLoader.GetForViewIndependentUse().GetString("TextEditor_DefaultNewFileName"),
+                            LastSavedEncoding = EncodingUtility.GetEncodingName(AppSettingsService.EditorDefaultEncoding),
+                            LastSavedLineEnding = LineEndingUtility.GetLineEndingName(AppSettingsService.EditorDefaultLineEnding),
+                            DateModifiedFileTime = -1,
+                            HasEditingFile = fileToken != null,
+                            IsModified = true,
+                            WrapWord = AppSettingsService.EditorDefaultTextWrapping == TextWrapping.Wrap,
+                            FontZoomFactor = 1,
+                        },
+                    });
+                }
+
+                LoggingService.LogInfo($"[{nameof(SessionManager)}] Restored a backup that is newer than the session file: {pendingFile.Name}");
+            }
+        }
+
         public async Task<int> RecoverBackupFilesAsync()
         {
             int numberOfRecoveredFiles = 0;
@@ -164,12 +244,12 @@ namespace Notepads.Core
             await Launcher.LaunchFolderAsync(await SessionUtility.GetBackupFolderAsync(_backupFolderName));
         }
 
-        public async Task SaveSessionAsync(Action actionAfterSaving = null)
+        public async Task<bool> SaveSessionAsync(Action actionAfterSaving = null)
         {
             if (!IsBackupEnabled)
             {
                 LoggingService.LogInfo($"[{nameof(SessionManager)}] Session backup is disabled.");
-                return;
+                return false;
             }
 
             // Serialize saves
@@ -177,7 +257,7 @@ namespace Notepads.Core
 
             try
             {
-                if (!IsBackupEnabled) return; // Check again now that the semaphore is held
+                if (!IsBackupEnabled) return false; // Check again now that the semaphore is held
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -187,7 +267,7 @@ namespace Notepads.Core
                 {
                     await ClearSessionDataAsync();
                     actionAfterSaving?.Invoke();
-                    return;
+                    return true;
                 }
 
                 ITextEditor selectedTextEditor = _notepadsCore.GetSelectedTextEditor();
@@ -196,22 +276,26 @@ namespace Notepads.Core
 
                 foreach (ITextEditor textEditor in textEditors)
                 {
+                    TextEditorSessionDataV1 textEditorSessionData = null;
+
                     try
                     {
-                        var textEditorSessionData = await GetTextEditorSessionDataAsync(textEditor);
-
-                        if (textEditorSessionData == null) continue;
-
-                        sessionData.TextEditors.Add(textEditorSessionData);
-
-                        if (textEditor == selectedTextEditor)
-                        {
-                            sessionData.SelectedTextEditor = textEditor.Id;
-                        }
+                        textEditorSessionData = await GetTextEditorSessionDataAsync(textEditor);
                     }
                     catch (Exception ex)
                     {
                         LoggingService.LogError($"[{nameof(SessionManager)}] Failed to build TextEditor session data: {ex}");
+                    }
+
+                    // A session without this tab would drop it, and its backup files with it.
+                    // Keep the last complete session file instead.
+                    if (textEditorSessionData == null) return false;
+
+                    sessionData.TextEditors.Add(textEditorSessionData);
+
+                    if (textEditor == selectedTextEditor)
+                    {
+                        sessionData.SelectedTextEditor = textEditor.Id;
                     }
                 }
 
@@ -235,8 +319,7 @@ namespace Notepads.Core
                 catch (Exception ex)
                 {
                     LoggingService.LogError($"[{nameof(SessionManager)}] Failed to save session metadata: {ex.Message}");
-                    actionAfterSaving?.Invoke();
-                    return; // Failed to save the session - do not proceed to delete backup files
+                    return false; // Failed to save the session - do not proceed to delete backup files
                 }
 
                 if (sessionDataSaved)
@@ -268,6 +351,7 @@ namespace Notepads.Core
                 }
 
                 actionAfterSaving?.Invoke();
+                return true;
             }
             finally
             {
@@ -321,7 +405,7 @@ namespace Notepads.Core
                 {
                     // Persist the last save known to the app, which might not be up-to-date (if the file was modified outside the app)
                     var lastSavedBackupFile = await SessionUtility.CreateNewFileInBackupFolderAsync(
-                        ToToken(textEditor.Id) + "-LastSaved",
+                        ToToken(textEditor.Id) + LastSavedBackupSuffix,
                         CreationCollisionOption.ReplaceExisting,
                         _backupFolderName);
 
@@ -341,7 +425,7 @@ namespace Notepads.Core
                 {
                     // Persist pending changes relative to the last save
                     var pendingBackupFile = await SessionUtility.CreateNewFileInBackupFolderAsync(
-                        ToToken(textEditor.Id) + "-Pending",
+                        ToToken(textEditor.Id) + PendingBackupSuffix,
                         CreationCollisionOption.ReplaceExisting,
                         _backupFolderName);
 
@@ -565,6 +649,9 @@ namespace Notepads.Core
                 }
             }
         }
+
+        private const string LastSavedBackupSuffix = "-LastSaved";
+        private const string PendingBackupSuffix = "-Pending";
 
         private static string ToToken(Guid textEditorId)
         {

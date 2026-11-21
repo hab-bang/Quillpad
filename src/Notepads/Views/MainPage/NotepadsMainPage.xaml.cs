@@ -322,14 +322,12 @@ namespace Notepads.Views.MainPage
         }
 
         // An update install ends the app without a close request, so save what closing the window saves.
-        // Returns false when unsaved text would be lost: session backup is off and a tab has unsaved changes.
+        // Returns false when unsaved text would be lost: a tab has unsaved changes and the session does not hold them.
         private async Task<bool> SaveBeforeUpdateInstallAsync()
         {
-            if (AppSettingsService.IsSessionSnapshotEnabled)
-            {
-                await SessionManager.SaveSessionAsync();
-            }
-            else if (NotepadsCore.HaveUnsavedTextEditor())
+            bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
+
+            if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
             {
                 return false;
             }
@@ -395,10 +393,11 @@ namespace Notepads.Views.MainPage
         {
             var deferral = e.GetDeferral();
 
-            if (AppSettingsService.IsSessionSnapshotEnabled)
+            // Save session before app exit, then the workspace, which can be slow on a network folder.
+            // If the session cannot be saved, ask about unsaved files as if session backup were off.
+            if (AppSettingsService.IsSessionSnapshotEnabled &&
+                await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; }))
             {
-                // Save session before app exit, then the workspace, which can be slow on a network folder
-                await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
                 await Workspace.SaveAsync();
                 App.InstanceHandlerMutex?.Dispose();
                 deferral.Complete();
@@ -524,12 +523,23 @@ namespace Notepads.Views.MainPage
         {
             if (NotepadsCore.GetNumberOfOpenedTextEditors() == 0)
             {
+                bool exiting = _lastTabMovedToAnotherInstance || AppSettingsService.ExitWhenLastTabClosed;
+
                 if (AppSettingsService.IsSessionSnapshotEnabled)
                 {
-                    await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
+                    // Stop backups only when the app is about to exit. Otherwise a new tab opens below,
+                    // and its text has to keep going into the session.
+                    if (exiting)
+                    {
+                        await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
+                    }
+                    else
+                    {
+                        await SessionManager.SaveSessionAsync();
+                    }
                 }
 
-                if (_lastTabMovedToAnotherInstance || AppSettingsService.ExitWhenLastTabClosed)
+                if (exiting)
                 {
                     if (!await ApplicationView.GetForCurrentView().TryConsolidateAsync())
                     {

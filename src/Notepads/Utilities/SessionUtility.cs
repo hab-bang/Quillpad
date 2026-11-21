@@ -86,7 +86,29 @@ namespace Notepads.Utilities
                 sessionMetaDataFileName + SessionMetaDataTempFileExtension,
                 CreationCollisionOption.ReplaceExisting);
             await FileSystemUtility.WriteTextToFileAsync(tempFile, serializedData);
-            await tempFile.MoveAsync(localFolder, sessionMetaDataFileName, NameCollisionOption.ReplaceExisting);
+
+            // Another process (antivirus, backup or sync) can hold the session file open for a moment,
+            // and replacing an open file fails with "access denied". Try again a few times first.
+            for (int attempt = 1; ; attempt++)
+            {
+                try
+                {
+                    await tempFile.MoveAsync(localFolder, sessionMetaDataFileName, NameCollisionOption.ReplaceExisting);
+                    return;
+                }
+                catch (Exception) when (attempt < 10)
+                {
+                    await Task.Delay(10);
+                }
+            }
+        }
+
+        // Returns null when there is no session file.
+        public static async Task<DateTimeOffset?> GetSessionMetaDataFileDateModifiedAsync(string sessionMetaDataFileName)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            if (!(await localFolder.TryGetItemAsync(sessionMetaDataFileName) is StorageFile file)) return null;
+            return (await file.GetBasicPropertiesAsync()).DateModified;
         }
 
         public static async Task DeleteSerializedSessionMetaDataAsync(string sessionMetaDataFileName)
