@@ -17,6 +17,7 @@ namespace Notepads.Utilities
     {
         private const string BackupFolderDefaultName = "BackupFiles";
         private const string SessionMetaDataFileDefaultName = "NotepadsSessionData.json";
+        private const string SessionMetaDataTempFileExtension = ".tmp";
 
         private static readonly ConcurrentDictionary<INotepadsCore, ISessionManager> SessionManagers = new ConcurrentDictionary<INotepadsCore, ISessionManager>();
 
@@ -77,8 +78,15 @@ namespace Notepads.Utilities
         public static async Task SaveSerializedSessionMetaDataAsync(string serializedData, string sessionMetaDataFileName)
         {
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile metaDataFile = await FileSystemUtility.GetOrCreateFileAsync(localFolder, sessionMetaDataFileName);
-            await FileSystemUtility.WriteTextToFileAsync(metaDataFile, serializedData);
+
+            // Write to a temporary file next to the real one, then move it over the real one.
+            // If the process ends mid-write, only the temporary file is damaged and the
+            // previous session file stays whole.
+            StorageFile tempFile = await localFolder.CreateFileAsync(
+                sessionMetaDataFileName + SessionMetaDataTempFileExtension,
+                CreationCollisionOption.ReplaceExisting);
+            await FileSystemUtility.WriteTextToFileAsync(tempFile, serializedData);
+            await tempFile.MoveAsync(localFolder, sessionMetaDataFileName, NameCollisionOption.ReplaceExisting);
         }
 
         public static async Task DeleteSerializedSessionMetaDataAsync(string sessionMetaDataFileName)

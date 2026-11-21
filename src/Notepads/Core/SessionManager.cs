@@ -175,100 +175,104 @@ namespace Notepads.Core
             // Serialize saves
             await _semaphoreSlim.WaitAsync();
 
-            if (!IsBackupEnabled) return; // Check again after SemaphoreSlim released
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            ITextEditor[] textEditors = _notepadsCore.GetAllTextEditors();
-
-            if (textEditors == null || textEditors.Length == 0)
+            try
             {
-                await ClearSessionDataAsync();
-                actionAfterSaving?.Invoke();
-                _semaphoreSlim.Release();
-                return;
-            }
+                if (!IsBackupEnabled) return; // Check again now that the semaphore is held
 
-            ITextEditor selectedTextEditor = _notepadsCore.GetSelectedTextEditor();
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
-            NotepadsSessionDataV1 sessionData = new NotepadsSessionDataV1();
+                ITextEditor[] textEditors = _notepadsCore.GetAllTextEditors();
 
-            foreach (ITextEditor textEditor in textEditors)
-            {
+                if (textEditors == null || textEditors.Length == 0)
+                {
+                    await ClearSessionDataAsync();
+                    actionAfterSaving?.Invoke();
+                    return;
+                }
+
+                ITextEditor selectedTextEditor = _notepadsCore.GetSelectedTextEditor();
+
+                NotepadsSessionDataV1 sessionData = new NotepadsSessionDataV1();
+
+                foreach (ITextEditor textEditor in textEditors)
+                {
+                    try
+                    {
+                        var textEditorSessionData = await GetTextEditorSessionDataAsync(textEditor);
+
+                        if (textEditorSessionData == null) continue;
+
+                        sessionData.TextEditors.Add(textEditorSessionData);
+
+                        if (textEditor == selectedTextEditor)
+                        {
+                            sessionData.SelectedTextEditor = textEditor.Id;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.LogError($"[{nameof(SessionManager)}] Failed to build TextEditor session data: {ex}");
+                    }
+                }
+
+                sessionData.TabScrollViewerHorizontalOffset =
+                    _notepadsCore.GetTabScrollViewerHorizontalOffset();
+
+                bool sessionDataSaved = false;
+
                 try
                 {
-                    var textEditorSessionData = await GetTextEditorSessionDataAsync(textEditor);
+                    string sessionJsonStr = JsonSerializer.Serialize(sessionData, new JsonSerializerOptions { WriteIndented = true });
 
-                    if (textEditorSessionData == null) continue;
-
-                    sessionData.TextEditors.Add(textEditorSessionData);
-
-                    if (textEditor == selectedTextEditor)
+                    if (_lastSessionJsonStr == null || !string.Equals(_lastSessionJsonStr, sessionJsonStr, StringComparison.OrdinalIgnoreCase))
                     {
-                        sessionData.SelectedTextEditor = textEditor.Id;
+                        // write
+                        await SessionUtility.SaveSerializedSessionMetaDataAsync(sessionJsonStr, _sessionMetaDataFileName);
+                        _lastSessionJsonStr = sessionJsonStr;
+                        sessionDataSaved = true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to build TextEditor session data: {ex}");
+                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to save session metadata: {ex.Message}");
+                    actionAfterSaving?.Invoke();
+                    return; // Failed to save the session - do not proceed to delete backup files
                 }
-            }
 
-            sessionData.TabScrollViewerHorizontalOffset =
-                _notepadsCore.GetTabScrollViewerHorizontalOffset();
-
-            bool sessionDataSaved = false;
-
-            try
-            {
-                string sessionJsonStr = JsonSerializer.Serialize(sessionData, new JsonSerializerOptions { WriteIndented = true });
-
-                if (_lastSessionJsonStr == null || !string.Equals(_lastSessionJsonStr, sessionJsonStr, StringComparison.OrdinalIgnoreCase))
+                if (sessionDataSaved)
                 {
-                    // write
-                    await SessionUtility.SaveSerializedSessionMetaDataAsync(sessionJsonStr, _sessionMetaDataFileName);
-                    _lastSessionJsonStr = sessionJsonStr;
-                    sessionDataSaved = true;
+                    try
+                    {
+                        await DeleteOrphanedBackupFilesAsync(sessionData);
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.LogException(ex);
+                    }
+
+                    try
+                    {
+                        DeleteOrphanedTokensInFutureAccessList(sessionData);
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.LogException(ex);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LoggingService.LogError($"[{nameof(SessionManager)}] Failed to save session metadata: {ex.Message}");
+
+                stopwatch.Stop();
+
+                if (sessionDataSaved)
+                {
+                    LoggingService.LogInfo($"[{nameof(SessionManager)}] Successfully saved the current session. Total time: {stopwatch.Elapsed.TotalMilliseconds} milliseconds.", consoleOnly: true);
+                }
+
                 actionAfterSaving?.Invoke();
+            }
+            finally
+            {
                 _semaphoreSlim.Release();
-                return; // Failed to save the session - do not proceed to delete backup files
             }
-
-            if (sessionDataSaved)
-            {
-                try
-                {
-                    await DeleteOrphanedBackupFilesAsync(sessionData);
-                }
-                catch (Exception ex)
-                {
-                    LoggingService.LogException(ex);
-                }
-
-                try
-                {
-                    DeleteOrphanedTokensInFutureAccessList(sessionData);
-                }
-                catch (Exception ex)
-                {
-                    LoggingService.LogException(ex);
-                }
-            }
-
-            stopwatch.Stop();
-
-            if (sessionDataSaved)
-            {
-                LoggingService.LogInfo($"[{nameof(SessionManager)}] Successfully saved the current session. Total time: {stopwatch.Elapsed.TotalMilliseconds} milliseconds.", consoleOnly: true);
-            }
-
-            actionAfterSaving?.Invoke();
-            _semaphoreSlim.Release();
         }
 
         private async Task<TextEditorSessionDataV1> GetTextEditorSessionDataAsync(ITextEditor textEditor)
