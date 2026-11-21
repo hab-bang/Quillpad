@@ -16,7 +16,15 @@ I use Quillpad mostly for my own writing. So it changes a lot, and the changes f
 2. Right-click `Install.ps1` and choose **Run with PowerShell**.
 3. Say yes when it asks to install the certificate. That needs admin rights, but only the first time.
 
-Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there. After that, you can update by double-clicking the newer `.msixbundle`.
+Quillpad is signed with my own certificate, which Windows doesn't trust out of the box. That's why step 3 is there.
+
+**Updates**
+
+Open Settings > About and click **Check for updates**. If there's a newer release, **Install update** downloads it from GitHub, closes Quillpad and installs it. Your open tabs are kept if session backup is on. Then open Quillpad again.
+
+After the first update this way, Windows also knows where Quillpad's updates come from. It checks when you open Quillpad and in the background, and offers or installs new versions by itself. You can also set this up directly: download `Quillpad.appinstaller` from the latest release and double-click it.
+
+Quillpad v0.3.1 and older have no update button. To move off one of those, double-click `Quillpad.appinstaller` from a newer release once.
 
 Releases after v0.3.0 come with a GitHub attestation for each file. If you have the [GitHub CLI](https://cli.github.com/) and are signed in to it, you can check that a file was built by the release workflow from a release tag before you trust it:
 

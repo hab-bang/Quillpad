@@ -269,6 +269,7 @@
     <Compile Include="Utilities\LineEndingUtility.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\ThemeSettingsService.cs" />
+    <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Controls\Dialog\NotepadsDialog.cs" />
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />

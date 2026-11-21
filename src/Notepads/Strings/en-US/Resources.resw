@@ -793,4 +793,56 @@
     <value>Warning</value>
     <comment>SessionCorruptionErrorDialog: "Title" display text.</comment>
   </data>
+  <data name="AboutPage_CheckForUpdatesButton.Content" xml:space="preserve">
+    <value>Check for updates</value>
+    <comment>AboutPage: button that looks for a newer Quillpad release on GitHub.</comment>
+  </data>
+  <data name="AboutPage_InstallUpdateButton.Content" xml:space="preserve">
+    <value>Install update</value>
+    <comment>AboutPage: button that installs the newer release.</comment>
+  </data>
+  <data name="AboutPage_Update_Checking" xml:space="preserve">
+    <value>Checking GitHub for a newer version...</value>
+    <comment>AboutPage: shown while the update check runs.</comment>
+  </data>
+  <data name="AboutPage_Update_UpToDate" xml:space="preserve">
+    <value>You have the latest version (v{0}).</value>
+    <comment>AboutPage: {0} is the latest released version.</comment>
+  </data>
+  <data name="AboutPage_Update_Available" xml:space="preserve">
+    <value>Version v{0} is available. Installing it closes Quillpad; open it again when the install is done.</value>
+    <comment>AboutPage: {0} is the new version.</comment>
+  </data>
+  <data name="AboutPage_Update_AvailableNoSessionBackup" xml:space="preserve">
+    <value>Version v{0} is available. Installing it closes Quillpad, and session backup is off, so save your files first.</value>
+    <comment>AboutPage: {0} is the new version. Shown when session snapshots are turned off.</comment>
+  </data>
+  <data name="AboutPage_Update_AvailableManualOnly" xml:space="preserve">
+    <value>Version v{0} is available. It has no update feed, so install it from the release page.</value>
+    <comment>AboutPage: {0} is the new version. Shown for releases without a Quillpad.appinstaller file.</comment>
+  </data>
+  <data name="AboutPage_Update_DevBuild" xml:space="preserve">
+    <value>The latest release is v{0}. This is a dev build, which does not update itself.</value>
+    <comment>AboutPage: {0} is the latest released version. Shown in the Quillpad-Dev app.</comment>
+  </data>
+  <data name="AboutPage_Update_Installing" xml:space="preserve">
+    <value>Downloading and installing v{0}... Quillpad will close when it is ready.</value>
+    <comment>AboutPage: {0} is the new version.</comment>
+  </data>
+  <data name="AboutPage_Update_CheckFailed" xml:space="preserve">
+    <value>Could not check for updates: {0}</value>
+    <comment>AboutPage: {0} is the error.</comment>
+  </data>
+  <data name="AboutPage_Update_InstallFailed" xml:space="preserve">
+    <value>The update did not install: {0}</value>
+    <comment>AboutPage: {0} is the error.</comment>
+  </data>
+  <data name="AboutPage_Update_ReleasePageLink.Content" xml:space="preserve">
+    <value>Open the release page</value>
+    <comment>AboutPage: link to the GitHub release.</comment>
+  </data>
+  <data name="AboutPage_Update_Installed" xml:space="preserve">
+    <value>v{0} is installed. Close and reopen Quillpad to use it.</value>
+    <comment>AboutPage: {0} is the new version. Shown if the install finished without closing the app.</comment>
+  </data>
 </root>

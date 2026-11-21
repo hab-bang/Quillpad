@@ -161,7 +161,21 @@ function Register-DevPackage {
     }
 
     Write-Host "Installing $DevPackageName"
-    Add-AppxPackage -Register (Join-Path $LayoutDir 'AppxManifest.xml') -ForceTargetApplicationShutdown
+    $manifest = Join-Path $LayoutDir 'AppxManifest.xml'
+    try {
+        Add-AppxPackage -Register $manifest -ForceTargetApplicationShutdown
+    }
+    catch {
+        # 0x80073CFB: the manifest changed (a new capability, say) but the version did not, so Windows
+        # will not register it over the installed one. Remove that one, keeping the app's settings and
+        # session, and register again.
+        if ($_.Exception.Message -notmatch '0x80073CFB') {
+            throw
+        }
+        Write-Host "The manifest changed, so reinstalling $DevPackageName (its data is kept)"
+        Remove-AppxPackage -Package (Get-AppxPackage -Name $DevPackageName).PackageFullName -PreserveApplicationData
+        Add-AppxPackage -Register $manifest -ForceTargetApplicationShutdown
+    }
 }
 
 function Start-DevApp {

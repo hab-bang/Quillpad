@@ -123,6 +123,25 @@ jobs:
           # double-clicking the .msixbundle gets it from the Store.
           Remove-Item "$($folder.FullName)\Dependencies" -Recurse -Force
           Compress-Archive -Path "$($folder.FullName)\*" -DestinationPath "$out\${name}_install.zip"
+
+          # The update feed. A Quillpad installed from this file (or updated by the app's own "Check for
+          # updates") asks Uri, the newest release's copy of this file, for updates. Windows then checks it
+          # on launch and in the background, and installs the MainBundle it names.
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $releases = "https://github.com/$env:GITHUB_REPOSITORY/releases"
+            @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+                        Uri="$releases/latest/download/Quillpad.appinstaller" Version="$env:VERSION">
+            <MainBundle Name="Quillpad" Publisher="CN=hab-bang" Version="$env:VERSION"
+                        Uri="$releases/download/$env:GITHUB_REF_NAME/$name.msixbundle" />
+            <UpdateSettings>
+              <OnLaunch HoursBetweenUpdateChecks="12" ShowPrompt="true" UpdateBlocksActivation="false" />
+              <AutomaticBackgroundTask />
+            </UpdateSettings>
+          </AppInstaller>
+          "@ | Set-Content -Encoding utf8 "$out\Quillpad.appinstaller"
+          }
           Get-ChildItem $out | Format-Table Name, Length
           Get-ChildItem $folder.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($folder.FullName.Length + 1) }
 

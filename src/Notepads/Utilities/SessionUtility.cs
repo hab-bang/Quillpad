@@ -51,6 +51,15 @@ namespace Notepads.Utilities
             return sessionManager;
         }
 
+        // Saves the session of every window in this process now, for example before an update closes the app
+        public static async Task SaveAllSessionsAsync()
+        {
+            foreach (ISessionManager sessionManager in SessionManagers.Values)
+            {
+                await sessionManager.SaveSessionAsync();
+            }
+        }
+
         public static async Task<StorageFolder> GetBackupFolderAsync(string backupFolderName)
         {
             return await FileSystemUtility.GetOrCreateAppFolderAsync(backupFolderName);
