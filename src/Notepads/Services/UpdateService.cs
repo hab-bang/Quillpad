@@ -86,18 +86,30 @@ namespace Notepads.Services
             }
         }
 
+        // Set by the main window. The install ends the app without a close request, so this saves what
+        // closing the window would. It returns false when unsaved text cannot be kept.
+        public static Func<Task<bool>> SaveBeforeInstallAsync { get; set; }
+
+        // Static, because the settings frame makes a new About page each time it is opened
+        public static bool IsInstalling { get; private set; }
+
         // Closes every Quillpad window when the new version is ready to register. The returned task finishes
         // only if the install fails, with the reason.
         public static async Task<string> InstallUpdateAsync(Uri appInstallerFile, IProgress<double> progress)
         {
+            IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> operation = null;
+            IsInstalling = true;
             try
             {
-                var packageManager = new PackageManager();
-                IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> operation =
-                    packageManager.AddPackageByAppInstallerFileAsync(
+                // The call downloads the feed before it returns, so keep it off the UI thread
+                operation = await Task.Run(() =>
+                {
+                    var packageManager = new PackageManager();
+                    return packageManager.AddPackageByAppInstallerFileAsync(
                         appInstallerFile,
                         AddPackageByAppInstallerOptions.ForceTargetAppShutdown,
                         packageManager.GetDefaultPackageVolume());
+                });
                 operation.Progress = (_, deploymentProgress) => progress?.Report(deploymentProgress.percentage);
 
                 DeploymentResult result = await operation;
@@ -106,7 +118,27 @@ namespace Notepads.Services
             catch (Exception ex)
             {
                 LoggingService.LogException(ex);
-                return ex.Message;
+
+                // A failed deployment throws with only the short HRESULT text. The details (which dependency,
+                // conflict or file) are in the operation's DeploymentResult.
+                string details = null;
+                try
+                {
+                    if (operation?.Status == AsyncStatus.Error)
+                    {
+                        details = operation.GetResults()?.ErrorText;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No result to read, so the exception message is all there is
+                }
+
+                return string.IsNullOrEmpty(details) ? ex.Message : details;
+            }
+            finally
+            {
+                IsInstalling = false;
             }
         }
 

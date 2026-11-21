@@ -8,9 +8,9 @@ namespace Notepads.Views.Settings
     using System;
     using Notepads.Extensions;
     using Notepads.Services;
-    using Notepads.Utilities;
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Resources;
+    using Windows.System.Diagnostics;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Media.Imaging;
@@ -29,6 +29,12 @@ namespace Notepads.Views.Settings
         {
             InitializeComponent();
             SetAppIconBasedOnTheme(ThemeSettingsService.ThemeMode);
+
+            if (UpdateService.IsInstalling)
+            {
+                CheckForUpdatesButton.IsEnabled = false;
+                ShowUpdateStatus(_resourceLoader.GetString("AboutPage_Update_AlreadyInstalling"));
+            }
 
             Loaded += AboutPage_Loaded;
             Unloaded += AboutPage_Unloaded;
@@ -109,15 +115,36 @@ namespace Notepads.Views.Settings
 
         private async void InstallUpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            if (UpdateService.IsInstalling)
+            {
+                return;
+            }
+
+            // The install ends every Quillpad window by force, with no save prompt. Only this window can
+            // keep its tabs (the others have no session backup), so the others must be closed first.
+            // Each window is its own process. GetForProcesses lists this package's processes; unlike
+            // AppInstance.GetInstances, it counts the calling window too.
+            if (ProcessDiagnosticInfo.GetForProcesses().Count > 1)
+            {
+                ShowUpdateStatus(_resourceLoader.GetString("AboutPage_Update_CloseOtherWindows"));
+                return;
+            }
+
             string latest = _update.LatestVersion.ToString(3);
             CheckForUpdatesButton.IsEnabled = false;
             InstallUpdateButton.IsEnabled = false;
+
+            if (UpdateService.SaveBeforeInstallAsync != null && !await UpdateService.SaveBeforeInstallAsync())
+            {
+                ShowUpdateStatus(_resourceLoader.GetString("AboutPage_Update_SaveFilesFirst"));
+                CheckForUpdatesButton.IsEnabled = true;
+                InstallUpdateButton.IsEnabled = true;
+                return;
+            }
+
             ShowUpdateStatus(string.Format(_resourceLoader.GetString("AboutPage_Update_Installing"), latest));
             UpdateProgressBar.IsIndeterminate = true;
             UpdateProgressBar.Visibility = Visibility.Visible;
-
-            // The install closes every Quillpad window, so keep the open tabs first
-            await SessionUtility.SaveAllSessionsAsync();
 
             var progress = new Progress<double>(percentage =>
             {

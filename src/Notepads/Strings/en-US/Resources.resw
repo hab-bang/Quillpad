@@ -814,7 +814,7 @@
     <comment>AboutPage: {0} is the new version.</comment>
   </data>
   <data name="AboutPage_Update_AvailableNoSessionBackup" xml:space="preserve">
-    <value>Version v{0} is available. Installing it closes Quillpad, and session backup is off, so save your files first.</value>
+    <value>Version v{0} is available. Installing it closes Quillpad. Session backup is off, so save your files before you install.</value>
     <comment>AboutPage: {0} is the new version. Shown when session snapshots are turned off.</comment>
   </data>
   <data name="AboutPage_Update_AvailableManualOnly" xml:space="preserve">
@@ -844,5 +844,17 @@
   <data name="AboutPage_Update_Installed" xml:space="preserve">
     <value>v{0} is installed. Close and reopen Quillpad to use it.</value>
     <comment>AboutPage: {0} is the new version. Shown if the install finished without closing the app.</comment>
+  </data>
+  <data name="AboutPage_Update_CloseOtherWindows" xml:space="preserve">
+    <value>Close the other Quillpad windows first. The install closes them without asking to save.</value>
+    <comment>AboutPage: shown when Install update is clicked while more than one Quillpad window is open.</comment>
+  </data>
+  <data name="AboutPage_Update_SaveFilesFirst" xml:space="preserve">
+    <value>Save your files first. Session backup is off, so unsaved changes would be lost when Quillpad closes.</value>
+    <comment>AboutPage: shown when Install update is clicked with unsaved tabs and session backup turned off.</comment>
+  </data>
+  <data name="AboutPage_Update_AlreadyInstalling" xml:space="preserve">
+    <value>An update is installing. Quillpad will close when it is ready.</value>
+    <comment>AboutPage: shown when the About page opens while an update installs.</comment>
   </data>
 </root>

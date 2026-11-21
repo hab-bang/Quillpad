@@ -20,7 +20,7 @@ Quillpad is signed with my own certificate, which Windows doesn't trust out of t
 
 **Updates**
 
-Open Settings > About and click **Check for updates**. If there's a newer release, **Install update** downloads it from GitHub, closes Quillpad and installs it. Your open tabs are kept if session backup is on. Then open Quillpad again.
+Open Settings > About and click **Check for updates**. If there's a newer release, **Install update** downloads it from GitHub, closes Quillpad and installs it. Then open Quillpad again. Close any other Quillpad windows first. Your open tabs and workspace are kept, but if session backup is off, save your files first.
 
 After the first update this way, Windows also knows where Quillpad's updates come from. It checks when you open Quillpad and in the background, and offers or installs new versions by itself. You can also set this up directly: download `Quillpad.appinstaller` from the latest release and double-click it.
 
