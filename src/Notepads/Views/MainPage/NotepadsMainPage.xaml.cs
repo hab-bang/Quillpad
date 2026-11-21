@@ -288,6 +288,8 @@ namespace Notepads.Views.MainPage
 
             await BuildOpenRecentButtonSubItemsAsync();
 
+            UpdateService.SaveBeforeInstallAsync = SaveBeforeUpdateInstallAsync;
+
             if (!App.IsGameBarWidget)
             {
                 // An issue with the Game Bar extension model and Windows platform prevents the Notepads process from exiting cleanly
@@ -317,6 +319,23 @@ namespace Notepads.Views.MainPage
             await Workspace.SaveAsync();
 
             deferral.Complete();
+        }
+
+        // An update install ends the app without a close request, so save what closing the window saves.
+        // Returns false when unsaved text would be lost: session backup is off and a tab has unsaved changes.
+        private async Task<bool> SaveBeforeUpdateInstallAsync()
+        {
+            if (AppSettingsService.IsSessionSnapshotEnabled)
+            {
+                await SessionManager.SaveSessionAsync();
+            }
+            else if (NotepadsCore.HaveUnsavedTextEditor())
+            {
+                return false;
+            }
+
+            await Workspace.SaveAsync();
+            return true;
         }
 
         public void ExecuteProtocol(Uri uri)
