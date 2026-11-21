@@ -161,13 +161,23 @@ namespace Notepads.Core
                 .Where(path => path != null)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            // Files older than the session file are left over from before the last save, not lost text
+            // Files older than the session file are left over from before the last save, not lost text.
+            // File times are coarse, so a file with the same time as the session file is kept: bringing back
+            // a leftover only shows old text again, but skipping a real backup would lose it.
             var newerFiles = new Dictionary<string, StorageFile>(StringComparer.OrdinalIgnoreCase);
             foreach (StorageFile file in await SessionUtility.GetAllFilesInBackupFolderAsync(_backupFolderName))
             {
                 if (file.Name.Contains(".") || knownPaths.Contains(file.Path)) continue;
-                if ((await file.GetBasicPropertiesAsync()).DateModified <= sessionSavedAt.Value) continue;
-                newerFiles[file.Name] = file;
+
+                try
+                {
+                    if ((await file.GetBasicPropertiesAsync()).DateModified < sessionSavedAt.Value) continue;
+                    newerFiles[file.Name] = file;
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to read the time of backup file {file.Name}: {ex.Message}");
+                }
             }
 
             foreach (StorageFile pendingFile in newerFiles.Values)
@@ -177,43 +187,79 @@ namespace Notepads.Core
                 string token = pendingFile.Name.Substring(0, pendingFile.Name.Length - PendingBackupSuffix.Length);
                 if (!Guid.TryParseExact(token, "N", out Guid id)) continue;
 
-                newerFiles.TryGetValue(token + LastSavedBackupSuffix, out StorageFile lastSavedFile);
-
-                TextEditorSessionDataV1 editorData = sessionData.TextEditors.FirstOrDefault(editor => editor.Id == id);
-
-                if (editorData != null) // The tab had no unsaved changes when the session file was written
+                try
                 {
-                    editorData.PendingBackupFilePath = pendingFile.Path;
-                    editorData.LastSavedBackupFilePath = editorData.LastSavedBackupFilePath ?? lastSavedFile?.Path;
-                    editorData.StateMetaData.IsModified = true;
-                }
-                else // The tab was opened after the session file was written
-                {
-                    // A save adds a tab's file to the FutureAccessList under the tab's token
-                    string fileToken = StorageApplicationPermissions.FutureAccessList.ContainsItem(token) ? token : null;
+                    newerFiles.TryGetValue(token + LastSavedBackupSuffix, out StorageFile lastSavedFile);
 
-                    sessionData.TextEditors.Add(new TextEditorSessionDataV1
+                    TextEditorSessionDataV1 editorData = sessionData.TextEditors.FirstOrDefault(editor => editor.Id == id);
+
+                    if (editorData != null) // The tab had no unsaved changes when the session file was written
                     {
-                        Id = id,
-                        EditingFileFutureAccessToken = fileToken,
-                        LastSavedBackupFilePath = lastSavedFile?.Path,
-                        PendingBackupFilePath = pendingFile.Path,
-                        StateMetaData = new TextEditorStateMetaData
-                        {
-                            FileNamePlaceholder = ResourceLoader.GetForViewIndependentUse().GetString("TextEditor_DefaultNewFileName"),
-                            LastSavedEncoding = EncodingUtility.GetEncodingName(AppSettingsService.EditorDefaultEncoding),
-                            LastSavedLineEnding = LineEndingUtility.GetLineEndingName(AppSettingsService.EditorDefaultLineEnding),
-                            DateModifiedFileTime = -1,
-                            HasEditingFile = fileToken != null,
-                            IsModified = true,
-                            WrapWord = AppSettingsService.EditorDefaultTextWrapping == TextWrapping.Wrap,
-                            FontZoomFactor = 1,
-                        },
-                    });
-                }
+                        editorData.PendingBackupFilePath = pendingFile.Path;
+                        editorData.LastSavedBackupFilePath = editorData.LastSavedBackupFilePath ?? lastSavedFile?.Path;
+                        editorData.StateMetaData.IsModified = true;
+                    }
+                    else // The tab was opened after the session file was written
+                    {
+                        sessionData.TextEditors.Add(await BuildRecoveredTextEditorSessionDataAsync(id, token, pendingFile, lastSavedFile));
+                    }
 
-                LoggingService.LogInfo($"[{nameof(SessionManager)}] Restored a backup that is newer than the session file: {pendingFile.Name}");
+                    LoggingService.LogInfo($"[{nameof(SessionManager)}] Restored a backup that is newer than the session file: {pendingFile.Name}");
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to restore backup file {pendingFile.Name}: {ex.Message}");
+                }
             }
+        }
+
+        private static async Task<TextEditorSessionDataV1> BuildRecoveredTextEditorSessionDataAsync(Guid id, string token, StorageFile pendingFile, StorageFile lastSavedFile)
+        {
+            // A save adds a tab's file to the FutureAccessList under the tab's token
+            string fileToken = StorageApplicationPermissions.FutureAccessList.ContainsItem(token) ? token : null;
+
+            // An untitled tab starts with the default encoding and line ending. A file tab's backups are written
+            // in the file's own, so detect them from -LastSaved, the way the app does when it opens a file.
+            string encodingName = EncodingUtility.GetEncodingName(AppSettingsService.EditorDefaultEncoding);
+            string lineEndingName = LineEndingUtility.GetLineEndingName(AppSettingsService.EditorDefaultLineEnding);
+
+            if (fileToken != null && lastSavedFile != null)
+            {
+                try
+                {
+                    TextFile lastSavedText = await FileSystemUtility.ReadFileAsync(lastSavedFile, ignoreFileSizeLimit: true);
+                    encodingName = EncodingUtility.GetEncodingName(lastSavedText.Encoding);
+
+                    // With no line break in the text, the detected line ending is only a default
+                    if (lastSavedText.Content.IndexOfAny(new[] { '\r', '\n' }) >= 0)
+                    {
+                        lineEndingName = LineEndingUtility.GetLineEndingName(lastSavedText.LineEnding);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to detect the encoding of {lastSavedFile.Name}: {ex.Message}");
+                }
+            }
+
+            return new TextEditorSessionDataV1
+            {
+                Id = id,
+                EditingFileFutureAccessToken = fileToken,
+                LastSavedBackupFilePath = lastSavedFile?.Path,
+                PendingBackupFilePath = pendingFile.Path,
+                StateMetaData = new TextEditorStateMetaData
+                {
+                    FileNamePlaceholder = ResourceLoader.GetForViewIndependentUse().GetString("TextEditor_DefaultNewFileName"),
+                    LastSavedEncoding = encodingName,
+                    LastSavedLineEnding = lineEndingName,
+                    DateModifiedFileTime = -1, // Unknown, so the tab shows the file as changed outside the app
+                    HasEditingFile = fileToken != null,
+                    IsModified = true,
+                    WrapWord = AppSettingsService.EditorDefaultTextWrapping == TextWrapping.Wrap,
+                    FontZoomFactor = 1,
+                },
+            };
         }
 
         public async Task<int> RecoverBackupFilesAsync()
@@ -273,6 +319,7 @@ namespace Notepads.Core
                 ITextEditor selectedTextEditor = _notepadsCore.GetSelectedTextEditor();
 
                 NotepadsSessionDataV1 sessionData = new NotepadsSessionDataV1();
+                bool everyTabBuilt = true;
 
                 foreach (ITextEditor textEditor in textEditors)
                 {
@@ -287,9 +334,13 @@ namespace Notepads.Core
                         LoggingService.LogError($"[{nameof(SessionManager)}] Failed to build TextEditor session data: {ex}");
                     }
 
-                    // A session without this tab would drop it, and its backup files with it.
-                    // Keep the last complete session file instead.
-                    if (textEditorSessionData == null) return false;
+                    // A session without this tab would drop it, and its backup files with it. Keep the last
+                    // complete session file, but still back up the other tabs: newer backups come back on launch.
+                    if (textEditorSessionData == null)
+                    {
+                        everyTabBuilt = false;
+                        continue;
+                    }
 
                     sessionData.TextEditors.Add(textEditorSessionData);
 
@@ -298,6 +349,8 @@ namespace Notepads.Core
                         sessionData.SelectedTextEditor = textEditor.Id;
                     }
                 }
+
+                if (!everyTabBuilt) return false;
 
                 sessionData.TabScrollViewerHorizontalOffset =
                     _notepadsCore.GetTabScrollViewerHorizontalOffset();
