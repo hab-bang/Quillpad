@@ -1,11 +1,12 @@
 # Builds the signed Quillpad package (x64 and ARM64).
 #   Push a tag like v0.1.0 on a commit in main -> builds version 0.1.0.0, signs it with the release
 #                                                 certificate, attests it and publishes a GitHub Release.
-#   Run it by hand                             -> builds version 0.0.0.<run number>, signs it with a throwaway
+#   Run it by hand on a branch                 -> builds version 0.0.0.<run number>, signs it with a throwaway
 #                                                 certificate made for that run and keeps it as a workflow artifact.
 # The release certificate is in the `release` environment as SIGNING_PFX_BASE64 and SIGNING_PFX_PASSWORD:
 # a self-signed certificate for CN=hab-bang, the Publisher in src/Notepads/Package.appxmanifest.
-# That environment accepts only v* tags, so no branch and no manual run can read the certificate.
+# That environment accepts only v* tags, so no run on a branch can read the certificate. A run started by
+# hand from a v* tag counts as a tag run.
 name: Release
 
 on:
@@ -64,7 +65,7 @@ jobs:
           if (-not $env:PFX_BASE64) { throw 'The release environment has no SIGNING_PFX_BASE64 secret.' }
           [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\signing.pfx", [Convert]::FromBase64String($env:PFX_BASE64))
 
-      # A manual run can build any branch, so it never gets the release certificate. It signs with a
+      # A run on a branch can build any code, so it never gets the release certificate. It signs with a
       # certificate that has the same Publisher, made for this run only. To install the build, trust the
       # .cer that comes with it.
       - name: Make a throwaway certificate
@@ -129,7 +130,7 @@ jobs:
         with:
           name: Quillpad_${{ env.VERSION }}
           path: ${{ runner.temp }}/release/
-          retention-days: ${{ github.ref_type == 'tag' && 1 || 14 }}
+          retention-days: ${{ github.ref_type == 'tag' && 7 || 14 }}
 
   # Publishing runs in its own job, without a checkout or the build, so the code that builds the
   # package never holds a token that can write to the repository.
@@ -141,7 +142,6 @@ jobs:
       contents: write
       id-token: write
       attestations: write
-      artifact-metadata: write
     steps:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -152,12 +152,13 @@ jobs:
         with:
           subject-path: release/*
 
-      # Immutable releases lock a release when it is published, so upload to a draft and publish after.
+      # Given files, gh uploads them to a draft and publishes it only when all are up, so immutable
+      # releases lock a complete release. It deletes the draft if an upload fails, and it refuses a
+      # tag that already has a release.
       - name: Publish the GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          gh release create "$GITHUB_REF_NAME" release/* --draft --verify-tag \
+          gh release create "$GITHUB_REF_NAME" release/* --verify-tag \
             --title "Quillpad $GITHUB_REF_NAME" --generate-notes
-          gh release edit "$GITHUB_REF_NAME" --draft=false
