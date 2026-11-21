@@ -14,7 +14,8 @@ namespace Notepads.Core
 
         Task<int> LoadLastSessionAsync();
 
-        Task SaveSessionAsync(Action actionAfterSaving = null);
+        // Returns true when the session on disk holds every open tab. actionAfterSaving runs only then.
+        Task<bool> SaveSessionAsync(Action actionAfterSaving = null);
 
         void StartSessionBackup(bool startImmediately = false);
 

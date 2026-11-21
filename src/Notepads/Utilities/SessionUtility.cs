@@ -17,6 +17,7 @@ namespace Notepads.Utilities
     {
         private const string BackupFolderDefaultName = "BackupFiles";
         private const string SessionMetaDataFileDefaultName = "NotepadsSessionData.json";
+        private const string SessionMetaDataTempFileExtension = ".tmp";
 
         private static readonly ConcurrentDictionary<INotepadsCore, ISessionManager> SessionManagers = new ConcurrentDictionary<INotepadsCore, ISessionManager>();
 
@@ -77,8 +78,37 @@ namespace Notepads.Utilities
         public static async Task SaveSerializedSessionMetaDataAsync(string serializedData, string sessionMetaDataFileName)
         {
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile metaDataFile = await FileSystemUtility.GetOrCreateFileAsync(localFolder, sessionMetaDataFileName);
-            await FileSystemUtility.WriteTextToFileAsync(metaDataFile, serializedData);
+
+            // Write to a temporary file next to the real one, then move it over the real one.
+            // If the process ends mid-write, only the temporary file is damaged and the
+            // previous session file stays whole.
+            StorageFile tempFile = await localFolder.CreateFileAsync(
+                sessionMetaDataFileName + SessionMetaDataTempFileExtension,
+                CreationCollisionOption.ReplaceExisting);
+            await FileSystemUtility.WriteTextToFileAsync(tempFile, serializedData);
+
+            // Another process (antivirus, backup or sync) can hold the session file open for a moment,
+            // and replacing an open file fails with "access denied". Try again a few times first.
+            for (int attempt = 1; ; attempt++)
+            {
+                try
+                {
+                    await tempFile.MoveAsync(localFolder, sessionMetaDataFileName, NameCollisionOption.ReplaceExisting);
+                    return;
+                }
+                catch (Exception) when (attempt < 10)
+                {
+                    await Task.Delay(10);
+                }
+            }
+        }
+
+        // Returns null when there is no session file.
+        public static async Task<DateTimeOffset?> GetSessionMetaDataFileDateModifiedAsync(string sessionMetaDataFileName)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            if (!(await localFolder.TryGetItemAsync(sessionMetaDataFileName) is StorageFile file)) return null;
+            return (await file.GetBasicPropertiesAsync()).DateModified;
         }
 
         public static async Task DeleteSerializedSessionMetaDataAsync(string sessionMetaDataFileName)

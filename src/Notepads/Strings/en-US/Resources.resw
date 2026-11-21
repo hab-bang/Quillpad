@@ -850,8 +850,8 @@
     <comment>AboutPage: shown when Install update is clicked while more than one Quillpad window is open.</comment>
   </data>
   <data name="AboutPage_Update_SaveFilesFirst" xml:space="preserve">
-    <value>Save your files first. Session backup is off, so unsaved changes would be lost when Quillpad closes.</value>
-    <comment>AboutPage: shown when Install update is clicked with unsaved tabs and session backup turned off.</comment>
+    <value>Save your files first. Some unsaved changes are not in the session backup, so they would be lost when Quillpad closes.</value>
+    <comment>AboutPage: shown when Install update is clicked with unsaved tabs that the session backup does not hold (backup turned off, or the backup save failed).</comment>
   </data>
   <data name="AboutPage_Update_AlreadyInstalling" xml:space="preserve">
     <value>An update is installing. Quillpad will close when it is ready.</value>
