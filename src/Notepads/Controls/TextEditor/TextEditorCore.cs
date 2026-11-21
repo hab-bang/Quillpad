@@ -51,6 +51,7 @@ namespace Notepads.Controls.TextEditor
 
         private int _textSelectionStartPosition = 0;
         private int _textSelectionEndPosition = 0;
+        private bool _hasPendingTextSelection; // Set until the editor is shown, see SetTextSelectionPosition
 
         private double _contentScrollViewerHorizontalOffset = 0;
         private double _contentScrollViewerVerticalOffset = 0;
@@ -317,6 +318,9 @@ namespace Notepads.Controls.TextEditor
 
             ResetRootGridClipping();
 
+            // Before the scroll position is put back, because placing the caret can scroll the view
+            if (_hasPendingTextSelection) ApplyTextSelectionPosition();
+
             if (_shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus)
             {
                 _shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus = false;
@@ -399,6 +403,9 @@ namespace Notepads.Controls.TextEditor
 
         private void OnSelectionChanging(RichEditBox sender, RichEditBoxSelectionChangingEventArgs args)
         {
+            // Text set before the editor is shown moves the selection, but the saved caret still applies
+            if (_hasPendingTextSelection) return;
+
             _textSelectionStartPosition = args.SelectionStart;
             _textSelectionEndPosition = args.SelectionStart + args.SelectionLength;
         }
@@ -594,8 +601,25 @@ namespace Notepads.Controls.TextEditor
         {
             _textSelectionStartPosition = selectionStartPosition;
             _textSelectionEndPosition = selectionEndPosition;
-            Document.Selection.StartPosition = selectionStartPosition;
-            Document.Selection.EndPosition = selectionEndPosition;
+
+            // An editor that was never shown has no width yet. Placing the caret there makes the
+            // RichEditBox lay out the whole text at zero width, which takes over a second for a
+            // 40,000-character file. So the caret is placed when the editor is shown (see OnLoaded).
+            if (!_loaded)
+            {
+                _hasPendingTextSelection = true;
+                return;
+            }
+
+            ApplyTextSelectionPosition();
+        }
+
+        private void ApplyTextSelectionPosition()
+        {
+            _hasPendingTextSelection = false;
+            var length = GetText().Length;
+            Document.Selection.StartPosition = Math.Min(_textSelectionStartPosition, length);
+            Document.Selection.EndPosition = Math.Min(_textSelectionEndPosition, length);
         }
 
         public void SetScrollViewerInitPosition(double horizontalOffset, double verticalOffset)
