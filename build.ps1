@@ -154,10 +154,19 @@ function Install-FrameworkDependencies {
 }
 
 function Register-DevPackage {
-    # A registration from another folder (for example an earlier Visual Studio F5) blocks this one
+    # A registration from another folder (another worktree, or an earlier Visual Studio F5) blocks this
+    # one. Remove it but keep the app's settings and session, which every Quillpad-Dev shares.
     $installed = Get-AppxPackage -Name $DevPackageName
     if ($installed -and ($installed.InstallLocation -ne $LayoutDir)) {
-        Remove-AppxPackage -Package $installed.PackageFullName
+        Write-Host "Replacing the $DevPackageName registered from $($installed.InstallLocation) (its data is kept)"
+        try {
+            Remove-AppxPackage -Package $installed.PackageFullName -PreserveApplicationData
+        }
+        catch {
+            # -PreserveApplicationData works only for a package registered from a folder in developer mode
+            Write-Warning "Could not keep the data of that $DevPackageName ($($_.Exception.Message)). Removing it with its data."
+            Remove-AppxPackage -Package $installed.PackageFullName
+        }
     }
 
     Write-Host "Installing $DevPackageName"
