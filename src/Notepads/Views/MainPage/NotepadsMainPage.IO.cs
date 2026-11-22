@@ -8,6 +8,7 @@ namespace Notepads.Views.MainPage
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
     using System.Threading.Tasks;
     using Windows.Graphics.Printing;
     using Windows.Storage;
@@ -163,6 +164,8 @@ namespace Notepads.Views.MainPage
                 return true;
             }
 
+            if (!await ConfirmEncodingHoldsTextAsync(textEditor)) return false;
+
             StorageFile file = null;
 
             try
@@ -259,6 +262,36 @@ namespace Notepads.Views.MainPage
             return false;
         }
 
+        // A code page like Windows-1252 has no Korean or emoji, and the write would turn each such character
+        // into "?" without a word. Offer UTF-8 instead. Returns false when the save should not go on.
+        private async Task<bool> ConfirmEncodingHoldsTextAsync(ITextEditor textEditor)
+        {
+            string text = textEditor.GetText();
+            Encoding encoding = textEditor.GetEncoding();
+            int index = EncodingFitUtility.FindFirstUnencodableIndex(text, encoding);
+            if (index < 0) return true;
+
+            NotepadsCore.SwitchTo(textEditor); // "Save all" can get here for a tab in the background
+            var dialog = new EncodingCannotHoldTextDialog(
+                textEditor.EditingFileName ?? textEditor.FileNamePlaceholder,
+                EncodingUtility.GetEncodingName(encoding),
+                EncodingFitUtility.GetCharacterAt(text, index),
+                EncodingFitUtility.GetLineNumber(text, index));
+            var result = await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+
+            if (result == ContentDialogResult.Primary)
+            {
+                textEditor.TryChangeEncoding(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                return true;
+            }
+
+            if (!dialog.IsAborted)
+            {
+                NotepadsCore.FocusOnSelectedTextEditor();
+            }
+            return false;
+        }
+
         private static async Task<string> ReadFileOnDiskAsync(ITextEditor textEditor)
         {
             TextFile fileOnDisk = await FileSystemUtility.ReadFileAsync(textEditor.EditingFile, ignoreFileSizeLimit: true, textEditor.LastSavedSnapshot.Encoding);
@@ -289,6 +322,9 @@ namespace Notepads.Views.MainPage
         private async Task<bool> SaveAllAsync(ITextEditor[] textEditors)
         {
             var success = false;
+
+            // A background tab whose file was deleted still reads as clean until it is checked, and would be skipped
+            await RefreshFileStatusOfUnmodifiedTabsAsync(textEditors);
 
             foreach (var textEditor in textEditors)
             {

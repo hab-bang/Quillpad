@@ -6,6 +6,8 @@
 namespace Notepads.Views.MainPage
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Windows.Storage;
     using Windows.System;
@@ -13,6 +15,7 @@ namespace Notepads.Views.MainPage
     using Windows.UI.Xaml.Controls;
     using Notepads.Controls.Dialog;
     using Notepads.Controls.FilePicker;
+    using Notepads.Controls.TextEditor;
     using Notepads.Core;
     using Notepads.Services;
     using Notepads.Utilities;
@@ -85,15 +88,40 @@ namespace Notepads.Views.MainPage
 
         private async Task OpenFolderAsync(StorageFolder folder)
         {
-            var opened = await ReplaceAllTabsAsync(() =>
+            // Two windows on one folder would write over each other's list of open tabs. Check before asking
+            // about unsaved changes. Opening the folder that is already open here only reloads its tabs.
+            WorkspaceFolderLock folderLock = null;
+            if (!Workspace.IsOpen(folder))
             {
-                Workspace.Open(folder);
-                return Workspace.RestoreTabsAsync();
-            });
+                folderLock = WorkspaceFolderLock.TryAcquire(folder.Path);
+                if (folderLock == null)
+                {
+                    var dialog = new FolderOpenInAnotherWindowDialog(folder.Name);
+                    await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+                    if (!dialog.IsAborted) NotepadsCore.FocusOnSelectedTextEditor();
+                    return;
+                }
+            }
 
-            if (opened && MRUService.TryAdd(folder))
+            bool lockHandedOver = false;
+
+            try
             {
-                await BuildOpenRecentButtonSubItemsAsync();
+                var opened = await ReplaceAllTabsAsync(() =>
+                {
+                    Workspace.Open(folder, folderLock);
+                    lockHandedOver = true;
+                    return Workspace.RestoreTabsAsync();
+                });
+
+                if (opened && MRUService.TryAdd(folder))
+                {
+                    await BuildOpenRecentButtonSubItemsAsync();
+                }
+            }
+            finally
+            {
+                if (!lockHandedOver) folderLock?.Dispose(); // Cancelled: the folder stays free for other windows
             }
         }
 
@@ -112,45 +140,69 @@ namespace Notepads.Views.MainPage
         /// </summary>
         private async Task<bool> ReplaceAllTabsAsync(Func<Task<int>> openTabsAsync)
         {
-            if (!await SaveOrDiscardUnsavedChangesAsync())
+            // A file deleted outside Quillpad makes its tab modified, so the question below covers it
+            await RefreshFileStatusOfUnmodifiedTabsAsync(NotepadsCore.GetAllTextEditors());
+
+            // Untitled drafts belong to no folder, so they stay open. "Don't save" would delete them, even with session backup on.
+            var closingEditors = NotepadsCore.GetAllTextEditors()
+                .Where(editor => editor.EditingFile != null || !editor.IsModified)
+                .ToArray();
+
+            if (!await SaveOrDiscardUnsavedChangesAsync(closingEditors))
             {
                 NotepadsCore.FocusOnSelectedTextEditor();
                 return false;
             }
 
-            await Workspace.SaveAsync();
-
-            var previousEditors = NotepadsCore.GetAllTextEditors();
-
-            // Open the new tabs before closing the old ones, so the window never runs out of tabs
-            if (await openTabsAsync() == 0)
+            // The closing tabs are locked from here on: text typed into them while the new tabs load would close with them
+            try
             {
-                NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
+                await Workspace.SaveAsync();
+
+                // Open the new tabs before closing the old ones, so the window never runs out of tabs
+                int openedCount = await openTabsAsync();
+
+                if (openedCount == 0 && closingEditors.Length == NotepadsCore.GetNumberOfOpenedTextEditors())
+                {
+                    NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
+                }
+
+                foreach (var editor in closingEditors)
+                {
+                    NotepadsCore.DeleteTextEditor(editor);
+                }
             }
-
-            foreach (var editor in previousEditors)
+            finally
             {
-                NotepadsCore.DeleteTextEditor(editor);
+                SetEditingLocked(closingEditors, false); // Only the tabs that are still open, after a failure
             }
 
             NotepadsCore.FocusOnSelectedTextEditor();
             return true;
         }
 
-        private async Task<bool> SaveOrDiscardUnsavedChangesAsync()
+        // Asks about the unsaved tabs among the closing ones. On "Save all" or "Don't save", the closing tabs
+        // are locked before anything else runs, so no text typed during the saves or the switch gets lost.
+        private async Task<bool> SaveOrDiscardUnsavedChangesAsync(IReadOnlyList<ITextEditor> closingEditors)
         {
-            if (!NotepadsCore.HaveUnsavedTextEditor()) return true;
+            if (!closingEditors.Any(editor => editor.IsModified))
+            {
+                SetEditingLocked(closingEditors, true);
+                return true;
+            }
 
             HideAllOpenFlyouts();
 
             var result = await DialogManager.OpenDialogAsync(new WorkspaceSaveReminderDialog(), awaitPreviousDialog: false);
 
+            if (result != ContentDialogResult.Primary && result != ContentDialogResult.Secondary) return false; // Cancel
+
+            SetEditingLocked(closingEditors, true);
             if (result == ContentDialogResult.Secondary) return true; // Don't save
-            if (result != ContentDialogResult.Primary) return false; // Cancel
 
             var allSaved = true;
 
-            foreach (var editor in NotepadsCore.GetAllTextEditors())
+            foreach (var editor in closingEditors)
             {
                 if (!await SaveAsync(editor, saveAs: false, ignoreUnmodifiedDocument: true, rebuildOpenRecentItems: false))
                 {
@@ -159,9 +211,25 @@ namespace Notepads.Views.MainPage
                 }
             }
 
+            if (!allSaved)
+            {
+                SetEditingLocked(closingEditors, false);
+            }
+
             // Files saved before a cancel are in the recent list too
             await BuildOpenRecentButtonSubItemsAsync();
             return allSaved;
+        }
+
+        private void SetEditingLocked(IEnumerable<ITextEditor> textEditors, bool locked)
+        {
+            var openEditors = NotepadsCore.GetAllTextEditors();
+
+            foreach (var textEditor in textEditors)
+            {
+                if (!openEditors.Contains(textEditor)) continue;
+                textEditor.SetEditingLocked(locked || _editingLockedForUpdate); // An update install keeps its own lock
+            }
         }
 
         private void OnWorkspaceFolderChanged(object sender, EventArgs e)

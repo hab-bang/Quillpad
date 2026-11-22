@@ -207,47 +207,7 @@ namespace Notepads.Views.MainPage
 
             if (!_loaded && AppSettingsService.IsSessionSnapshotEnabled)
             {
-                try
-                {
-                    loadedCount = await SessionManager.LoadLastSessionAsync();
-                }
-                catch (SessionDataCorruptedException ex)
-                {
-                    LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
-
-                    // Last session data is corrupted, clear it first
-                    await SessionManager.ClearSessionDataAsync();
-
-                    // Recover backup files
-                    int numberOfRecoveredFiles = await SessionManager.RecoverBackupFilesAsync();
-
-                    LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] {numberOfRecoveredFiles} file(s) recovered from last session backup.");
-
-
-                    // Show session recovery dialog if there are any recovered files
-                    if (numberOfRecoveredFiles > 0)
-                    {
-                        var sessionCorruptionErrorDialog = new SessionCorruptionErrorDialog(
-                            recoveryAction: async () =>
-                            {
-                                await SessionManager.OpenSessionBackupFolderAsync();
-                            });
-                        await DialogManager.OpenDialogAsync(sessionCorruptionErrorDialog, awaitPreviousDialog: false);
-                    }
-                }
-                catch (Exception ex) // Catch all other exceptions
-                {
-                    LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
-                }
-
-                if (SessionManager.TabsNotRestored.Count > 0)
-                {
-                    var tabsNotRestoredDialog = new SessionCorruptionErrorDialog(
-                        recoveryAction: async () => { await SessionManager.OpenSessionBackupFolderAsync(); },
-                        content: string.Format(_resourceLoader.GetString("SessionCorruptionErrorDialog_TabsNotRestored"),
-                            string.Join(", ", SessionManager.TabsNotRestored)));
-                    await DialogManager.OpenDialogAsync(tabsNotRestoredDialog, awaitPreviousDialog: false);
-                }
+                loadedCount = await LoadLastSessionAsync();
             }
 
             if (!_loaded)
@@ -317,6 +277,125 @@ namespace Notepads.Views.MainPage
             }
         }
 
+        // Restores the tabs of the last session, and says which ones could not come back. Returns how many came back.
+        private async Task<int> LoadLastSessionAsync()
+        {
+            int loadedCount = 0;
+
+            try
+            {
+                loadedCount = await SessionManager.LoadLastSessionAsync();
+            }
+            catch (SessionDataCorruptedException ex)
+            {
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
+
+                // Last session data is corrupted, clear it first
+                await SessionManager.ClearSessionDataAsync();
+
+                // Recover backup files
+                int numberOfRecoveredFiles = await SessionManager.RecoverBackupFilesAsync();
+
+                LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] {numberOfRecoveredFiles} file(s) recovered from last session backup.");
+
+                // Show session recovery dialog if there are any recovered files
+                if (numberOfRecoveredFiles > 0)
+                {
+                    var sessionCorruptionErrorDialog = new SessionCorruptionErrorDialog(
+                        recoveryAction: async () =>
+                        {
+                            await SessionManager.OpenSessionBackupFolderAsync();
+                        });
+                    await DialogManager.OpenDialogAsync(sessionCorruptionErrorDialog, awaitPreviousDialog: false);
+                }
+            }
+            catch (Exception ex) // Catch all other exceptions
+            {
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
+            }
+
+            if (SessionManager.TabsNotRestored.Count > 0)
+            {
+                var tabsNotRestoredDialog = new SessionCorruptionErrorDialog(
+                    recoveryAction: async () => { await SessionManager.OpenSessionBackupFolderAsync(); },
+                    content: string.Format(_resourceLoader.GetString("SessionCorruptionErrorDialog_TabsNotRestored"),
+                        string.Join(", ", SessionManager.TabsNotRestored)));
+                await DialogManager.OpenDialogAsync(tabsNotRestoredDialog, awaitPreviousDialog: false);
+            }
+
+            return loadedCount;
+        }
+
+        private bool _becomingPrimaryInstance;
+
+        /// <summary>
+        /// Called when this window is activated. When the main window has closed, this window takes over its
+        /// session backup, Settings and folder memory. Before its first backup, it restores the last session:
+        /// the closed window's unsaved tabs are only in that session, and the first save here would delete their backups.
+        /// </summary>
+        public async Task TryBecomePrimaryInstanceAsync()
+        {
+            if (!_loaded || _becomingPrimaryInstance || App.IsPrimaryInstance || App.IsGameBarWidget) return;
+            if (!App.TryBecomePrimaryInstance()) return;
+
+            _becomingPrimaryInstance = true;
+
+            try
+            {
+                AppSettingsService.ReloadSessionSnapshotSetting();
+                Workspace.StartRememberingFolder();
+                UpdateShadowWindowIndicator();
+                UpdateMainMenuForPrimaryInstance();
+
+                if (!AppSettingsService.IsSessionSnapshotEnabled) return;
+
+                var selectedEditor = NotepadsCore.GetSelectedTextEditor();
+                var editorsBefore = NotepadsCore.GetAllTextEditors();
+
+                int restoredCount = await LoadLastSessionAsync();
+
+                if (restoredCount > 0)
+                {
+                    CloseRestoredCopiesOfOpenFiles(editorsBefore);
+
+                    if (selectedEditor != null && NotepadsCore.GetAllTextEditors().Contains(selectedEditor))
+                    {
+                        NotepadsCore.SwitchTo(selectedEditor); // Stay on the tab the user was in
+                    }
+
+                    LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] {restoredCount} tab(s) of the closed main window restored here.");
+                }
+
+                SessionManager.IsBackupEnabled = true;
+                SessionManager.StartSessionBackup(startImmediately: true);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to take over as the main window: {ex}");
+            }
+            finally
+            {
+                _becomingPrimaryInstance = false;
+            }
+        }
+
+        // Both windows can have one file open. A restored tab without unsaved changes is then only a second copy.
+        private void CloseRestoredCopiesOfOpenFiles(ITextEditor[] editorsBefore)
+        {
+            var openPaths = new HashSet<string>(
+                editorsBefore.Where(editor => editor.EditingFilePath != null).Select(editor => editor.EditingFilePath),
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var editor in NotepadsCore.GetAllTextEditors())
+            {
+                if (editorsBefore.Contains(editor) || editor.IsModified || editor.EditingFilePath == null) continue;
+                if (openPaths.Contains(editor.EditingFilePath))
+                {
+                    NotepadsCore.DeleteTextEditor(editor);
+                }
+            }
+        }
+
         private async void App_EnteredBackground(object sender, Windows.ApplicationModel.EnteredBackgroundEventArgs e)
         {
             var deferral = e.GetDeferral();
@@ -343,6 +422,8 @@ namespace Notepads.Views.MainPage
 
             try
             {
+                await RefreshFileStatusOfUnmodifiedTabsAsync(NotepadsCore.GetAllTextEditors());
+
                 bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
 
                 if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
@@ -391,8 +472,19 @@ namespace Notepads.Views.MainPage
             {
                 LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] CoreWindow Activated.", consoleOnly: true);
                 Task.Run(() => ApplicationSettingsStore.Write(SettingsKey.ActiveInstanceIdStr, App.InstanceId.ToString()));
+
+                // Another window may have changed settings since this one was last in front
+                AppSettingsService.ReloadFromStore();
+                ThemeSettingsService.ReloadFromStore();
+
+                // The main window may have closed. TryBecomePrimaryInstanceAsync starts the backup itself, after the session restore.
+                if (!App.IsPrimaryInstance)
+                {
+                    _ = TryBecomePrimaryInstanceAsync();
+                }
+
                 NotepadsCore.GetSelectedTextEditor()?.StartCheckingFileStatusPeriodically();
-                if (AppSettingsService.IsSessionSnapshotEnabled)
+                if (AppSettingsService.IsSessionSnapshotEnabled && !_becomingPrimaryInstance)
                 {
                     SessionManager.StartSessionBackup();
                 }
@@ -426,6 +518,8 @@ namespace Notepads.Views.MainPage
         private async void MainPage_CloseRequested(object sender, Windows.UI.Core.Preview.SystemNavigationCloseRequestedPreviewEventArgs e)
         {
             var deferral = e.GetDeferral();
+
+            await RefreshFileStatusOfUnmodifiedTabsAsync(NotepadsCore.GetAllTextEditors());
 
             // Save session before app exit, then the workspace, which can be slow on a network folder.
             // If the session cannot be saved, ask about unsaved files as if session backup were off.
@@ -499,6 +593,15 @@ namespace Notepads.Views.MainPage
             {
                 NotepadsCore.FocusOnSelectedTextEditor();
             }
+        }
+
+        // Only the selected tab checks its file on a timer. Before tabs close without asking, check whether
+        // a file was deleted outside Quillpad: such a tab then counts as modified, so its text is asked about or backed up.
+        private static async Task RefreshFileStatusOfUnmodifiedTabsAsync(IEnumerable<ITextEditor> textEditors)
+        {
+            await Task.WhenAll(textEditors
+                .Where(textEditor => !textEditor.IsModified && textEditor.EditingFile != null)
+                .Select(textEditor => textEditor.RefreshFileStatusAsync()));
         }
 
         private void HideAllOpenFlyouts()
@@ -619,7 +722,14 @@ namespace Notepads.Views.MainPage
         {
             try
             {
-                await textEditor.ReloadFromEditingFileAsync();
+                // The other app may still be writing. A reload now would take part of the file, and the next save would write that part back.
+                if (!await WaitUntilFileStopsChangingAsync(textEditor.EditingFile)) return false;
+
+                // Text typed during the wait is not in the file: keep it, and show the warning instead
+                if (textEditor.IsModified || !NotepadsCore.GetAllTextEditors().Contains(textEditor)) return false;
+
+                if (!await textEditor.ReloadFromEditingFileAsync(requireUnchangedFile: true)) return false;
+
                 NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
                 return true;
             }
@@ -629,6 +739,33 @@ namespace Notepads.Views.MainPage
                 LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to reload a file changed outside the app: {ex.Message}");
                 return false;
             }
+        }
+
+        private static readonly TimeSpan FileSettleCheckDelay = TimeSpan.FromMilliseconds(500);
+        private const int FileSettleCheckAttempts = 20; // Up to 10 s, then the "changed outside" warning shows instead
+
+        // True once the file's time and size stay the same between two looks
+        private static async Task<bool> WaitUntilFileStopsChangingAsync(StorageFile file)
+        {
+            if (file == null) return false;
+
+            var before = await file.GetBasicPropertiesAsync();
+
+            for (int attempt = 0; attempt < FileSettleCheckAttempts; attempt++)
+            {
+                await Task.Delay(FileSettleCheckDelay);
+                var after = await file.GetBasicPropertiesAsync();
+
+                if (DiskChangeUtility.HasStoppedChanging(before.DateModified.ToFileTime(), before.Size, after.DateModified.ToFileTime(), after.Size))
+                {
+                    return true;
+                }
+
+                before = after;
+            }
+
+            LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] The file kept changing, so it was not reloaded: {file.Path}");
+            return false;
         }
 
         private void OnTextEditorSaved(object sender, ITextEditor textEditor)
@@ -651,6 +788,14 @@ namespace Notepads.Views.MainPage
 
         private async void OnTextEditorClosing(object sender, ITextEditor textEditor)
         {
+            if (!textEditor.IsModified && textEditor.EditingFile != null)
+            {
+                // A file deleted outside Quillpad leaves this tab with the only copy of the text. Then the tab
+                // counts as modified, and closing it asks first.
+                await textEditor.RefreshFileStatusAsync();
+                if (!NotepadsCore.GetAllTextEditors().Contains(textEditor)) return;
+            }
+
             if (!AppSettingsService.ExitWhenLastTabClosed &&
                 NotepadsCore.GetNumberOfOpenedTextEditors() == 1 &&
                 textEditor.IsModified == false &&

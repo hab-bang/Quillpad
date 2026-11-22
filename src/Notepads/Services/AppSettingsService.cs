@@ -348,6 +348,66 @@ namespace Notepads.Services
             InitializeAppClosingPreferencesSettings();
         }
 
+        /// <summary>
+        /// Each window is its own process with its own copy of the settings, and Settings writes only to the shared store.
+        /// Reads the store again and raises the change event of each setting that another window changed.
+        /// The session backup toggle is left out: only the main window can change it, and <see cref="ReloadSessionSnapshotSetting"/> reads it.
+        /// </summary>
+        public static void ReloadFromStore()
+        {
+            var fontFamily = _editorFontFamily;
+            var fontSize = _editorFontSize;
+            var fontStyle = _editorFontStyle;
+            var fontWeight = _editorFontWeight.Weight;
+            var textWrapping = _editorDefaultTextWrapping;
+            var textWidth = _editorTextWidth;
+            var lineHighlighter = _editorDisplayLineHighlighter;
+            var lineNumbers = _displayLineNumbers;
+            var lineEnding = _editorDefaultLineEnding;
+            var encoding = _editorDefaultEncoding;
+            var tabIndents = _editorDefaultTabIndents;
+            var showStatusBar = _showStatusBar;
+            var highlightMisspelledWords = _isHighlightMisspelledWordsEnabled;
+
+            InitializeFontSettings();
+            InitializeTextWrappingSettings();
+            InitializeTextWidthSettings();
+            InitializeSpellingSettings();
+            InitializeDisplaySettings();
+            InitializeSmartCopySettings();
+            InitializeLineEndingSettings();
+            InitializeEncodingSettings();
+            InitializeDecodingSettings();
+            InitializeTabIndentsSettings();
+            InitializeSearchEngineSettings();
+            InitializeStatusBarSettings();
+            InitializeAppOpeningPreferencesSettings();
+            InitializeAppClosingPreferencesSettings();
+
+            if (!string.Equals(fontFamily, _editorFontFamily, StringComparison.Ordinal)) OnFontFamilyChanged?.Invoke(null, _editorFontFamily);
+            if (fontSize != _editorFontSize) OnFontSizeChanged?.Invoke(null, _editorFontSize);
+            if (fontStyle != _editorFontStyle) OnFontStyleChanged?.Invoke(null, _editorFontStyle);
+            if (fontWeight != _editorFontWeight.Weight) OnFontWeightChanged?.Invoke(null, _editorFontWeight);
+            if (textWrapping != _editorDefaultTextWrapping) OnDefaultTextWrappingChanged?.Invoke(null, _editorDefaultTextWrapping);
+            if (textWidth != _editorTextWidth) OnTextWidthChanged?.Invoke(null, _editorTextWidth);
+            if (lineHighlighter != _editorDisplayLineHighlighter) OnDefaultLineHighlighterViewStateChanged?.Invoke(null, _editorDisplayLineHighlighter);
+            if (lineNumbers != _displayLineNumbers) OnDefaultDisplayLineNumbersViewStateChanged?.Invoke(null, _displayLineNumbers);
+            if (lineEnding != _editorDefaultLineEnding) OnDefaultLineEndingChanged?.Invoke(null, _editorDefaultLineEnding);
+            if (!EncodingUtility.Equals(encoding, _editorDefaultEncoding)) OnDefaultEncodingChanged?.Invoke(null, _editorDefaultEncoding);
+            if (tabIndents != _editorDefaultTabIndents) OnDefaultTabIndentsChanged?.Invoke(null, _editorDefaultTabIndents);
+            if (showStatusBar != _showStatusBar) OnStatusBarVisibilityChanged?.Invoke(null, _showStatusBar);
+            if (highlightMisspelledWords != _isHighlightMisspelledWordsEnabled) OnHighlightMisspelledWordsChanged?.Invoke(null, _isHighlightMisspelledWordsEnabled);
+        }
+
+        /// <summary>
+        /// Reads the session backup toggle again, for a window that just became the main window. Raises no event:
+        /// that window first restores the last session, then starts the backup itself.
+        /// </summary>
+        public static void ReloadSessionSnapshotSetting()
+        {
+            InitializeSessionSnapshotSettings();
+        }
+
         private static void InitializeStatusBarSettings()
         {
             if (ApplicationSettingsStore.Read(SettingsKey.EditorShowStatusBarBool) is bool showStatusBar)

@@ -118,6 +118,62 @@ namespace Notepads.Services
             InitializeAppBackgroundPanelTintOpacity();
         }
 
+        /// <summary>
+        /// Each window is its own process, and Settings writes only to the shared store. Reads the theme settings
+        /// again and raises the change event of each one that another window changed.
+        /// </summary>
+        public static void ReloadFromStore()
+        {
+            _useWindowsTheme = !(ApplicationSettingsStore.Read(SettingsKey.UseWindowsThemeBool) is bool useWindowsTheme) || useWindowsTheme;
+
+            var theme = ThemeMode;
+            if (_useWindowsTheme)
+            {
+                theme = ThemeListener.CurrentTheme.ToElementTheme();
+            }
+            else if (ApplicationSettingsStore.Read(SettingsKey.RequestedThemeStr) is string themeModeStr &&
+                     Enum.TryParse(typeof(ElementTheme), themeModeStr, out var storedTheme))
+            {
+                theme = (ElementTheme)storedTheme;
+            }
+
+            if (theme != ThemeMode)
+            {
+                ThemeMode = theme;
+                OnThemeChanged?.Invoke(null, theme);
+            }
+
+            _useWindowsAccentColor = !(ApplicationSettingsStore.Read(SettingsKey.UseWindowsAccentColorBool) is bool useWindowsAccentColor) || useWindowsAccentColor;
+
+            var accentColor = _appAccentColor;
+            if (_useWindowsAccentColor)
+            {
+                accentColor = UISettings.GetColorValue(UIColorType.Accent);
+            }
+            else if (ApplicationSettingsStore.Read(SettingsKey.AppAccentColorHexStr) is string accentColorHexStr)
+            {
+                accentColor = accentColorHexStr.ToColor();
+            }
+
+            if (accentColor != _appAccentColor)
+            {
+                _appAccentColor = accentColor;
+                OnAccentColorChanged?.Invoke(null, accentColor);
+            }
+
+            if (ApplicationSettingsStore.Read(SettingsKey.CustomAccentColorHexStr) is string customAccentColorHexStr)
+            {
+                _customAccentColor = customAccentColorHexStr.ToColor();
+            }
+
+            if (ApplicationSettingsStore.Read(SettingsKey.AppBackgroundTintOpacityDouble) is double tintOpacity &&
+                !tintOpacity.Equals(_appBackgroundPanelTintOpacity))
+            {
+                _appBackgroundPanelTintOpacity = tintOpacity;
+                OnBackgroundChanged?.Invoke(null, GetAppBackgroundBrush(ThemeMode));
+            }
+        }
+
         private static void InitializeAppAccentColor()
         {
             if (ApplicationSettingsStore.Read(SettingsKey.UseWindowsAccentColorBool) is bool useWindowsAccentColor)

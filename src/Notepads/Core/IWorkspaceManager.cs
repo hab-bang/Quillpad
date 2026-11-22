@@ -8,6 +8,7 @@ namespace Notepads.Core
     using System;
     using System.Threading.Tasks;
     using Windows.Storage;
+    using Notepads.Utilities;
 
     /// <summary>
     /// A workspace is a folder the user opened. Its open tabs are kept in the folder itself,
@@ -21,11 +22,25 @@ namespace Notepads.Core
         /// <summary>The open workspace folder, or null when no folder is open.</summary>
         StorageFolder Folder { get; }
 
-        /// <summary>Makes the folder from the last run the workspace again. Does not open any tab.</summary>
+        /// <summary>
+        /// Makes the folder from the last run the workspace again. Does not open any tab.
+        /// Returns false when there is none, or when another window has it open.
+        /// </summary>
         Task<bool> TryResumeLastFolderAsync();
 
-        /// <summary>Makes <paramref name="folder"/> the workspace. Does not open or close any tab.</summary>
-        void Open(StorageFolder folder);
+        /// <summary>True when <paramref name="folder"/> is the open workspace folder.</summary>
+        bool IsOpen(StorageFolder folder);
+
+        /// <summary>
+        /// Makes <paramref name="folder"/> the workspace and keeps <paramref name="folderLock"/> until the folder closes.
+        /// The lock is null only when the folder is already open. Does not open or close any tab.
+        /// </summary>
+        void Open(StorageFolder folder, WorkspaceFolderLock folderLock);
+
+        /// <summary>
+        /// From now on, reopen the workspace folder on the next launch. Used when this window becomes the main window.
+        /// </summary>
+        void StartRememberingFolder();
 
         /// <summary>Leaves the workspace. Does not close any tab.</summary>
         void Close();

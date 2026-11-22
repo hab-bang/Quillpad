@@ -24,7 +24,8 @@ namespace Notepads.Core
         private const string LastFolderToken = "WorkspaceFolder";
 
         private readonly INotepadsCore _notepadsCore;
-        private readonly bool _rememberFolder;
+        private bool _rememberFolder;
+        private WorkspaceFolderLock _folderLock;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private string _lastStateJson;
 
@@ -53,7 +54,18 @@ namespace Notepads.Core
             try
             {
                 if (!futureAccessList.ContainsItem(LastFolderToken)) return false;
-                SetFolder(await futureAccessList.GetFolderAsync(LastFolderToken));
+                var folder = await futureAccessList.GetFolderAsync(LastFolderToken);
+
+                // Another window opened it after this folder's window closed. Leave it there, and keep the token.
+                var folderLock = WorkspaceFolderLock.TryAcquire(folder.Path);
+                if (folderLock == null)
+                {
+                    LoggingService.LogInfo($"[{nameof(WorkspaceManager)}] The last workspace folder is open in another window, so it is not resumed.");
+                    return false;
+                }
+
+                ReplaceFolderLock(folderLock);
+                SetFolder(folder);
                 return true;
             }
             catch (Exception ex)
@@ -66,8 +78,18 @@ namespace Notepads.Core
             }
         }
 
-        public void Open(StorageFolder folder)
+        public bool IsOpen(StorageFolder folder)
         {
+            return folder != null && WorkspaceFolderLock.IsSameFolder(Folder?.Path, folder.Path);
+        }
+
+        public void Open(StorageFolder folder, WorkspaceFolderLock folderLock)
+        {
+            if (folderLock != null || !IsOpen(folder))
+            {
+                ReplaceFolderLock(folderLock);
+            }
+
             if (_rememberFolder)
             {
                 StorageApplicationPermissions.FutureAccessList.AddOrReplace(LastFolderToken, folder);
@@ -83,7 +105,27 @@ namespace Notepads.Core
                 StorageApplicationPermissions.FutureAccessList.Remove(LastFolderToken);
             }
 
+            ReplaceFolderLock(null);
             SetFolder(null);
+        }
+
+        public void StartRememberingFolder()
+        {
+            if (_rememberFolder) return;
+            _rememberFolder = true;
+
+            // With no folder open here, the token still names the folder of the main window that closed.
+            // Its tabs come back with the session, so its folder comes back on the next launch too.
+            if (Folder != null)
+            {
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace(LastFolderToken, Folder);
+            }
+        }
+
+        private void ReplaceFolderLock(WorkspaceFolderLock folderLock)
+        {
+            _folderLock?.Dispose();
+            _folderLock = folderLock;
         }
 
         public async Task<int> RestoreTabsAsync()

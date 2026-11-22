@@ -50,6 +50,8 @@
     <Compile Include="$(AppSource)Utilities\LogFileUtility.cs" Link="Linked\LogFileUtility.cs" />
     <Compile Include="$(AppSource)Utilities\DiskChangeUtility.cs" Link="Linked\DiskChangeUtility.cs" />
     <Compile Include="$(AppSource)Utilities\BackupFileUtility.cs" Link="Linked\BackupFileUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\EncodingFitUtility.cs" Link="Linked\EncodingFitUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\WorkspaceFolderLock.cs" Link="Linked\WorkspaceFolderLock.cs" />
   </ItemGroup>
 
 </Project>

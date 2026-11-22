@@ -77,5 +77,19 @@ namespace Quillpad.Tests
             Assert.False(DiskChangeUtility.HasSameText(null, "text"));
             Assert.False(DiskChangeUtility.HasSameText("text", null));
         }
+
+        [Fact]
+        public void FileWithSameTimeAndSizeHasStoppedChanging()
+        {
+            Assert.True(DiskChangeUtility.HasStoppedChanging(LoadedAt, 4096, LoadedAt, 4096));
+        }
+
+        [Fact]
+        public void FileStillBeingWrittenHasNotStoppedChanging()
+        {
+            // A sync tool writing in parts: the size grows, and the time may or may not move with it
+            Assert.False(DiskChangeUtility.HasStoppedChanging(LoadedAt, 4096, LoadedAt, 8192));
+            Assert.False(DiskChangeUtility.HasStoppedChanging(LoadedAt, 4096, LoadedAt + TimeSpan.FromSeconds(1).Ticks, 4096));
+        }
     }
 }
