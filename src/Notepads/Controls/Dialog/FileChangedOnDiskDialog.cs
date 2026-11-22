@@ -5,6 +5,8 @@
 
 namespace Notepads.Controls.Dialog
 {
+    using Windows.UI.Xaml.Controls;
+
     /// <summary>
     /// Asked before a save writes over a file that another app changed since the tab loaded or saved it.
     /// Primary: overwrite, Secondary: compare with the file on disk, Close: cancel.
@@ -18,6 +20,10 @@ namespace Notepads.Controls.Dialog
             PrimaryButtonText = ResourceLoader.GetString("FileChangedOnDiskDialog_PrimaryButtonText");
             SecondaryButtonText = ResourceLoader.GetString("FileChangedOnDiskDialog_SecondaryButtonText");
             CloseButtonText = ResourceLoader.GetString("RevertAllChangesConfirmationDialog_CloseButtonText");
+
+            // Overwrite throws away the other app's changes. Someone who saved mid-sentence keeps typing,
+            // so a Space or Enter must land on Cancel.
+            DefaultButton = ContentDialogButton.Close;
         }
     }
 }
