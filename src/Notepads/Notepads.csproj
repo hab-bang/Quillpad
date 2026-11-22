@@ -150,6 +150,7 @@
     <Compile Include="Controls\Dialog\AppCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\SessionCorruptionErrorDialog.cs" />
     <Compile Include="Controls\Dialog\FileRenameDialog.cs" />
+    <Compile Include="Controls\Dialog\FileChangedOnDiskDialog.cs" />
     <Compile Include="Controls\Dialog\FileOpenErrorDialog.cs" />
     <Compile Include="Controls\Dialog\FileSaveErrorDialog.cs" />
     <Compile Include="Controls\Dialog\ReloadFileConfirmationDialog.cs" />
@@ -246,6 +247,7 @@
     <Compile Include="Views\MainPage\NotepadsMainPage.ViewModes.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Workspace.cs" />
     <Compile Include="Services\MRUService.cs" />
+    <Compile Include="Utilities\BackupFileUtility.cs" />
     <Compile Include="Utilities\BrushUtility.cs" />
     <Compile Include="Utilities\Downloader.cs" />
     <Compile Include="Services\LoggingService.cs" />
@@ -267,6 +269,7 @@
     <Compile Include="Utilities\FontUtility.cs" />
     <Compile Include="Utilities\EncodingUtility.cs" />
     <Compile Include="Brushes\HostBackdropAcrylicBrush.cs" />
+    <Compile Include="Utilities\DiskChangeUtility.cs" />
     <Compile Include="Utilities\LineEndingUtility.cs" />
     <Compile Include="Utilities\LogFileUtility.cs" />
     <Compile Include="Services\AppSettingsService.cs" />

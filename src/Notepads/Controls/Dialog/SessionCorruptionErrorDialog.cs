@@ -10,10 +10,11 @@ namespace Notepads.Controls.Dialog
 
     public sealed class SessionCorruptionErrorDialog : NotepadsDialog
     {
-        public SessionCorruptionErrorDialog(Action recoveryAction)
+        // content replaces the default text, for example to name the tabs that could not be restored
+        public SessionCorruptionErrorDialog(Action recoveryAction, string content = null)
         {
             Title = ResourceLoader.GetString("SessionCorruptionErrorDialog_Title");
-            Content = ResourceLoader.GetString("SessionCorruptionErrorDialog_Content");
+            Content = content ?? ResourceLoader.GetString("SessionCorruptionErrorDialog_Content");
             PrimaryButtonText = ResourceLoader.GetString("SessionCorruptionErrorDialog_PrimaryButtonText");
             CloseButtonText = ResourceLoader.GetString("SessionCorruptionErrorDialog_CloseButtonText");
             PrimaryButtonStyle = GetButtonStyle(Color.FromArgb(255, 255, 69, 0));

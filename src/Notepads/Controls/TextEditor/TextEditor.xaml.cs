@@ -163,6 +163,10 @@
 
         private SearchContext _lastSearchContext = new SearchContext(string.Empty);
 
+        private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk
+
+        private bool _editingLocked;
+
         public TextEditorMode Mode
         {
             get => _mode;
@@ -288,7 +292,7 @@
             {
                 if (Mode == TextEditorMode.DiffPreview)
                 {
-                    SideBySideDiffViewer.RenderDiff(LastSavedSnapshot.Content, TextEditorCore.GetText(), theme);
+                    RenderDiff(theme);
                     Task.Factory.StartNew(async () =>
                     {
                         await Dispatcher.CallOnUIThreadAsync(() => { SideBySideDiffViewer.Focus(); });
@@ -388,7 +392,15 @@
                     {
                         await Task.Delay(TimeSpan.FromSeconds(_fileStatusCheckerDelayInSec), cancellationToken);
                         LoggingService.LogInfo($"[{nameof(TextEditor)}] Checking file status for \"{EditingFile.Path}\".", consoleOnly: true);
-                        await CheckAndUpdateFileStatusAsync(cancellationToken);
+                        try
+                        {
+                            await CheckAndUpdateFileStatusAsync(cancellationToken);
+                        }
+                        catch (Exception ex) when (!(ex is OperationCanceledException) && !(ex is ObjectDisposedException))
+                        {
+                            // A network folder can drop for a moment. Keep the last state and try again next time.
+                            LoggingService.LogInfo($"[{nameof(TextEditor)}] Failed to check status for file [{EditingFile?.Path}]: {ex.Message}", consoleOnly: true);
+                        }
                         await Task.Delay(TimeSpan.FromSeconds(_fileStatusCheckerPollingRateInSec), cancellationToken);
                     }
                 }, cancellationToken);
@@ -421,38 +433,36 @@
 
             await _fileStatusSemaphoreSlim.WaitAsync(cancellationToken);
 
-            if (cancellationToken.IsCancellationRequested)
+            // Released in finally: an I/O error used to keep the lock, and the poll stopped for good
+            try
+            {
+                if (cancellationToken.IsCancellationRequested) return;
+
+                FileModificationState newState;
+
+                if (!await FileSystemUtility.FileExistsAsync(EditingFile))
+                {
+                    newState = FileModificationState.RenamedMovedOrDeleted;
+                }
+                else
+                {
+                    long fileModifiedTime = await FileSystemUtility.GetDateModifiedAsync(EditingFile);
+                    newState = DiskChangeUtility.HasChangedOnDisk(LastSavedSnapshot.DateModifiedFileTime, fileModifiedTime) ?
+                        FileModificationState.Modified :
+                        FileModificationState.Untouched;
+                }
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                await Dispatcher.CallOnUIThreadAsync(() =>
+                {
+                    FileModificationState = newState;
+                });
+            }
+            finally
             {
                 _fileStatusSemaphoreSlim.Release();
-                return;
             }
-
-            FileModificationState? newState = null;
-
-            if (!await FileSystemUtility.FileExistsAsync(EditingFile))
-            {
-                newState = FileModificationState.RenamedMovedOrDeleted;
-            }
-            else
-            {
-                long fileModifiedTime = await FileSystemUtility.GetDateModifiedAsync(EditingFile);
-                newState = fileModifiedTime != LastSavedSnapshot.DateModifiedFileTime ?
-                    FileModificationState.Modified :
-                    FileModificationState.Untouched;
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                _fileStatusSemaphoreSlim.Release();
-                return;
-            }
-
-            await Dispatcher.CallOnUIThreadAsync(() =>
-            {
-                FileModificationState = newState.Value;
-            });
-
-            _fileStatusSemaphoreSlim.Release();
         }
 
         private KeyboardCommandHandler GetKeyboardCommandHandler()
@@ -645,25 +655,56 @@
             }
         }
 
-        public void OpenSideBySideDiffViewer()
+        public void OpenSideBySideDiffViewer(string fileOnDiskText = null)
         {
-            if (string.Equals(LastSavedSnapshot.Content, TextEditorCore.GetText())) return;
+            if (string.Equals(fileOnDiskText ?? LastSavedSnapshot.Content, TextEditorCore.GetText())) return;
             if (Mode == TextEditorMode.DiffPreview) return;
             if (SideBySideDiffViewer == null) LoadSideBySideDiffViewer();
+            _diffFileOnDiskText = fileOnDiskText;
             Mode = TextEditorMode.DiffPreview;
             TextEditorCore.IsEnabled = false;
             EditorRowDefinition.Height = new GridLength(0);
             SideBySideDiffViewRowDefinition.Height = new GridLength(1, GridUnitType.Star);
             SideBySideDiffViewer.Visibility = Visibility.Visible;
-            SideBySideDiffViewer.RenderDiff(LastSavedSnapshot.Content, TextEditorCore.GetText(), ThemeSettingsService.ThemeMode);
+            RenderDiff(ThemeSettingsService.ThemeMode);
             SideBySideDiffViewer.Focus();
+        }
+
+        public void SetEditingLocked(bool locked)
+        {
+            _editingLocked = locked;
+            if (Mode == TextEditorMode.Editing) // The diff viewer disables the editor on its own
+            {
+                TextEditorCore.IsEnabled = !locked;
+            }
+
+            if (locked)
+            {
+                // An open find bar's Replace buttons change the text without going through the editor's input.
+                // Neither bar can open again while the editor is disabled.
+                HideFindAndReplaceControl();
+                HideGoToControl();
+            }
+        }
+
+        private void RenderDiff(ElementTheme theme)
+        {
+            if (_diffFileOnDiskText == null)
+            {
+                SideBySideDiffViewer.RenderDiff(LastSavedSnapshot.Content, TextEditorCore.GetText(), theme);
+            }
+            else
+            {
+                SideBySideDiffViewer.RenderDiff(_diffFileOnDiskText, TextEditorCore.GetText(), theme,
+                    _resourceLoader.GetString("DiffViewer_Header_FileOnDisk"));
+            }
         }
 
         public void CloseSideBySideDiffViewer()
         {
             if (Mode != TextEditorMode.DiffPreview) return;
             Mode = TextEditorMode.Editing;
-            TextEditorCore.IsEnabled = true;
+            TextEditorCore.IsEnabled = !_editingLocked;
             EditorRowDefinition.Height = new GridLength(1, GridUnitType.Star);
             SideBySideDiffViewRowDefinition.Height = new GridLength(0);
             SideBySideDiffViewer.Visibility = Visibility.Collapsed;

@@ -6,6 +6,7 @@
 namespace Notepads.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     internal interface ISessionManager
@@ -13,6 +14,9 @@ namespace Notepads.Core
         bool IsBackupEnabled { get; set; }
 
         Task<int> LoadLastSessionAsync();
+
+        // Names of the tabs LoadLastSessionAsync could not bring back. Their backup files are kept as .txt files.
+        IReadOnlyList<string> TabsNotRestored { get; }
 
         // Returns true when the session on disk holds every open tab. actionAfterSaving runs only then.
         Task<bool> SaveSessionAsync(Action actionAfterSaving = null);

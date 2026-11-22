@@ -44,6 +44,7 @@ namespace Notepads.Views.MainPage
 
         private bool _loaded = false;
         private bool _lastTabMovedToAnotherInstance = false;
+        private bool _editingLockedForUpdate = false;
 
         private INotepadsCore _notepadsCore;
 
@@ -238,6 +239,15 @@ namespace Notepads.Views.MainPage
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
                 }
+
+                if (SessionManager.TabsNotRestored.Count > 0)
+                {
+                    var tabsNotRestoredDialog = new SessionCorruptionErrorDialog(
+                        recoveryAction: async () => { await SessionManager.OpenSessionBackupFolderAsync(); },
+                        content: string.Format(_resourceLoader.GetString("SessionCorruptionErrorDialog_TabsNotRestored"),
+                            string.Join(", ", SessionManager.TabsNotRestored)));
+                    await DialogManager.OpenDialogAsync(tabsNotRestoredDialog, awaitPreviousDialog: false);
+                }
             }
 
             if (!_loaded)
@@ -289,6 +299,7 @@ namespace Notepads.Views.MainPage
             await BuildOpenRecentButtonSubItemsAsync();
 
             UpdateService.SaveBeforeInstallAsync = SaveBeforeUpdateInstallAsync;
+            UpdateService.InstallStopped = () => SetEditingLockedForUpdate(false);
 
             if (!App.IsGameBarWidget)
             {
@@ -325,15 +336,38 @@ namespace Notepads.Views.MainPage
         // Returns false when unsaved text would be lost: a tab has unsaved changes and the session does not hold them.
         private async Task<bool> SaveBeforeUpdateInstallAsync()
         {
-            bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
+            // The install downloads first and then closes the app with no warning. Text typed in between
+            // would be in neither the session nor the file, so the editors take no typing until then.
+            SetEditingLockedForUpdate(true);
+            bool keepLocked = false;
 
-            if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
+            try
             {
-                return false;
-            }
+                bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
 
-            await Workspace.SaveAsync();
-            return true;
+                if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
+                {
+                    return false;
+                }
+
+                await Workspace.SaveAsync();
+                keepLocked = true; // InstallStopped unlocks if the app is still running after the install
+                return true;
+            }
+            finally
+            {
+                // Also on a throw: the install never starts then, so InstallStopped would never run
+                if (!keepLocked) SetEditingLockedForUpdate(false);
+            }
+        }
+
+        private void SetEditingLockedForUpdate(bool locked)
+        {
+            _editingLockedForUpdate = locked;
+            foreach (ITextEditor textEditor in NotepadsCore.GetAllTextEditors())
+            {
+                textEditor.SetEditingLocked(locked);
+            }
         }
 
         public void ExecuteProtocol(Uri uri)
@@ -512,6 +546,11 @@ namespace Notepads.Views.MainPage
 
         private void OnTextEditorLoaded(object sender, ITextEditor textEditor)
         {
+            if (_editingLockedForUpdate)
+            {
+                textEditor.SetEditingLocked(true); // A tab opened during the update download
+            }
+
             if (NotepadsCore.GetSelectedTextEditor() == textEditor)
             {
                 SetupStatusBar(textEditor);
