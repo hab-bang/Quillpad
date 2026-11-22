@@ -19,7 +19,8 @@ namespace Notepads.Utilities
         /// <summary>
         /// Counts words the way a writer expects: a run of non-space characters is a word only if it
         /// holds a letter or a digit, so markdown markers on their own ("#", "*", "-", "---") do not count.
-        /// Each Chinese or Japanese character counts as one word, because those scripts do not use spaces.
+        /// Dashes split words as described in IsWordBreakingDash. Each Chinese or Japanese character counts
+        /// as one word, because those scripts do not use spaces.
         /// </summary>
         public static TextStatistics Count(string text, int start = 0, int length = -1)
         {
@@ -52,6 +53,14 @@ namespace Notepads.Utilities
 
                 stats.CharactersWithoutSpaces++;
 
+                if (IsWordBreakingDash(text, i, start, end))
+                {
+                    if (inToken && tokenHasWordChar) stats.Words++;
+                    inToken = false;
+                    tokenHasWordChar = false;
+                    continue;
+                }
+
                 if (IsIdeograph(c))
                 {
                     if (inToken && tokenHasWordChar) stats.Words++;
@@ -68,6 +77,17 @@ namespace Notepads.Utilities
             if (inToken && tokenHasWordChar) stats.Words++;
 
             return stats;
+        }
+
+        /// <summary>
+        /// "paused—then" is two words. An em dash, an en dash, or two hyphens typed for an em dash
+        /// separate words. A single hyphen joins them ("well-known").
+        /// </summary>
+        private static bool IsWordBreakingDash(string text, int i, int start, int end)
+        {
+            var c = text[i];
+            if (c == '–' || c == '—' || c == '―') return true;
+            return c == '-' && ((i > start && text[i - 1] == '-') || (i + 1 < end && text[i + 1] == '-'));
         }
 
         private static bool IsIdeograph(char c)

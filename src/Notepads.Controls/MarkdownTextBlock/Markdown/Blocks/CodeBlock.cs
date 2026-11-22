@@ -58,7 +58,8 @@ namespace Notepads.Controls.Markdown
             foreach (var lineInfo in Common.ParseLines(markdown, start, maxEnd, quoteDepth))
             {
                 int pos = lineInfo.StartOfLine;
-                if (pos < maxEnd && markdown[pos] == '`')
+                // Quillpad: once an indented block has started, a backtick line ends it instead of opening a fence
+                if (pos < maxEnd && markdown[pos] == '`' && (code == null || insideCodeBlock))
                 {
                     var backTickCount = 0;
                     while (pos < maxEnd && backTickCount < 3)
@@ -75,7 +76,14 @@ namespace Notepads.Controls.Markdown
                         pos++;
                     }
 
-                    if (backTickCount == 3)
+                    if (backTickCount == 3 && insideCodeBlock &&
+                        markdown.Substring(pos, lineInfo.EndOfLine - pos).TrimStart('`').Trim().Length > 0)
+                    {
+                        // Quillpad: a closing fence has no info string, the same as in the editor.
+                        // ```js inside a block is a line of code.
+                        pos = lineInfo.StartOfLine;
+                    }
+                    else if (backTickCount == 3)
                     {
                         insideCodeBlock = !insideCodeBlock;
 
@@ -98,40 +106,22 @@ namespace Notepads.Controls.Markdown
 
                 if (!insideCodeBlock)
                 {
-                    // Add every line that starts with a tab character or at least 4 spaces.
-                    if (pos < maxEnd && markdown[pos] == '\t')
+                    // Add every line that starts with at least 4 spaces. Quillpad: a tab does not make
+                    // code, because writers indent the first line of a paragraph with a tab.
+                    int spaceCount = 0;
+                    while (pos < maxEnd && spaceCount < 4 && markdown[pos] == ' ')
                     {
+                        spaceCount++;
                         pos++;
                     }
-                    else
+
+                    if (spaceCount < 4)
                     {
-                        int spaceCount = 0;
-                        while (pos < maxEnd && spaceCount < 4)
+                        // We found a line that doesn't start with 4 spaces.
+                        // But don't end the code block until we find a non-blank line.
+                        if (lineInfo.IsLineBlank == false)
                         {
-                            if (markdown[pos] == ' ')
-                            {
-                                spaceCount++;
-                            }
-                            else if (markdown[pos] == '\t')
-                            {
-                                spaceCount += 4;
-                            }
-                            else
-                            {
-                                break;
-                            }
-
-                            pos++;
-                        }
-
-                        if (spaceCount < 4)
-                        {
-                            // We found a line that doesn't start with a tab or 4 spaces.
-                            // But don't end the code block until we find a non-blank line.
-                            if (lineInfo.IsLineBlank == false)
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
@@ -169,7 +159,8 @@ namespace Notepads.Controls.Markdown
                 actualEnd = lineInfo.StartOfNextLine;
             }
 
-            if (code == null)
+            // Quillpad: a ``` fence with no closing fence is not a code block, the same as in the editor
+            if (code == null || insideCodeBlock)
             {
                 // Not a valid code block.
                 actualEnd = start;
