@@ -90,6 +90,10 @@ namespace Notepads.Services
         // closing the window would. It returns false when unsaved text cannot be kept.
         public static Func<Task<bool>> SaveBeforeInstallAsync { get; set; }
 
+        // Set by the main window. Runs when an install ends and the app is still running (it failed, or
+        // finished without closing the app), so the window can undo what SaveBeforeInstallAsync set up.
+        public static Action InstallStopped { get; set; }
+
         // Static, because the settings frame makes a new About page each time it is opened
         public static bool IsInstalling { get; private set; }
 
@@ -139,6 +143,7 @@ namespace Notepads.Services
             finally
             {
                 IsInstalling = false;
+                InstallStopped?.Invoke();
             }
         }
 

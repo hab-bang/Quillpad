@@ -150,8 +150,10 @@
     <Compile Include="Controls\Dialog\AppCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\SessionCorruptionErrorDialog.cs" />
     <Compile Include="Controls\Dialog\FileRenameDialog.cs" />
+    <Compile Include="Controls\Dialog\FileChangedOnDiskDialog.cs" />
     <Compile Include="Controls\Dialog\FileOpenErrorDialog.cs" />
     <Compile Include="Controls\Dialog\FileSaveErrorDialog.cs" />
+    <Compile Include="Controls\Dialog\ReloadFileConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\RevertAllChangesConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
@@ -245,6 +247,7 @@
     <Compile Include="Views\MainPage\NotepadsMainPage.ViewModes.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Workspace.cs" />
     <Compile Include="Services\MRUService.cs" />
+    <Compile Include="Utilities\BackupFileUtility.cs" />
     <Compile Include="Utilities\BrushUtility.cs" />
     <Compile Include="Utilities\Downloader.cs" />
     <Compile Include="Services\LoggingService.cs" />
@@ -252,6 +255,7 @@
     <Compile Include="Services\NotificationCenter.cs" />
     <Compile Include="Utilities\DialogManager.cs" />
     <Compile Include="Utilities\FileTypeUtility.cs" />
+    <Compile Include="Utilities\FindReplaceUtility.cs" />
     <Compile Include="Extensions\INotepadsExtensionProvider.cs" />
     <Compile Include="Extensions\IContentPreviewExtension.cs" />
     <Compile Include="Controls\Markdown\MarkdownExtensionView.xaml.cs">
@@ -266,11 +270,14 @@
     <Compile Include="Utilities\FontUtility.cs" />
     <Compile Include="Utilities\EncodingUtility.cs" />
     <Compile Include="Brushes\HostBackdropAcrylicBrush.cs" />
+    <Compile Include="Utilities\DiskChangeUtility.cs" />
     <Compile Include="Utilities\LineEndingUtility.cs" />
+    <Compile Include="Utilities\LogFileUtility.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\ThemeSettingsService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Controls\Dialog\NotepadsDialog.cs" />
+    <Compile Include="Utilities\SaveStateUtility.cs" />
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />

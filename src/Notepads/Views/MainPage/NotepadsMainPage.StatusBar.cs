@@ -11,6 +11,7 @@ namespace Notepads.Views.MainPage
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Windows.ApplicationModel.DataTransfer;
     using Windows.System;
     using Windows.UI.ViewManagement;
@@ -305,7 +306,8 @@ namespace Notepads.Views.MainPage
             var selectedEditor = NotepadsCore.GetSelectedTextEditor();
 
             if (selectedEditor?.EditingFile != null &&
-                selectedEditor.FileModificationState != FileModificationState.RenamedMovedOrDeleted)
+                selectedEditor.FileModificationState != FileModificationState.RenamedMovedOrDeleted &&
+                await ConfirmReloadAsync(selectedEditor))
             {
                 try
                 {
@@ -322,6 +324,23 @@ namespace Notepads.Views.MainPage
                     }
                 }
             }
+        }
+
+        // A reload replaces the tab's text with the file on disk. Ask first when unsaved edits would be lost.
+        private async Task<bool> ConfirmReloadAsync(ITextEditor textEditor)
+        {
+            if (textEditor.NoChangesSinceLastSaved(compareTextOnly: true)) return true;
+
+            var reloadFileConfirmationDialog = new ReloadFileConfirmationDialog(textEditor.EditingFilePath ?? textEditor.FileNamePlaceholder);
+            var result = await DialogManager.OpenDialogAsync(reloadFileConfirmationDialog, awaitPreviousDialog: true);
+
+            if (result == ContentDialogResult.Primary) return true;
+
+            if (!reloadFileConfirmationDialog.IsAborted)
+            {
+                NotepadsCore.FocusOnSelectedTextEditor();
+            }
+            return false;
         }
 
         private void CopyFullPath(object sender, RoutedEventArgs e)
@@ -712,6 +731,8 @@ namespace Notepads.Views.MainPage
                     return;
                 }
 
+                if (!await ConfirmReloadAsync(selectedTextEditor)) return;
+
                 try
                 {
                     await selectedTextEditor.ReloadFromEditingFileAsync(encoding);
@@ -745,7 +766,7 @@ namespace Notepads.Views.MainPage
             reopenWithEncodingItem.Click += async (sender, args) =>
             {
                 var selectedTextEditor = NotepadsCore.GetSelectedTextEditor();
-                if (selectedTextEditor != null)
+                if (selectedTextEditor != null && await ConfirmReloadAsync(selectedTextEditor))
                 {
                     try
                     {

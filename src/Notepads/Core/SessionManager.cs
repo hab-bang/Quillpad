@@ -38,6 +38,7 @@ namespace Notepads.Core
         private readonly INotepadsCore _notepadsCore;
         private readonly SemaphoreSlim _semaphoreSlim;
         private readonly ConcurrentDictionary<Guid, TextEditorSessionDataV1> _sessionDataCache;
+        private readonly List<string> _tabsNotRestored = new List<string>();
         private string _lastSessionJsonStr;
         private bool _loaded;
         private Timer _timer;
@@ -67,6 +68,8 @@ namespace Notepads.Core
         }
 
         public bool IsBackupEnabled { get; set; }
+
+        public IReadOnlyList<string> TabsNotRestored => _tabsNotRestored;
 
         public async Task<int> LoadLastSessionAsync()
         {
@@ -127,6 +130,13 @@ namespace Notepads.Core
                 catch (Exception ex)
                 {
                     LoggingService.LogError($"[{nameof(SessionManager)}] Failed to recover TextEditor: {ex.Message}");
+
+                    // The next save would delete this tab's backups as orphans. Keep them, and say which tab it was.
+                    await KeepBackupFilesAsync(textEditorData);
+                    _tabsNotRestored.Add(BackupFileUtility.GetTabName(
+                        textEditorData.EditingFileName,
+                        textEditorData.StateMetaData?.FileNamePlaceholder,
+                        ResourceLoader.GetForViewIndependentUse().GetString("TextEditor_DefaultNewFileName")));
                     continue;
                 }
 
@@ -262,6 +272,26 @@ namespace Notepads.Core
             };
         }
 
+        private static async Task KeepBackupFilesAsync(TextEditorSessionDataV1 textEditorData)
+        {
+            foreach (string path in new[] { textEditorData.LastSavedBackupFilePath, textEditorData.PendingBackupFilePath })
+            {
+                if (path == null) continue;
+
+                try
+                {
+                    StorageFile backupFile = await FileSystemUtility.GetFileAsync(path);
+                    if (backupFile == null) continue; // A missing backup file is a common reason the restore failed
+
+                    await backupFile.RenameAsync(BackupFileUtility.GetKeptFileName(backupFile.Name), NameCollisionOption.GenerateUniqueName);
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"[{nameof(SessionManager)}] Failed to keep backup file {path}: {ex.Message}");
+                }
+            }
+        }
+
         public async Task<int> RecoverBackupFilesAsync()
         {
             int numberOfRecoveredFiles = 0;
@@ -273,7 +303,7 @@ namespace Notepads.Core
 
                 try
                 {
-                    await backupFile.RenameAsync(backupFile.Name + "-Corrupted.txt");
+                    await backupFile.RenameAsync(BackupFileUtility.GetKeptFileName(backupFile.Name));
                     numberOfRecoveredFiles++;
                 }
                 catch (Exception)
@@ -457,9 +487,11 @@ namespace Notepads.Core
                 if (textEditor.EditingFile != null)
                 {
                     // Persist the last save known to the app, which might not be up-to-date (if the file was modified outside the app)
+                    // OpenIfExists keeps the old backup until the write swaps the new one in. With ReplaceExisting
+                    // it was emptied first, so a failed write left the session pointing at an empty file.
                     var lastSavedBackupFile = await SessionUtility.CreateNewFileInBackupFolderAsync(
                         ToToken(textEditor.Id) + LastSavedBackupSuffix,
-                        CreationCollisionOption.ReplaceExisting,
+                        CreationCollisionOption.OpenIfExists,
                         _backupFolderName);
 
                     if (!await BackupTextAsync(textEditor.LastSavedSnapshot.Content,
@@ -479,7 +511,7 @@ namespace Notepads.Core
                     // Persist pending changes relative to the last save
                     var pendingBackupFile = await SessionUtility.CreateNewFileInBackupFolderAsync(
                         ToToken(textEditor.Id) + PendingBackupSuffix,
-                        CreationCollisionOption.ReplaceExisting,
+                        CreationCollisionOption.OpenIfExists,
                         _backupFolderName);
 
                     if (!await BackupTextAsync(textEditor.GetText(),
@@ -655,10 +687,7 @@ namespace Notepads.Core
 
             foreach (StorageFile backupFile in await SessionUtility.GetAllFilesInBackupFolderAsync(_backupFolderName))
             {
-                if (backupPaths.Contains(backupFile.Path)) continue; // Skip files that are known to be used
-
-                // Only delete files with no extension (by contract, all backup files have no extension)
-                if (backupFile.Name.Contains(".")) continue;
+                if (!BackupFileUtility.ShouldDeleteFromBackupFolder(backupFile.Name, backupPaths.Contains(backupFile.Path))) continue;
 
                 try
                 {

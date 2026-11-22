@@ -159,9 +159,12 @@ namespace Notepads.Controls.DiffViewer
             RightTextBlock.Blocks.Clear();
         }
 
-        public void RenderDiff(string left, string right, ElementTheme theme)
+        // leftHeader names the left side when it is not the last saved text, for example the file on disk
+        public void RenderDiff(string left, string right, ElementTheme theme, string leftHeader = null)
         {
             StopRenderingAndClearCache();
+
+            OldTextHeader.Text = leftHeader ?? Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView().GetString("DiffViewer_Header_OldTextTittle/Text");
 
             var foregroundBrush = (theme == ElementTheme.Dark)
                 ? new SolidColorBrush(Colors.White)
