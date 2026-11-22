@@ -857,4 +857,16 @@
     <value>An update is installing. Quillpad will close when it is ready.</value>
     <comment>AboutPage: shown when the About page opens while an update installs.</comment>
   </data>
+  <data name="ReloadFileConfirmationDialog_Title" xml:space="preserve">
+    <value>Reload from disk?</value>
+    <comment>ReloadFileConfirmationDialog: "Title" display text. Asked before a reload replaces a tab with unsaved edits.</comment>
+  </data>
+  <data name="ReloadFileConfirmationDialog_Content" xml:space="preserve">
+    <value>"{0}" has unsaved changes. Reloading replaces them with the file on disk.</value>
+    <comment>ReloadFileConfirmationDialog: "Content" display text, {0} stands for file name. You can change the order but DO NOT REMOVE it from the string.</comment>
+  </data>
+  <data name="ReloadFileConfirmationDialog_PrimaryButtonText" xml:space="preserve">
+    <value>Reload</value>
+    <comment>ReloadFileConfirmationDialog: PrimaryButtonText.</comment>
+  </data>
 </root>
