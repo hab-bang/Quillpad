@@ -81,10 +81,13 @@ namespace Notepads.Controls.TextEditor
             }
         }
 
+        private long _foregroundChangedForMarkdownToken;
+
         private void HookMarkdownStylingEvents()
         {
             FontSizeChanged += OnFontSizeChangedForMarkdown;
             ActualThemeChanged += OnActualThemeChangedForMarkdown;
+            _foregroundChangedForMarkdownToken = RegisterPropertyChangedCallback(ForegroundProperty, OnForegroundChangedForMarkdown);
             TextCompositionStarted += OnTextCompositionStartedForMarkdown;
             TextCompositionEnded += OnTextCompositionEndedForMarkdown;
             AddHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks), handledEventsToo: true);
@@ -94,6 +97,7 @@ namespace Notepads.Controls.TextEditor
         {
             FontSizeChanged -= OnFontSizeChangedForMarkdown;
             ActualThemeChanged -= OnActualThemeChangedForMarkdown;
+            UnregisterPropertyChangedCallback(ForegroundProperty, _foregroundChangedForMarkdownToken);
             TextCompositionStarted -= OnTextCompositionStartedForMarkdown;
             TextCompositionEnded -= OnTextCompositionEndedForMarkdown;
             RemoveHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks));
@@ -183,6 +187,29 @@ namespace Notepads.Controls.TextEditor
         private void OnActualThemeChangedForMarkdown(FrameworkElement sender, object args)
         {
             RequestFullMarkdownRestyle();
+        }
+
+        /// <summary>
+        /// A theme switch changes Foreground, and the RichEditBox then paints all text in that colour.
+        /// ActualThemeChanged is not raised on the editor when the theme is set on the window content.
+        /// </summary>
+        private void OnForegroundChangedForMarkdown(DependencyObject sender, DependencyProperty property)
+        {
+            if (!_isMarkdownStylingEnabled) return;
+
+            // With no history a full restyle loads RTF in one step. With history it would reset and write every
+            // run, and the RichEditBox kept weight and slant, so reading back and writing only colours is faster.
+            if (_markdownStyledLines != null && (Document.CanUndo() || Document.CanRedo()))
+            {
+                _hasWholeDocumentFormatStepInHistory = true;
+                _markdownStyledLines = Array.Empty<string>();
+                _markdownStyledContexts = Array.Empty<MarkdownLineContext>();
+                ScheduleMarkdownRestyle();
+            }
+            else
+            {
+                RequestFullMarkdownRestyle();
+            }
         }
 
         private void OnTextCompositionStartedForMarkdown(Windows.UI.Xaml.Controls.RichEditBox sender, Windows.UI.Xaml.Controls.TextCompositionStartedEventArgs args)
