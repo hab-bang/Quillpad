@@ -17,9 +17,8 @@ namespace Notepads
     {
         static void Main(string[] args)
         {
-#if DEBUG
+            // Release builds log too (warnings and errors only), so a failure in a shipped build leaves a trace
             Task.Run(LoggingService.InitializeFileSystemLoggingAsync);
-#endif
 
             IActivatedEventArgs activatedArgs = AppInstance.GetActivatedEventArgs();
 

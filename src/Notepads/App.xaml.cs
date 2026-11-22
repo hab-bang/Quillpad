@@ -226,6 +226,7 @@ namespace Notepads
         private static void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             LoggingService.LogError($"[{nameof(App)}] OnUnhandledException: {e.Exception}");
+            LoggingService.Flush(); // The app may not live until the next timed write
 
             // suppress and handle it manually.
             e.Handled = true;
@@ -236,6 +237,7 @@ namespace Notepads
         private static void OnUnobservedException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             LoggingService.LogError($"[{nameof(App)}] OnUnobservedException: {e.Exception}");
+            LoggingService.Flush();
 
             // suppress and handle it manually.
             e.SetObserved();

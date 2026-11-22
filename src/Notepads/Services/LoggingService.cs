@@ -10,6 +10,7 @@ namespace Notepads.Services
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Notepads.Utilities;
@@ -24,6 +25,13 @@ namespace Notepads.Services
         private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1, 1);
         private static readonly TimeSpan LoggingInterval = TimeSpan.FromSeconds(10);
         private static readonly List<string> Messages = new List<string>();
+        private static readonly TimeSpan FlushTimeout = TimeSpan.FromSeconds(2);
+
+#if DEBUG
+        private const bool WriteInfoToFile = true;
+#else
+        private const bool WriteInfoToFile = false; // Release builds keep only warnings and errors
+#endif
 
         private static StorageFile _logFile;
         private static Task _backgroundTask;
@@ -40,6 +48,23 @@ namespace Notepads.Services
             CoreApplication.Resuming += async (sender, args) => { await InitializeLogFileWriterBackgroundTaskAsync(); };
 
             await InitializeLogFileWriterBackgroundTaskAsync();
+        }
+
+        /// <summary>
+        /// Writes the queued messages now, waiting at most a short time. For crash handlers: the
+        /// background writer runs every few seconds, and the app may not live that long.
+        /// </summary>
+        public static void Flush()
+        {
+            try
+            {
+                // Task.Run keeps the write off the caller's context, so waiting on the UI thread cannot deadlock
+                Task.Run(TryFlushMessageQueueAsync).Wait(FlushTimeout);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         public static StorageFile GetLogFile()
@@ -85,7 +110,7 @@ namespace Notepads.Services
                 return;
             }
 
-            if (!consoleOnly)
+            if (!consoleOnly && LogFileUtility.ShouldWriteToFile(level, WriteInfoToFile))
             {
                 // Add to message queue
                 MessageQueue.Enqueue(formattedMessage);
@@ -109,6 +134,7 @@ namespace Notepads.Services
                     StorageFolder logsFolder = await FileSystemUtility.GetOrCreateAppFolderAsync("Logs");
                     _logFile = await FileSystemUtility.CreateFileAsync(logsFolder,
                         DateTime.UtcNow.ToString("yyyyMMddTHHmmss", CultureInfo.InvariantCulture) + ".log");
+                    await DeleteOldLogFilesAsync(logsFolder);
                 }
 
                 _backgroundTask = Task.Run(WriteLogMessagesAsync);
@@ -127,6 +153,30 @@ namespace Notepads.Services
             }
 
             return false;
+        }
+
+        private static async Task DeleteOldLogFilesAsync(StorageFolder logsFolder)
+        {
+            try
+            {
+                var files = (await logsFolder.GetFilesAsync()).ToDictionary(file => file.Name, StringComparer.OrdinalIgnoreCase);
+
+                foreach (string name in LogFileUtility.GetFileNamesToDelete(files.Keys, LogFileUtility.FilesToKeep))
+                {
+                    try
+                    {
+                        await files[name].DeleteAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex); // Another window may still write to it
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         private static async Task WriteLogMessagesAsync()

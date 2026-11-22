@@ -30,6 +30,7 @@
   <!-- Issue #8: decision logic pulled out of the save, session and logging code -->
   <ItemGroup>
     <Compile Include="$(AppSource)Utilities\SaveStateUtility.cs" Link="Linked\SaveStateUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\LogFileUtility.cs" Link="Linked\LogFileUtility.cs" />
   </ItemGroup>
 
   <ItemGroup>
