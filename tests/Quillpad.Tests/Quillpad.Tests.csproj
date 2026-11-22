@@ -26,6 +26,9 @@
     <Compile Include="$(AppSource)Utilities\LineEndingUtility.cs" Link="Linked\LineEndingUtility.cs" />
     <Compile Include="$(AppSource)Utilities\TextWidthUtility.cs" Link="Linked\TextWidthUtility.cs" />
     <Compile Include="$(AppSource)Utilities\FileTypeUtility.cs" Link="Linked\FileTypeUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\FindReplaceUtility.cs" Link="Linked\FindReplaceUtility.cs" />
+    <Compile Include="$(AppSource)Controls\FindAndReplace\SearchContext.cs" Link="Linked\SearchContext.cs" />
+    <Compile Include="$(AppSource)Extensions\StringExtensions.cs" Link="Linked\StringExtensions.cs" />
   </ItemGroup>
 
   <!-- The markdown preview's parser. Render\ draws with XAML, so it stays out. -->

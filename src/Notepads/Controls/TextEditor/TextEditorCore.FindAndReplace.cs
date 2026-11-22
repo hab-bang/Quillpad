@@ -6,10 +6,13 @@
 namespace Notepads.Controls.TextEditor
 {
     using System;
-    using System.Text.RegularExpressions;
+    using System.Collections.Generic;
+    using Windows.UI.Core;
     using Windows.UI.Text;
     using Notepads.Controls.FindAndReplace;
     using Notepads.Extensions;
+    using Notepads.Services;
+    using Notepads.Utilities;
 
     public partial class TextEditorCore
     {
@@ -172,7 +175,7 @@ namespace Notepads.Controls.TextEditor
             {
                 if (searchContext.UseRegex)
                 {
-                    replaceText = ApplyTabAndLineEndingFix(replaceText);
+                    replaceText = ExpandReplacementForSelectedMatch(searchContext, replaceText);
                 }
 
                 Document.Selection.SetText(TextSetOptions.None, replaceText);
@@ -191,7 +194,7 @@ namespace Notepads.Controls.TextEditor
             {
                 if (searchContext.UseRegex)
                 {
-                    replaceText = ApplyTabAndLineEndingFix(replaceText);
+                    replaceText = ExpandReplacementForSelectedMatch(searchContext, replaceText);
                 }
 
                 Document.Selection.SetText(TextSetOptions.None, replaceText);
@@ -205,50 +208,100 @@ namespace Notepads.Controls.TextEditor
         public bool TryFindAndReplaceAll(SearchContext searchContext, string replaceText, out bool regexError)
         {
             regexError = false;
-            var found = false;
-            var text = GetText();
 
-            if (string.IsNullOrEmpty(searchContext.SearchText))
+            List<TextReplacement> replacements;
+            try
             {
+                replacements = FindReplaceUtility.FindAll(GetText(), searchContext, replaceText);
+            }
+            catch (Exception)
+            {
+                regexError = true; // A bad pattern, or one that ran past the timeout
                 return false;
             }
 
-            if (searchContext.UseRegex)
+            if (replacements.Count == 0) return false;
+
+            ReplaceRanges(replacements);
+            return true;
+        }
+
+        /// <summary>
+        /// Above this many replacements, Replace All sets the whole text at once. Each range edit makes the
+        /// editor read the whole text again, so very many of them would be slower than one full restyle.
+        /// </summary>
+        private const int MaxRangeReplacements = 1000;
+
+        /// <summary>
+        /// Replaces each match in place, as one undo step. Only the changed lines get restyled, and the
+        /// caret and the view stay on the same words.
+        /// </summary>
+        private void ReplaceRanges(IReadOnlyList<TextReplacement> replacements)
+        {
+            if (replacements.Count > MaxRangeReplacements)
             {
-                found = TryFindAndReplaceAllUsingRegex(text, searchContext, replaceText, out regexError, out var output);
-                if (found) text = output;
+                SetText(FindReplaceUtility.Apply(GetText(), replacements), keepPosition: true);
+                return;
             }
-            else
+
+            var selectionStart = Document.Selection.StartPosition;
+            var selectionEnd = Document.Selection.EndPosition;
+            var scrollViewer = _contentScrollViewer;
+            var horizontalOffset = scrollViewer?.HorizontalOffset;
+            var verticalOffset = scrollViewer?.VerticalOffset;
+
+            Document.BatchDisplayUpdates();
+            Document.BeginUndoGroup();
+            try
             {
-                var pos = 0;
-                var searchTextLength = searchContext.SearchText.Length;
-                var replaceTextLength = replaceText.Length;
-
-                StringComparison comparison = searchContext.MatchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-
-                pos = searchContext.MatchWholeWord
-                    ? text.IndexOfWholeWord(searchContext.SearchText, pos, comparison)
-                    : text.IndexOf(searchContext.SearchText, pos, comparison);
-
-                while (pos != -1)
+                // From the end, so the positions of the matches before it stay valid
+                for (var i = replacements.Count - 1; i >= 0; i--)
                 {
-                    found = true;
-                    text = text.Remove(pos, searchTextLength).Insert(pos, replaceText);
-                    pos += replaceTextLength;
-                    pos = searchContext.MatchWholeWord
-                        ? text.IndexOfWholeWord(searchContext.SearchText, pos, comparison)
-                        : text.IndexOf(searchContext.SearchText, pos, comparison);
+                    var replacement = replacements[i];
+                    Document.GetRange(replacement.Start, replacement.Start + replacement.Length).SetText(TextSetOptions.None, replacement.Text);
                 }
             }
-
-            if (found)
+            finally
             {
-                SetText(text);
-                Document.Selection.StartPosition = int.MaxValue;
-                Document.Selection.EndPosition = Document.Selection.StartPosition;
+                Document.EndUndoGroup();
+                Document.ApplyDisplayUpdates();
             }
 
-            return found;
+            Document.Selection.SetRange(
+                FindReplaceUtility.MapPosition(selectionStart, replacements),
+                FindReplaceUtility.MapPosition(selectionEnd, replacements));
+
+            if (scrollViewer != null)
+            {
+                // The new text is laid out after this call, so scroll back once that is done
+                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low,
+                    () => scrollViewer.ChangeView(horizontalOffset, verticalOffset, zoomFactor: null, disableAnimation: true));
+            }
+        }
+
+        /// <summary>
+        /// Single Replace in regex mode: expands "$1" and the other substitutions for the selected match,
+        /// the same as Replace All does.
+        /// </summary>
+        private string ExpandReplacementForSelectedMatch(SearchContext searchContext, string replaceText)
+        {
+            var start = Document.Selection.StartPosition;
+            var length = Document.Selection.EndPosition - start;
+
+            try
+            {
+                var match = FindReplaceUtility.CreateRegex(searchContext).Match(FindReplaceUtility.ToRegexText(GetText()), start);
+                if (match.Success && match.Index == start && match.Length == length)
+                {
+                    return FindReplaceUtility.ExpandRegexReplacement(match, replaceText);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(TextEditorCore)}] Failed to expand the regex replacement: {ex.Message}");
+            }
+
+            return FindReplaceUtility.UnescapeReplaceText(replaceText);
         }
 
         private bool TryFindNextAndSelectUsingRegex(string content, SearchContext searchContext, bool stopAtEof,
@@ -257,9 +310,8 @@ namespace Notepads.Controls.TextEditor
             try
             {
                 regexError = false;
-                content = content.Replace(RichEditBoxDefaultLineEnding, RegexDefaultLineEnding);
-                Regex regex = new Regex(searchContext.SearchText,
-                    RegexOptions.Multiline | (searchContext.MatchCase ? RegexOptions.None : RegexOptions.IgnoreCase));
+                content = FindReplaceUtility.ToRegexText(content);
+                var regex = FindReplaceUtility.CreateRegex(searchContext);
 
                 var match = regex.Match(content, Document.Selection.EndPosition);
 
@@ -293,10 +345,8 @@ namespace Notepads.Controls.TextEditor
             try
             {
                 regexError = false;
-                content = content.Replace(RichEditBoxDefaultLineEnding, RegexDefaultLineEnding);
-                Regex regex = new Regex(searchContext.SearchText,
-                    RegexOptions.RightToLeft | RegexOptions.Multiline |
-                    (searchContext.MatchCase ? RegexOptions.None : RegexOptions.IgnoreCase));
+                content = FindReplaceUtility.ToRegexText(content);
+                var regex = FindReplaceUtility.CreateRegex(searchContext, rightToLeft: true);
 
                 var match = regex.Match(content, Document.Selection.StartPosition);
 
@@ -323,41 +373,6 @@ namespace Notepads.Controls.TextEditor
                 regexError = true;
                 return false;
             }
-        }
-
-        private static bool TryFindAndReplaceAllUsingRegex(string content, SearchContext searchContext, string replaceText, out bool regexError, out string output)
-        {
-            regexError = false;
-            output = string.Empty;
-            content = content.Replace(RichEditBoxDefaultLineEnding, RegexDefaultLineEnding);
-
-            try
-            {
-                Regex regex = new Regex(searchContext.SearchText, RegexOptions.Multiline | (searchContext.MatchCase ? RegexOptions.None : RegexOptions.IgnoreCase));
-
-                if (regex.IsMatch(content))
-                {
-                    if (searchContext.UseRegex)
-                    {
-                        replaceText = ApplyTabAndLineEndingFix(replaceText);
-                    }
-
-                    output = regex.Replace(content, replaceText).Replace(RegexDefaultLineEnding, RichEditBoxDefaultLineEnding);
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-                regexError = true;
-                return false;
-            }
-
-            return false;
-        }
-
-        private static string ApplyTabAndLineEndingFix(string text)
-        {
-            return text.Replace("\\r", "\r").Replace("\\n", "\n").Replace("\\t", "\t");
         }
     }
 }
