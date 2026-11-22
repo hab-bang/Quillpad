@@ -5,6 +5,8 @@
 
 namespace Notepads.Controls.Dialog
 {
+    using Windows.UI.Xaml.Controls;
+
     /// <summary>
     /// Asked before a reload from disk replaces a tab that has unsaved edits.
     /// Primary: reload, Close: cancel.
@@ -17,6 +19,9 @@ namespace Notepads.Controls.Dialog
             Content = string.Format(ResourceLoader.GetString("ReloadFileConfirmationDialog_Content"), fileNameOrPath);
             PrimaryButtonText = ResourceLoader.GetString("ReloadFileConfirmationDialog_PrimaryButtonText");
             CloseButtonText = ResourceLoader.GetString("RevertAllChangesConfirmationDialog_CloseButtonText");
+
+            // Reload throws away the edits, so a Space or Enter typed by habit must not pick it
+            DefaultButton = ContentDialogButton.Close;
         }
     }
 }

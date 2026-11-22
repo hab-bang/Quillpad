@@ -332,7 +332,7 @@ namespace Notepads.Views.MainPage
             if (textEditor.NoChangesSinceLastSaved(compareTextOnly: true)) return true;
 
             var reloadFileConfirmationDialog = new ReloadFileConfirmationDialog(textEditor.EditingFilePath ?? textEditor.FileNamePlaceholder);
-            var result = await DialogManager.OpenDialogAsync(reloadFileConfirmationDialog, awaitPreviousDialog: false);
+            var result = await DialogManager.OpenDialogAsync(reloadFileConfirmationDialog, awaitPreviousDialog: true);
 
             if (result == ContentDialogResult.Primary) return true;
 
