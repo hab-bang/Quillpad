@@ -50,6 +50,30 @@ namespace Quillpad.Tests
             Assert.Equal("Darcy", FindReplaceUtility.ExpandRegexReplacement(match, "$1"));
         }
 
+        [Theory]
+        [InlineData(6, 5, "<world>")] // Find next selects "world"
+        [InlineData(6, 2, "<wo>")]    // Find previous from "wo|rld" selects "wo" (right to left)
+        public void SelectedMatchIsExpandedInBothDirections(int start, int length, string expected)
+        {
+            var context = new SearchContext(@"\w+", useRegex: true);
+            Assert.Equal(expected, FindReplaceUtility.ExpandReplacementForSelection("hello world", context, start, length, "<$0>"));
+        }
+
+        [Fact]
+        public void SelectionThatIsNotAMatchIsNotExpanded()
+        {
+            var context = new SearchContext(@"\w+", useRegex: true);
+            Assert.Null(FindReplaceUtility.ExpandReplacementForSelection("hello world", context, 5, 1, "<$0>"));
+        }
+
+        [Fact]
+        public void SingleReplaceStopsAtTheTimeout()
+        {
+            var text = new string('a', 40) + "b";
+            Assert.Throws<RegexMatchTimeoutException>(() =>
+                FindReplaceUtility.ExpandReplacementForSelection(text, new SearchContext("(a+)+$", useRegex: true), 0, 41, "x"));
+        }
+
         [Fact]
         public void RegexSeesLineEndsAndTypedLineBreaksBecomeEditorLineBreaks()
         {

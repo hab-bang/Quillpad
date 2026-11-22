@@ -56,6 +56,30 @@ namespace Notepads.Utilities
             return match.Result(UnescapeReplaceText(replaceText)).Replace(RegexLineEnding, EditorLineEnding);
         }
 
+        /// <summary>
+        /// The text that replaces the selected match in single Replace. Find previous selects the match
+        /// right to left, so this tries both directions to find the same match. Returns null when the
+        /// selection is not a match. Throws for a bad pattern or a timeout.
+        /// </summary>
+        public static string ExpandReplacementForSelection(string text, SearchContext searchContext, int start, int length, string replaceText)
+        {
+            text = ToRegexText(text);
+
+            var match = CreateRegex(searchContext).Match(text, start);
+            if (match.Success && match.Index == start && match.Length == length)
+            {
+                return ExpandRegexReplacement(match, replaceText);
+            }
+
+            match = CreateRegex(searchContext, rightToLeft: true).Match(text, start + length);
+            if (match.Success && match.Index == start && match.Length == length)
+            {
+                return ExpandRegexReplacement(match, replaceText);
+            }
+
+            return null;
+        }
+
         public static string UnescapeReplaceText(string text)
         {
             return text.Replace("\\r", "\r").Replace("\\n", "\n").Replace("\\t", "\t");

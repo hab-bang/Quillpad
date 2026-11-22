@@ -173,9 +173,10 @@ namespace Notepads.Controls.TextEditor
 
             if (TryFindNextAndSelect(searchContext, stopAtEof: true, out regexError))
             {
-                if (searchContext.UseRegex)
+                if (!TryExpandReplacementForSelectedMatch(searchContext, ref replaceText))
                 {
-                    replaceText = ExpandReplacementForSelectedMatch(searchContext, replaceText);
+                    regexError = true;
+                    return false;
                 }
 
                 Document.Selection.SetText(TextSetOptions.None, replaceText);
@@ -192,9 +193,10 @@ namespace Notepads.Controls.TextEditor
 
             if (TryFindPreviousAndSelect(searchContext, stopAtBof: true, out regexError))
             {
-                if (searchContext.UseRegex)
+                if (!TryExpandReplacementForSelectedMatch(searchContext, ref replaceText))
                 {
-                    replaceText = ExpandReplacementForSelectedMatch(searchContext, replaceText);
+                    regexError = true;
+                    return false;
                 }
 
                 Document.Selection.SetText(TextSetOptions.None, replaceText);
@@ -281,28 +283,27 @@ namespace Notepads.Controls.TextEditor
         }
 
         /// <summary>
-        /// Single Replace in regex mode: expands "$1" and the other substitutions for the selected match,
-        /// the same as Replace All does.
+        /// Single Replace: in regex mode, expands "$1" and the other substitutions for the selected match,
+        /// the same as Replace All does. Returns false when the pattern runs past the timeout.
         /// </summary>
-        private string ExpandReplacementForSelectedMatch(SearchContext searchContext, string replaceText)
+        private bool TryExpandReplacementForSelectedMatch(SearchContext searchContext, ref string replaceText)
         {
+            if (!searchContext.UseRegex) return true;
+
             var start = Document.Selection.StartPosition;
             var length = Document.Selection.EndPosition - start;
 
             try
             {
-                var match = FindReplaceUtility.CreateRegex(searchContext).Match(FindReplaceUtility.ToRegexText(GetText()), start);
-                if (match.Success && match.Index == start && match.Length == length)
-                {
-                    return FindReplaceUtility.ExpandRegexReplacement(match, replaceText);
-                }
+                replaceText = FindReplaceUtility.ExpandReplacementForSelection(GetText(), searchContext, start, length, replaceText)
+                    ?? FindReplaceUtility.UnescapeReplaceText(replaceText);
+                return true;
             }
             catch (Exception ex)
             {
                 LoggingService.LogError($"[{nameof(TextEditorCore)}] Failed to expand the regex replacement: {ex.Message}");
+                return false;
             }
-
-            return FindReplaceUtility.UnescapeReplaceText(replaceText);
         }
 
         private bool TryFindNextAndSelectUsingRegex(string content, SearchContext searchContext, bool stopAtEof,
