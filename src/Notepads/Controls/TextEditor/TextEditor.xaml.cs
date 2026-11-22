@@ -520,7 +520,9 @@
             {
                 TextEditorCore.ClearUndoQueue();
             }
-            IsModified = isModified;
+            // "Revert all changes" comes here too. While the file is gone, the tab holds the only copy of the text,
+            // and the state setter won't mark it again, since the state doesn't change.
+            IsModified = isModified || (EditingFile != null && FileModificationState == FileModificationState.RenamedMovedOrDeleted);
             _loaded = true;
         }
 

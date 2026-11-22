@@ -323,6 +323,9 @@ namespace Notepads.Views.MainPage
         {
             var success = false;
 
+            // A background tab whose file was deleted still reads as clean until it is checked, and would be skipped
+            await RefreshFileStatusOfUnmodifiedTabsAsync(textEditors);
+
             foreach (var textEditor in textEditors)
             {
                 if (await SaveAsync(textEditor, saveAs: false, ignoreUnmodifiedDocument: true, rebuildOpenRecentItems: false)) success = true;
