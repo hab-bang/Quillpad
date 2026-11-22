@@ -58,7 +58,24 @@ namespace Quillpad.Tests
             Assert.Equal(new[] { MarkdownBlockType.Code }, Blocks("    var x = 1;"));
         }
 
+        [Fact]
+        public void FenceWithAnInfoStringDoesNotCloseABlock()
+        {
+            var document = new MarkdownDocument();
+            document.Parse("```\ncode\n```js\nmore\n```");
+            var block = Assert.IsType<CodeBlock>(Assert.Single(document.Blocks));
+            Assert.Equal("code\n```js\nmore", block.Text.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public void BacktickLineEndsAnIndentedBlock()
+        {
+            Assert.Equal(new[] { MarkdownBlockType.Code, MarkdownBlockType.Paragraph },
+                Blocks("    code\n```\nprose"));
+        }
+
         [Theory]
+        [InlineData("```\nprose\n```js\n\nafter")]
         [InlineData("She left.\n\n~~~\n\nMorning came.\n\n~~~\n\nNight.")]
         [InlineData("She left.\n\n~~~\n\nMorning came.")]
         [InlineData("text\n\n```\n\nno closing fence")]
