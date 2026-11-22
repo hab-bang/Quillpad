@@ -485,7 +485,12 @@
             }
             if (resetLastSavedSnapshot)
             {
-                textFile.Content = TextEditorCore.GetText();
+                // The editor normalizes line breaks, so the snapshot takes the text back from it. Without
+                // resetText the caller already holds the editor's form, and the editor may hold newer text.
+                if (resetText)
+                {
+                    textFile.Content = TextEditorCore.GetText();
+                }
                 LastSavedSnapshot = textFile;
             }
             if (clearUndoQueue)
@@ -503,6 +508,7 @@
                 var textFile = await FileSystemUtility.ReadFileAsync(EditingFile, ignoreFileSizeLimit: false, encoding: encoding);
                 _loaded = false; // Like Init: the new text is not a user edit
                 TextEditorCore.SetText(textFile.Content, keepPosition: true); // A reload should not jump to the top
+                textFile.Content = TextEditorCore.GetText(); // The editor's form of the text, with its line breaks
                 Init(textFile, EditingFile, clearUndoQueue: false, resetText: false);
                 LineEndingChanged?.Invoke(this, EventArgs.Empty);
                 EncodingChanged?.Invoke(this, EventArgs.Empty);
@@ -723,7 +729,9 @@
             if (Mode == TextEditorMode.DiffPreview) CloseSideBySideDiffViewer();
             TextFile textFile = await SaveContentToFileAsync(file); // Will throw if not succeeded
             FileModificationState = FileModificationState.Untouched;
-            Init(textFile, file, clearUndoQueue: false, resetText: false);
+            // The snapshot is the text that was written. Text typed during the write keeps the tab modified.
+            bool isModified = SaveStateUtility.IsModifiedAfterSave(textFile.Content, TextEditorCore.GetText());
+            Init(textFile, file, clearUndoQueue: false, isModified: isModified, resetText: false);
             FileSaved?.Invoke(this, EventArgs.Empty);
             StartCheckingFileStatusPeriodically();
         }

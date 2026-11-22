@@ -152,6 +152,7 @@
     <Compile Include="Controls\Dialog\FileRenameDialog.cs" />
     <Compile Include="Controls\Dialog\FileOpenErrorDialog.cs" />
     <Compile Include="Controls\Dialog\FileSaveErrorDialog.cs" />
+    <Compile Include="Controls\Dialog\ReloadFileConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\RevertAllChangesConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
@@ -267,10 +268,12 @@
     <Compile Include="Utilities\EncodingUtility.cs" />
     <Compile Include="Brushes\HostBackdropAcrylicBrush.cs" />
     <Compile Include="Utilities\LineEndingUtility.cs" />
+    <Compile Include="Utilities\LogFileUtility.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\ThemeSettingsService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Controls\Dialog\NotepadsDialog.cs" />
+    <Compile Include="Utilities\SaveStateUtility.cs" />
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
