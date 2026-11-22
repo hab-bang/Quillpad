@@ -581,6 +581,11 @@ namespace Notepads.Utilities
                     "FileSystemUtility_WriteTextToFileAsync_UsingStreamWriter",
                     async () =>
                     {
+                        // A write into the file itself leaves it cut short if it stops halfway (power cut,
+                        // full disk, network drop). So write a temp file next to it and swap that in.
+                        if (await TryWriteThroughTempFileAsync(file, text, encoding)) return;
+
+                        // No access to the folder, or the swap was refused (some cloud providers)
                         using (var stream = await file.OpenStreamForWriteAsync())
                         using (var writer = new StreamWriter(stream, encoding))
                         {
@@ -591,6 +596,71 @@ namespace Notepads.Utilities
                         }
                     },
                     maxRetryAttempts: 5); // Retry 5 times for this case
+            }
+        }
+
+        /// <summary>
+        /// Writes the text to a temp file in the same folder, flushes it, then moves it over the file.
+        /// Returns false, with the file untouched, when the temp file cannot be made or the swap is refused,
+        /// so the caller can write in place. Throws when writing the temp file fails: the file is still
+        /// untouched then, and an in-place write would likely fail the same way and cut the file short.
+        /// </summary>
+        private static async Task<bool> TryWriteThroughTempFileAsync(StorageFile file, string text, Encoding encoding)
+        {
+            StorageFile tempFile;
+
+            try
+            {
+                StorageFolder folder = await file.GetParentAsync(); // Null when the app may use the file but not its folder
+                if (folder == null) return false;
+                // One fixed name, so the next save clears what a stopped save left. Saves of one file don't overlap:
+                // session saves take turns, and a file is open in one tab only.
+                tempFile = await folder.CreateFileAsync(file.Name + BackupFileUtility.SaveTempFileSuffix, CreationCollisionOption.ReplaceExisting);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogInfo($"[{nameof(FileSystemUtility)}] Cannot make a temp file next to the file, so it is written in place: {ex.Message}", consoleOnly: true);
+                return false;
+            }
+
+            try
+            {
+                using (var stream = await tempFile.OpenStreamForWriteAsync())
+                using (var writer = new StreamWriter(stream, encoding))
+                {
+                    await writer.WriteAsync(text);
+                    await writer.FlushAsync();
+                    await stream.FlushAsync(); // Onto the disk before the swap
+                }
+            }
+            catch (Exception)
+            {
+                await TryDeleteAsync(tempFile);
+                throw;
+            }
+
+            try
+            {
+                await tempFile.MoveAndReplaceAsync(file);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogWarning($"[{nameof(FileSystemUtility)}] Failed to swap in the saved file, so it is written in place: {ex.Message}");
+                await TryDeleteAsync(tempFile);
+                return false;
+            }
+        }
+
+        private static async Task TryDeleteAsync(StorageFile file)
+        {
+            try
+            {
+                await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogWarning($"[{nameof(FileSystemUtility)}] Failed to delete temp file {file.Name}: {ex.Message}");
             }
         }
 
@@ -733,6 +803,8 @@ namespace Notepads.Utilities
             }
             catch (Exception ex)
             {
+                // The check itself failed (offline network folder, file locked, access denied), so nothing
+                // says the file is gone. Answer true: false would mark the tab as deleted and turn off reload.
                 LoggingService.LogError($"[{nameof(FileSystemUtility)}] Failed to check if file [{file.Path}] exists: {ex.Message}", consoleOnly: true);
                 return true;
             }

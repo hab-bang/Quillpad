@@ -826,7 +826,7 @@
     <comment>AboutPage: {0} is the latest released version. Shown in the Quillpad-Dev app.</comment>
   </data>
   <data name="AboutPage_Update_Installing" xml:space="preserve">
-    <value>Downloading and installing v{0}... Quillpad will close when it is ready.</value>
+    <value>Downloading and installing v{0}... Typing is paused, and Quillpad will close when it is ready.</value>
     <comment>AboutPage: {0} is the new version.</comment>
   </data>
   <data name="AboutPage_Update_CheckFailed" xml:space="preserve">
@@ -856,5 +856,41 @@
   <data name="AboutPage_Update_AlreadyInstalling" xml:space="preserve">
     <value>An update is installing. Quillpad will close when it is ready.</value>
     <comment>AboutPage: shown when the About page opens while an update installs.</comment>
+  </data>
+  <data name="ReloadFileConfirmationDialog_Title" xml:space="preserve">
+    <value>Reload from disk?</value>
+    <comment>ReloadFileConfirmationDialog: "Title" display text. Asked before a reload replaces a tab with unsaved edits.</comment>
+  </data>
+  <data name="ReloadFileConfirmationDialog_Content" xml:space="preserve">
+    <value>"{0}" has unsaved changes. Reloading replaces them with the file on disk.</value>
+    <comment>ReloadFileConfirmationDialog: "Content" display text, {0} stands for file name. You can change the order but DO NOT REMOVE it from the string.</comment>
+  </data>
+  <data name="ReloadFileConfirmationDialog_PrimaryButtonText" xml:space="preserve">
+    <value>Reload</value>
+    <comment>ReloadFileConfirmationDialog: PrimaryButtonText.</comment>
+  </data>
+  <data name="FileChangedOnDiskDialog_Title" xml:space="preserve">
+    <value>File changed on disk</value>
+    <comment>FileChangedOnDiskDialog: "Title" display text. Asked before a save writes over a file that another app changed.</comment>
+  </data>
+  <data name="FileChangedOnDiskDialog_Content" xml:space="preserve">
+    <value>Another app changed "{0}" after Quillpad opened or saved it. Saving now replaces those changes.</value>
+    <comment>FileChangedOnDiskDialog: "Content" display text, {0} stands for file path. You can change the order but DO NOT REMOVE it from the string.</comment>
+  </data>
+  <data name="FileChangedOnDiskDialog_PrimaryButtonText" xml:space="preserve">
+    <value>Overwrite</value>
+    <comment>FileChangedOnDiskDialog: PrimaryButtonText. Saves over the changed file.</comment>
+  </data>
+  <data name="FileChangedOnDiskDialog_SecondaryButtonText" xml:space="preserve">
+    <value>Compare</value>
+    <comment>FileChangedOnDiskDialog: SecondaryButtonText. Shows the file on disk next to the tab's text, without saving.</comment>
+  </data>
+  <data name="DiffViewer_Header_FileOnDisk" xml:space="preserve">
+    <value>File on disk</value>
+    <comment>DiffViewer: Header's text for the left side when the tab's text is compared with the file on disk.</comment>
+  </data>
+  <data name="SessionCorruptionErrorDialog_TabsNotRestored" xml:space="preserve">
+    <value>Quillpad could not reopen these tabs from the last session: {0}. Any unsaved text they had is kept in the session backup folder as .txt files.</value>
+    <comment>SessionCorruptionErrorDialog: "Content" display text when some tabs failed to restore. {0} is the list of tab names. You can change the order but DO NOT REMOVE it from the string.</comment>
   </data>
 </root>
