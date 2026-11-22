@@ -31,6 +31,7 @@
   <ItemGroup>
     <Compile Include="$(AppSource)Utilities\SaveStateUtility.cs" Link="Linked\SaveStateUtility.cs" />
     <Compile Include="$(AppSource)Utilities\LogFileUtility.cs" Link="Linked\LogFileUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\DiskChangeUtility.cs" Link="Linked\DiskChangeUtility.cs" />
   </ItemGroup>
 
   <ItemGroup>

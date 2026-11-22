@@ -51,6 +51,7 @@
 
             <Grid Row="0" Background="{ThemeResource HeaderBackgroundThemeBrush}">
                 <TextBlock Grid.Row="0"
+                           x:Name="OldTextHeader"
                            x:Uid="DiffViewer_Header_OldTextTittle"
                            FontStyle="Italic"
                            HorizontalAlignment="Center"

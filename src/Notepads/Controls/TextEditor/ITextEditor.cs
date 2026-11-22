@@ -98,7 +98,11 @@ namespace Notepads.Controls.TextEditor
 
         void ShowHideContentPreview();
 
-        void OpenSideBySideDiffViewer();
+        /// <summary>
+        /// Shows the changes since the last save. With <paramref name="fileOnDiskText"/>, shows the
+        /// differences from that text instead, which is the file as another app left it.
+        /// </summary>
+        void OpenSideBySideDiffViewer(string fileOnDiskText = null);
 
         void CloseSideBySideDiffViewer();
 

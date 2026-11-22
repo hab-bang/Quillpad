@@ -11,10 +11,12 @@ namespace Notepads.Views.MainPage
     using System.Threading.Tasks;
     using Windows.Graphics.Printing;
     using Windows.Storage;
+    using Windows.UI.Xaml.Controls;
     using Notepads.Controls.Dialog;
     using Notepads.Controls.FilePicker;
     using Notepads.Controls.Print;
     using Notepads.Controls.TextEditor;
+    using Notepads.Models;
     using Notepads.Services;
     using Notepads.Utilities;
 
@@ -173,6 +175,7 @@ namespace Notepads.Views.MainPage
                 else
                 {
                     file = textEditor.EditingFile;
+                    if (!await ConfirmOverwriteIfChangedOnDiskAsync(textEditor)) return false;
                 }
 
                 bool promptSaveAs = false;
@@ -209,6 +212,59 @@ namespace Notepads.Views.MainPage
                     NotepadsCore.FocusOnSelectedTextEditor();
                 }
                 return false;
+            }
+        }
+
+        // Sync tools, git and agents edit files too. Before a save writes over the tab's file, check that
+        // nobody changed it since the tab loaded or saved it. Returns false when the save should not go on.
+        private async Task<bool> ConfirmOverwriteIfChangedOnDiskAsync(ITextEditor textEditor)
+        {
+            long? fileTime = null;
+            try
+            {
+                fileTime = await FileSystemUtility.GetDateModifiedAsync(textEditor.EditingFile);
+            }
+            catch (Exception ex)
+            {
+                // The file may be gone or offline. The write reports that itself.
+                LoggingService.LogWarning($"[{nameof(NotepadsMainPage)}] Failed to read the file time before a save: {ex.Message}");
+            }
+
+            if (!DiskChangeUtility.HasChangedOnDisk(textEditor.LastSavedSnapshot.DateModifiedFileTime, fileTime)) return true;
+
+            NotepadsCore.SwitchTo(textEditor); // "Save all" can get here for a tab in the background
+            var fileChangedOnDiskDialog = new FileChangedOnDiskDialog(textEditor.EditingFilePath);
+            var result = await DialogManager.OpenDialogAsync(fileChangedOnDiskDialog, awaitPreviousDialog: false);
+
+            if (result == ContentDialogResult.Primary) return true; // Overwrite
+
+            if (result == ContentDialogResult.Secondary)
+            {
+                await CompareWithFileOnDiskAsync(textEditor);
+            }
+            else if (!fileChangedOnDiskDialog.IsAborted)
+            {
+                NotepadsCore.FocusOnSelectedTextEditor();
+            }
+            return false;
+        }
+
+        private async Task CompareWithFileOnDiskAsync(ITextEditor textEditor)
+        {
+            try
+            {
+                TextFile fileOnDisk = await FileSystemUtility.ReadFileAsync(textEditor.EditingFile, ignoreFileSizeLimit: true, textEditor.LastSavedSnapshot.Encoding);
+                // The editor keeps each line break as a single CR, so compare in that form
+                textEditor.OpenSideBySideDiffViewer(LineEndingUtility.ApplyLineEnding(fileOnDisk.Content, LineEnding.Cr));
+            }
+            catch (Exception ex)
+            {
+                var fileOpenErrorDialog = new FileOpenErrorDialog(textEditor.EditingFilePath, ex.Message);
+                await DialogManager.OpenDialogAsync(fileOpenErrorDialog, awaitPreviousDialog: false);
+                if (!fileOpenErrorDialog.IsAborted)
+                {
+                    NotepadsCore.FocusOnSelectedTextEditor();
+                }
             }
         }
 

@@ -733,6 +733,8 @@ namespace Notepads.Utilities
             }
             catch (Exception ex)
             {
+                // The check itself failed (offline network folder, file locked, access denied), so nothing
+                // says the file is gone. Answer true: false would mark the tab as deleted and turn off reload.
                 LoggingService.LogError($"[{nameof(FileSystemUtility)}] Failed to check if file [{file.Path}] exists: {ex.Message}", consoleOnly: true);
                 return true;
             }
