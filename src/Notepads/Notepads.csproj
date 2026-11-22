@@ -271,6 +271,7 @@
     <Compile Include="Services\ThemeSettingsService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Controls\Dialog\NotepadsDialog.cs" />
+    <Compile Include="Utilities\SaveStateUtility.cs" />
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
