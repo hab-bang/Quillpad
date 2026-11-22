@@ -121,6 +121,25 @@ namespace Notepads.Utilities
             return replacements;
         }
 
+        /// <summary>
+        /// The replacements that change the text. Rewriting a match with the same text changes nothing,
+        /// but the editor would still give the new characters one format.
+        /// </summary>
+        public static List<TextReplacement> WithoutUnchanged(string text, IReadOnlyList<TextReplacement> replacements)
+        {
+            var changed = new List<TextReplacement>(replacements.Count);
+            foreach (var replacement in replacements)
+            {
+                if (replacement.Length != replacement.Text.Length ||
+                    string.CompareOrdinal(text, replacement.Start, replacement.Text, 0, replacement.Length) != 0)
+                {
+                    changed.Add(replacement);
+                }
+            }
+
+            return changed;
+        }
+
         public static string Apply(string text, IReadOnlyList<TextReplacement> replacements)
         {
             var result = new StringBuilder(text.Length);

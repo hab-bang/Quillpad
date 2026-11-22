@@ -268,10 +268,9 @@ namespace Notepads.Controls.TextEditor
             var lineStart = 0;
             for (var i = 0; i < first; i++) lineStart += lines[i].Length + 1;
 
-            // With the same line count, a line with the same text and context kept its format, even between
-            // two changed lines (Replace All changes many lines far apart), so it is skipped
-            var sameLineCount = !full && lines.Length == oldLines.Length;
-
+            // Every line from the first change to the last is read back, even one with the same text as before:
+            // a range edit (paste, Replace All) gives all its new characters one format, so that line may be wrong.
+            // ApplyRuns only writes what differs, so an unchanged line costs reads only.
             RunMarkdownFormatting(formatter =>
             {
                 if (full && text.Length > 0)
@@ -284,11 +283,6 @@ namespace Notepads.Controls.TextEditor
                 {
                     var line = lines[i];
 
-                    if (sameLineCount && line == oldLines[i] && contexts[i] == oldContexts[i])
-                    {
-                        lineStart += line.Length + 1;
-                        continue;
-                    }
                     if (styles.Length < line.Length) styles = new byte[Math.Max(line.Length, styles.Length * 2)];
                     MarkdownLiveStyleParser.StyleLine(line, contexts[i], styles);
 

@@ -1,6 +1,7 @@
 namespace Quillpad.Tests
 {
     using System;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using Notepads.Controls.FindAndReplace;
     using Notepads.Utilities;
@@ -48,6 +49,20 @@ namespace Quillpad.Tests
         {
             var match = FindReplaceUtility.CreateRegex(new SearchContext(@"Mr\. (\w+)", useRegex: true)).Match("Mr. Darcy");
             Assert.Equal("Darcy", FindReplaceUtility.ExpandRegexReplacement(match, "$1"));
+        }
+
+        [Fact]
+        public void ReplacementsThatKeepTheTextAreDropped()
+        {
+            // Rewriting a match with the same text would still reset its format in the editor
+            var text = "*one* and *two* and *three*";
+            var context = new SearchContext(@"\*(\w+)\*", useRegex: true);
+            Assert.Empty(FindReplaceUtility.WithoutUnchanged(text, FindReplaceUtility.FindAll(text, context, "*$1*")));
+
+            var replacements = FindReplaceUtility.FindAll(text, new SearchContext(@"\*(o\w+|t\w+)\*", useRegex: true), "*one*");
+            var changed = FindReplaceUtility.WithoutUnchanged(text, replacements);
+            Assert.Equal(new[] { 10, 20 }, changed.Select(r => r.Start));
+            Assert.Equal("*one* and *one* and *one*", FindReplaceUtility.Apply(text, changed));
         }
 
         [Theory]

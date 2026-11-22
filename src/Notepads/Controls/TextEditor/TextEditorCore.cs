@@ -59,6 +59,9 @@ namespace Notepads.Controls.TextEditor
 
         private bool _shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus = false;
 
+        // Set from an edit until the dispatcher is idle: the view to keep (see RestoreScrollAfterEdit)
+        private (double? Horizontal, double? Vertical)? _pendingScrollRestore;
+
         private bool _loaded = false;
 
         private readonly double _minimumZoomFactor = 10;
@@ -418,7 +421,12 @@ namespace Notepads.Controls.TextEditor
 
         private void OnContentScrollViewerViewChanged(object sender, ScrollViewerViewChangedEventArgs _)
         {
-            if (_shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus)
+            if (_pendingScrollRestore.HasValue && HasViewMoved(_pendingScrollRestore.Value.Horizontal, _pendingScrollRestore.Value.Vertical))
+            {
+                _contentScrollViewer.ChangeView(_pendingScrollRestore.Value.Horizontal, _pendingScrollRestore.Value.Vertical,
+                    zoomFactor: null, disableAnimation: true);
+            }
+            else if (_shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus)
             {
                 _shouldResetScrollViewerToLastKnownPositionAfterRegainingFocus = false;
                 _contentScrollViewer.ChangeView(
@@ -510,14 +518,19 @@ namespace Notepads.Controls.TextEditor
         /// </param>
         public void SetText(string text, bool keepPosition = false)
         {
-            if (TryReplaceChangedTextOnly(text)) return;
+            var horizontalOffset = _contentScrollViewer?.HorizontalOffset;
+            var verticalOffset = _contentScrollViewer?.VerticalOffset;
+
+            if (TryReplaceChangedTextOnly(text))
+            {
+                // The caret moves with the text, but the editor scrolls to it after a range edit
+                if (keepPosition) RestoreScrollAfterEdit(horizontalOffset, verticalOffset);
+                return;
+            }
 
             var oldText = GetText();
             var selectionStart = Document.Selection.StartPosition;
             var selectionEnd = Document.Selection.EndPosition;
-            var scrollViewer = _contentScrollViewer;
-            var horizontalOffset = scrollViewer?.HorizontalOffset;
-            var verticalOffset = scrollViewer?.VerticalOffset;
 
             RequestFullMarkdownRestyle(); // The new text takes one format for all of it
             _markdownLoadedFromRtf = false;
@@ -536,13 +549,34 @@ namespace Notepads.Controls.TextEditor
                 : Math.Clamp(position + lengthChange, prefix, newText.Length);
 
             Document.Selection.SetRange(Map(selectionStart), Map(selectionEnd));
+            RestoreScrollAfterEdit(horizontalOffset, verticalOffset);
+        }
 
-            if (scrollViewer != null)
+        /// <summary>
+        /// Puts the view back where it was before an edit. The new text is laid out after the edit, and after
+        /// a range edit the editor also scrolls to the caret on its own. So the view is put back each time it
+        /// moves, until the dispatcher is idle.
+        /// </summary>
+        private bool HasViewMoved(double? horizontalOffset, double? verticalOffset)
+        {
+            return (verticalOffset.HasValue && Math.Abs(_contentScrollViewer.VerticalOffset - verticalOffset.Value) > 0.5) ||
+                   (horizontalOffset.HasValue && Math.Abs(_contentScrollViewer.HorizontalOffset - horizontalOffset.Value) > 0.5);
+        }
+
+        private void RestoreScrollAfterEdit(double? horizontalOffset, double? verticalOffset)
+        {
+            var scrollViewer = _contentScrollViewer;
+            if (scrollViewer == null) return;
+
+            _pendingScrollRestore = (horizontalOffset, verticalOffset);
+            void Restore() => scrollViewer.ChangeView(horizontalOffset, verticalOffset, zoomFactor: null, disableAnimation: true);
+
+            _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low, Restore);
+            _ = Dispatcher.RunIdleAsync(_ =>
             {
-                // The new text is laid out after this call, so scroll back once that is done
-                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low,
-                    () => scrollViewer.ChangeView(horizontalOffset, verticalOffset, zoomFactor: null, disableAnimation: true));
-            }
+                _pendingScrollRestore = null;
+                Restore();
+            });
         }
 
         /// <summary>

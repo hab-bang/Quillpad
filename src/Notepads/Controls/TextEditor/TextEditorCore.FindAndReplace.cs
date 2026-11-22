@@ -224,7 +224,9 @@ namespace Notepads.Controls.TextEditor
 
             if (replacements.Count == 0) return false;
 
-            ReplaceRanges(replacements);
+            // A match replaced with the same text keeps its format only if it is not rewritten
+            replacements = FindReplaceUtility.WithoutUnchanged(GetText(), replacements);
+            if (replacements.Count > 0) ReplaceRanges(replacements);
             return true;
         }
 
@@ -249,9 +251,8 @@ namespace Notepads.Controls.TextEditor
 
             var selectionStart = Document.Selection.StartPosition;
             var selectionEnd = Document.Selection.EndPosition;
-            var scrollViewer = _contentScrollViewer;
-            var horizontalOffset = scrollViewer?.HorizontalOffset;
-            var verticalOffset = scrollViewer?.VerticalOffset;
+            var horizontalOffset = _contentScrollViewer?.HorizontalOffset;
+            var verticalOffset = _contentScrollViewer?.VerticalOffset;
 
             Document.BatchDisplayUpdates();
             Document.BeginUndoGroup();
@@ -274,12 +275,7 @@ namespace Notepads.Controls.TextEditor
                 FindReplaceUtility.MapPosition(selectionStart, replacements),
                 FindReplaceUtility.MapPosition(selectionEnd, replacements));
 
-            if (scrollViewer != null)
-            {
-                // The new text is laid out after this call, so scroll back once that is done
-                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low,
-                    () => scrollViewer.ChangeView(horizontalOffset, verticalOffset, zoomFactor: null, disableAnimation: true));
-            }
+            RestoreScrollAfterEdit(horizontalOffset, verticalOffset);
         }
 
         /// <summary>
