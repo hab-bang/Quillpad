@@ -255,6 +255,7 @@
     <Compile Include="Services\NotificationCenter.cs" />
     <Compile Include="Utilities\DialogManager.cs" />
     <Compile Include="Utilities\FileTypeUtility.cs" />
+    <Compile Include="Utilities\FindReplaceUtility.cs" />
     <Compile Include="Extensions\INotepadsExtensionProvider.cs" />
     <Compile Include="Extensions\IContentPreviewExtension.cs" />
     <Compile Include="Controls\Markdown\MarkdownExtensionView.xaml.cs">

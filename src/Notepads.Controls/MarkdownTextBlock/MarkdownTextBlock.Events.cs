@@ -6,6 +6,7 @@
 namespace Notepads.Controls
 {
     using System;
+    using Windows.UI.Core;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Documents;
@@ -31,8 +32,19 @@ namespace Notepads.Controls
         /// </summary>
         private void OnPropertyChanged(DependencyObject d, DependencyProperty prop)
         {
-            RenderMarkdown();
+            // Quillpad: properties often change together (one zoom step sets seven font sizes), and each
+            // render parses and lays out the whole text. So render once, after the current burst of changes.
+            if (_isRenderScheduled) return;
+            _isRenderScheduled = true;
+
+            _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                _isRenderScheduled = false;
+                RenderMarkdown();
+            });
         }
+
+        private bool _isRenderScheduled;
 
         /// <summary>
         /// Fired when a user taps one of the link elements
