@@ -195,7 +195,21 @@ namespace Notepads.Controls.TextEditor
         /// </summary>
         private void OnForegroundChangedForMarkdown(DependencyObject sender, DependencyProperty property)
         {
-            RequestFullMarkdownRestyle();
+            if (!_isMarkdownStylingEnabled) return;
+
+            // With no history a full restyle loads RTF in one step. With history it would reset and write every
+            // run, and the RichEditBox kept weight and slant, so reading back and writing only colours is faster.
+            if (_markdownStyledLines != null && (Document.CanUndo() || Document.CanRedo()))
+            {
+                _hasWholeDocumentFormatStepInHistory = true;
+                _markdownStyledLines = Array.Empty<string>();
+                _markdownStyledContexts = Array.Empty<MarkdownLineContext>();
+                ScheduleMarkdownRestyle();
+            }
+            else
+            {
+                RequestFullMarkdownRestyle();
+            }
         }
 
         private void OnTextCompositionStartedForMarkdown(Windows.UI.Xaml.Controls.RichEditBox sender, Windows.UI.Xaml.Controls.TextCompositionStartedEventArgs args)
