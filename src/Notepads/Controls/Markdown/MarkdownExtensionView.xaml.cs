@@ -29,6 +29,7 @@ namespace Notepads.Controls.Markdown
             set
             {
                 _isExtensionEnabled = value;
+                _renderTimer.Stop();
                 if (_isExtensionEnabled)
                 {
                     UpdateFontSize();
@@ -42,9 +43,14 @@ namespace Notepads.Controls.Markdown
 
         private string _lastRenderedText;
 
+        // Each render parses and lays out the whole text, so typing renders only once it pauses
+        private readonly DispatcherTimer _renderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+
         public MarkdownExtensionView()
         {
             InitializeComponent();
+
+            _renderTimer.Tick += OnRenderTimerTick;
 
             MarkdownTextBlock.LinkClicked += MarkdownTextBlock_OnLinkClicked;
             MarkdownTextBlock.ImageClicked += MarkdownTextBlock_OnLinkClicked;
@@ -64,6 +70,7 @@ namespace Notepads.Controls.Markdown
         public void Dispose()
         {
             IsExtensionEnabled = false;
+            _renderTimer.Tick -= OnRenderTimerTick;
 
             MarkdownTextBlock.LinkClicked -= MarkdownTextBlock_OnLinkClicked;
             MarkdownTextBlock.ImageClicked -= MarkdownTextBlock_OnLinkClicked;
@@ -160,6 +167,16 @@ namespace Notepads.Controls.Markdown
             // TextChanged also fires for every format change of the editor's live markdown styling.
             // GetText() returns a new string only when the text changes, so skip when it is the same one.
             if (IsExtensionEnabled && !ReferenceEquals(_lastRenderedText, _editorCore.GetText()))
+            {
+                _renderTimer.Stop();
+                _renderTimer.Start();
+            }
+        }
+
+        private void OnRenderTimerTick(object sender, object e)
+        {
+            _renderTimer.Stop();
+            if (IsExtensionEnabled && !ReferenceEquals(_lastRenderedText, _editorCore?.GetText()))
             {
                 UpdateText();
             }
