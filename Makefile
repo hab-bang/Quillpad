@@ -5,6 +5,7 @@
 #   make run        Same as build, then install and open the dev app
 #   make dev        Always run MSBuild (it is incremental itself), then install and open the dev app
 #   make uninstall  Remove the installed dev app
+#   make test       Run the unit tests in tests/Quillpad.Tests (needs the .NET 8 SDK or later)
 #
 # The dev app installs as "Quillpad-Dev", next to (not over) an installed Quillpad or Notepads.
 
@@ -16,7 +17,7 @@ MARK_BUILT   := powershell -NoProfile -Command "Set-Content -Path '$(BUILD_STAMP
 # the halves of the few paths that contain spaces, which make cannot use as prerequisites.
 SOURCES := $(wildcard $(shell git ls-files --cached --others --exclude-standard src))
 
-.PHONY: build run dev uninstall
+.PHONY: build run dev uninstall test
 
 build: $(BUILD_STAMP)
 
@@ -34,3 +35,6 @@ dev:
 
 uninstall:
 	$(BUILD_SCRIPT) uninstall
+
+test:
+	dotnet test tests/Quillpad.Tests --nologo

@@ -23,3 +23,6 @@ jobs:
           msbuild src/Notepads.sln /restore /m /nologo /verbosity:minimal
           /p:Configuration=Debug /p:Platform=x64
           /p:AppxBundle=Never /p:AppxPackageSigningEnabled=false
+
+      - name: Unit tests
+        run: dotnet test tests/Quillpad.Tests --nologo
