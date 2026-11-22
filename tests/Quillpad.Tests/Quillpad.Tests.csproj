@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Unit tests for the parts of the app that do not use UWP types. The app's source files are
+    linked here, not copied, so the tests always run against the real code.
+    This runs on .NET 8, not on the .NET Native runtime of the shipped app: it tests the logic only.
+    Run with: make test
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AppSource>..\..\src\Notepads\</AppSource>
+    <PreviewParserSource>..\..\src\Notepads.Controls\MarkdownTextBlock\Markdown\</PreviewParserSource>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AppSource)Utilities\MarkdownLiveStyleParser.cs" Link="Linked\MarkdownLiveStyleParser.cs" />
+    <Compile Include="$(AppSource)Utilities\WordCountUtility.cs" Link="Linked\WordCountUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\LineEndingUtility.cs" Link="Linked\LineEndingUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\TextWidthUtility.cs" Link="Linked\TextWidthUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\FileTypeUtility.cs" Link="Linked\FileTypeUtility.cs" />
+  </ItemGroup>
+
+  <!-- The markdown preview's parser. Render\ draws with XAML, so it stays out. -->
+  <ItemGroup>
+    <Compile Include="$(PreviewParserSource)**\*.cs" Exclude="$(PreviewParserSource)Render\**" Link="Linked\Preview\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The preview parser uses its string helpers. Same version the app gets through Microsoft.Toolkit.Uwp.UI. -->
+    <PackageReference Include="Microsoft.Toolkit" Version="7.1.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+</Project>
