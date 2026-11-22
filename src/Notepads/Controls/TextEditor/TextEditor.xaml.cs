@@ -677,6 +677,14 @@
             {
                 TextEditorCore.IsEnabled = !locked;
             }
+
+            if (locked)
+            {
+                // An open find bar's Replace buttons change the text without going through the editor's input.
+                // Neither bar can open again while the editor is disabled.
+                HideFindAndReplaceControl();
+                HideGoToControl();
+            }
         }
 
         private void RenderDiff(ElementTheme theme)

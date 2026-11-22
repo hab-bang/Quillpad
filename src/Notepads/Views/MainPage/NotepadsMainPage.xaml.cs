@@ -339,17 +339,26 @@ namespace Notepads.Views.MainPage
             // The install downloads first and then closes the app with no warning. Text typed in between
             // would be in neither the session nor the file, so the editors take no typing until then.
             SetEditingLockedForUpdate(true);
+            bool keepLocked = false;
 
-            bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
-
-            if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
+            try
             {
-                SetEditingLockedForUpdate(false);
-                return false;
-            }
+                bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
 
-            await Workspace.SaveAsync();
-            return true;
+                if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
+                {
+                    return false;
+                }
+
+                await Workspace.SaveAsync();
+                keepLocked = true; // InstallStopped unlocks if the app is still running after the install
+                return true;
+            }
+            finally
+            {
+                // Also on a throw: the install never starts then, so InstallStopped would never run
+                if (!keepLocked) SetEditingLockedForUpdate(false);
+            }
         }
 
         private void SetEditingLockedForUpdate(bool locked)
