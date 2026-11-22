@@ -10,12 +10,14 @@ namespace Notepads.Services
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Notepads.Utilities;
     using Windows.ApplicationModel.Core;
     using Windows.Storage;
+    using Windows.System.Diagnostics;
 
     public static class LoggingService
     {
@@ -33,7 +35,11 @@ namespace Notepads.Services
         private const bool WriteInfoToFile = false; // Release builds keep only warnings and errors
 #endif
 
+        // Made on the first line to write, so in release builds a file exists only when something went wrong.
+        // Starting a file per window at launch let empty files push the ones with errors out of the last 10.
         private static StorageFile _logFile;
+        private static long _logFileBytes;
+        private static bool _logFileFull;
         private static Task _backgroundTask;
         private static bool _initialized;
 
@@ -67,6 +73,7 @@ namespace Notepads.Services
             }
         }
 
+        // Null until this window has written a line
         public static StorageFile GetLogFile()
         {
             return _logFile;
@@ -129,18 +136,9 @@ namespace Notepads.Services
 
             try
             {
-                if (_logFile == null)
-                {
-                    StorageFolder logsFolder = await FileSystemUtility.GetOrCreateAppFolderAsync("Logs");
-                    _logFile = await FileSystemUtility.CreateFileAsync(logsFolder,
-                        DateTime.UtcNow.ToString("yyyyMMddTHHmmss", CultureInfo.InvariantCulture) + ".log");
-                    await DeleteOldLogFilesAsync(logsFolder);
-                }
-
                 _backgroundTask = Task.Run(WriteLogMessagesAsync);
 
                 _initialized = true;
-                LogInfo($"Log file location: {_logFile.Path}", true);
                 return true;
             }
             catch (Exception ex)
@@ -153,6 +151,19 @@ namespace Notepads.Services
             }
 
             return false;
+        }
+
+        private static async Task<StorageFile> CreateLogFileAsync()
+        {
+            StorageFolder logsFolder = await FileSystemUtility.GetOrCreateAppFolderAsync("Logs");
+
+            // The process id keeps two windows that start in the same second apart
+            string fileName = LogFileUtility.GetFileName(DateTime.UtcNow, ProcessDiagnosticInfo.GetForCurrentProcess().ProcessId);
+            StorageFile logFile = await FileSystemUtility.CreateFileAsync(logsFolder, fileName, CreationCollisionOption.OpenIfExists);
+            Debug.WriteLine($"Log file location: {logFile.Path}");
+
+            await DeleteOldLogFilesAsync(logsFolder);
+            return logFile;
         }
 
         private static async Task DeleteOldLogFilesAsync(StorageFolder logsFolder)
@@ -205,7 +216,8 @@ namespace Notepads.Services
 
             try
             {
-                if (MessageQueue.Count == 0)
+                // Messages holds lines left over from a failed write, so check both
+                if (MessageQueue.IsEmpty && Messages.Count == 0)
                 {
                     return true;
                 }
@@ -215,12 +227,39 @@ namespace Notepads.Services
                     Messages.Add(message);
                 }
 
-                await FileIO.AppendLinesAsync(_logFile, Messages);
+                if (_logFileFull)
+                {
+                    Messages.Clear();
+                    return true;
+                }
+
+                if (_logFile == null)
+                {
+                    _logFile = await CreateLogFileAsync();
+                    _logFileBytes = 0;
+                }
+
+                List<string> lines = Messages;
+                int linesThatFit = LogFileUtility.CountLinesThatFit(Messages, _logFileBytes, LogFileUtility.MaxFileBytes);
+                if (linesThatFit < Messages.Count)
+                {
+                    lines = Messages.Take(linesThatFit).ToList();
+                    lines.Add($"{DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} [Warning] The log file is full. Later lines of this window are not written.");
+                }
+
+                await FileIO.AppendLinesAsync(_logFile, lines);
+                _logFileBytes += lines.Sum(LogFileUtility.GetByteCount);
+                _logFileFull = linesThatFit < Messages.Count;
                 Messages.Clear();
                 return true;
             }
             catch (Exception ex)
             {
+                // The file was deleted (by hand, or by another window's cleanup): start a new one on the next write
+                if (ex is FileNotFoundException || ex.HResult == unchecked((int)0x80070002))
+                {
+                    _logFile = null;
+                }
                 Debug.WriteLine(ex);
             }
             finally

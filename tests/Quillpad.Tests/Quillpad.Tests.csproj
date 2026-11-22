@@ -27,18 +27,18 @@
     <Compile Include="$(AppSource)Utilities\FileTypeUtility.cs" Link="Linked\FileTypeUtility.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
   <!-- Issue #8: decision logic pulled out of the save, session and logging code -->
   <ItemGroup>
     <Compile Include="$(AppSource)Utilities\SaveStateUtility.cs" Link="Linked\SaveStateUtility.cs" />
     <Compile Include="$(AppSource)Utilities\LogFileUtility.cs" Link="Linked\LogFileUtility.cs" />
     <Compile Include="$(AppSource)Utilities\DiskChangeUtility.cs" Link="Linked\DiskChangeUtility.cs" />
     <Compile Include="$(AppSource)Utilities\BackupFileUtility.cs" Link="Linked\BackupFileUtility.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
 
 </Project>
