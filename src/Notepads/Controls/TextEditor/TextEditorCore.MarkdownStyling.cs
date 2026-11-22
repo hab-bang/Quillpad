@@ -81,10 +81,13 @@ namespace Notepads.Controls.TextEditor
             }
         }
 
+        private long _foregroundChangedForMarkdownToken;
+
         private void HookMarkdownStylingEvents()
         {
             FontSizeChanged += OnFontSizeChangedForMarkdown;
             ActualThemeChanged += OnActualThemeChangedForMarkdown;
+            _foregroundChangedForMarkdownToken = RegisterPropertyChangedCallback(ForegroundProperty, OnForegroundChangedForMarkdown);
             TextCompositionStarted += OnTextCompositionStartedForMarkdown;
             TextCompositionEnded += OnTextCompositionEndedForMarkdown;
             AddHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks), handledEventsToo: true);
@@ -94,6 +97,7 @@ namespace Notepads.Controls.TextEditor
         {
             FontSizeChanged -= OnFontSizeChangedForMarkdown;
             ActualThemeChanged -= OnActualThemeChangedForMarkdown;
+            UnregisterPropertyChangedCallback(ForegroundProperty, _foregroundChangedForMarkdownToken);
             TextCompositionStarted -= OnTextCompositionStartedForMarkdown;
             TextCompositionEnded -= OnTextCompositionEndedForMarkdown;
             RemoveHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks));
@@ -138,6 +142,15 @@ namespace Notepads.Controls.TextEditor
         private bool _markdownLoadedFromRtf;
 
         private void OnActualThemeChangedForMarkdown(FrameworkElement sender, object args)
+        {
+            RequestFullMarkdownRestyle();
+        }
+
+        /// <summary>
+        /// A theme switch changes Foreground, and the RichEditBox then paints all text in that colour.
+        /// ActualThemeChanged is not raised on the editor when the theme is set on the window content.
+        /// </summary>
+        private void OnForegroundChangedForMarkdown(DependencyObject sender, DependencyProperty property)
         {
             RequestFullMarkdownRestyle();
         }
