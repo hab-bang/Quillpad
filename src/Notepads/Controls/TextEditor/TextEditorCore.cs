@@ -777,6 +777,7 @@ namespace Notepads.Controls.TextEditor
             {
                 Document.UndoLimit = 0;
                 Document.UndoLimit = undoLimit;
+                _hasWholeDocumentFormatStepInHistory = false;
             }
         }
 

@@ -132,10 +132,53 @@ namespace Notepads.Controls.TextEditor
             if (!_markdownLoadedFromRtf) return;
             var length = GetText().Length;
             if (length == 0) return;
+
+            // With no history, undo stays off so the zoom leaves no undo step. With history it cannot:
+            // turning undo off clears the history (see ClearUndoQueue). So the step stays, and is remembered.
+            var historyWasEmpty = !Document.CanUndo() && !Document.CanRedo();
+            var undoLimit = Document.UndoLimit;
+            var undoDisabled = historyWasEmpty && undoLimit > 0;
+            if (undoDisabled) Document.UndoLimit = 0;
+
             Document.GetRange(0, length).ParagraphFormat.SetLineSpacing(LineSpacingRule.Exactly, (float)fontSize);
+
+            if (undoDisabled) Document.UndoLimit = undoLimit;
+            else _hasWholeDocumentFormatStepInHistory = true;
         }
 
         private bool _markdownLoadedFromRtf;
+
+        /// <summary>
+        /// True once a zoom, theme or font change restyled the whole document as an undo step. Undo can step
+        /// back across it, together with an older text change, and bring back the old line spacing or colours.
+        /// </summary>
+        private bool _hasWholeDocumentFormatStepInHistory;
+
+        /// <summary>
+        /// Called after an undo that stepped back across format-only steps, when one of them may have been a
+        /// whole-document restyle. Puts back the line spacing of the current zoom, and checks every line's
+        /// style. Only what differs is changed, so this costs reads, not writes, when nothing is wrong.
+        /// </summary>
+        private void RestoreWholeDocumentFormatAfterUndo()
+        {
+            var length = GetText().Length;
+            if (_markdownLoadedFromRtf && length > 0)
+            {
+                var paragraphFormat = Document.GetRange(0, length).ParagraphFormat;
+                if (paragraphFormat.LineSpacingRule != LineSpacingRule.Exactly || Math.Abs(paragraphFormat.LineSpacing - FontSize) > 0.1)
+                {
+                    paragraphFormat.SetLineSpacing(LineSpacingRule.Exactly, (float)FontSize);
+                }
+            }
+
+            if (_isMarkdownStylingEnabled && _markdownStyledLines != null)
+            {
+                // With no lines known as styled, the next restyle reads back every line
+                _markdownStyledLines = Array.Empty<string>();
+                _markdownStyledContexts = Array.Empty<MarkdownLineContext>();
+                ScheduleMarkdownRestyle();
+            }
+        }
 
         private void OnActualThemeChangedForMarkdown(FrameworkElement sender, object args)
         {
@@ -219,6 +262,8 @@ namespace Notepads.Controls.TextEditor
 
             // Styling a whole file one change at a time is slow, so load it as styled RTF in one step
             if (full && text.Length > 0 && TryRestyleMarkdownWithRtf(text, lines, contexts)) return;
+
+            if (full && (Document.CanUndo() || Document.CanRedo())) _hasWholeDocumentFormatStepInHistory = true;
 
             var lineStart = 0;
             for (var i = 0; i < first; i++) lineStart += lines[i].Length + 1;
@@ -646,13 +691,19 @@ namespace Notepads.Controls.TextEditor
         private void UndoSkippingFormatChanges()
         {
             Document.GetText(TextGetOptions.None, out var before);
+            var formatStepsUndone = 0;
 
             for (var step = 0; step < 1000 && Document.CanUndo(); step++)
             {
                 Document.Undo();
                 Document.GetText(TextGetOptions.None, out var after);
                 if (after != before) break; // Undid a text change: done
+                formatStepsUndone++;
             }
+
+            // Redo needs no such check: a restyle after an undo clears the redo history, so redo never
+            // brings back a restyle made for an older zoom or theme
+            if (formatStepsUndone > 0 && _hasWholeDocumentFormatStepInHistory) RestoreWholeDocumentFormatAfterUndo();
         }
 
         private void RedoSkippingFormatChanges()
