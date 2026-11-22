@@ -247,6 +247,7 @@
     <Compile Include="Views\MainPage\NotepadsMainPage.ViewModes.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Workspace.cs" />
     <Compile Include="Services\MRUService.cs" />
+    <Compile Include="Utilities\BackupFileUtility.cs" />
     <Compile Include="Utilities\BrushUtility.cs" />
     <Compile Include="Utilities\Downloader.cs" />
     <Compile Include="Services\LoggingService.cs" />
