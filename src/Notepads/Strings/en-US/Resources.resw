@@ -889,4 +889,8 @@
     <value>File on disk</value>
     <comment>DiffViewer: Header's text for the left side when the tab's text is compared with the file on disk.</comment>
   </data>
+  <data name="SessionCorruptionErrorDialog_TabsNotRestored" xml:space="preserve">
+    <value>Quillpad could not reopen these tabs from the last session: {0}. Any unsaved text they had is kept in the session backup folder as .txt files.</value>
+    <comment>SessionCorruptionErrorDialog: "Content" display text when some tabs failed to restore. {0} is the list of tab names. You can change the order but DO NOT REMOVE it from the string.</comment>
+  </data>
 </root>

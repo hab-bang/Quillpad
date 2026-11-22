@@ -238,6 +238,15 @@ namespace Notepads.Views.MainPage
                 {
                     LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load last session: {ex}");
                 }
+
+                if (SessionManager.TabsNotRestored.Count > 0)
+                {
+                    var tabsNotRestoredDialog = new SessionCorruptionErrorDialog(
+                        recoveryAction: async () => { await SessionManager.OpenSessionBackupFolderAsync(); },
+                        content: string.Format(_resourceLoader.GetString("SessionCorruptionErrorDialog_TabsNotRestored"),
+                            string.Join(", ", SessionManager.TabsNotRestored)));
+                    await DialogManager.OpenDialogAsync(tabsNotRestoredDialog, awaitPreviousDialog: false);
+                }
             }
 
             if (!_loaded)
