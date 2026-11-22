@@ -58,7 +58,8 @@ namespace Notepads.Controls.Markdown
             foreach (var lineInfo in Common.ParseLines(markdown, start, maxEnd, quoteDepth))
             {
                 int pos = lineInfo.StartOfLine;
-                if (pos < maxEnd && markdown[pos] == '`')
+                // Quillpad: once an indented block has started, a backtick line ends it instead of opening a fence
+                if (pos < maxEnd && markdown[pos] == '`' && (code == null || insideCodeBlock))
                 {
                     var backTickCount = 0;
                     while (pos < maxEnd && backTickCount < 3)
@@ -75,7 +76,14 @@ namespace Notepads.Controls.Markdown
                         pos++;
                     }
 
-                    if (backTickCount == 3)
+                    if (backTickCount == 3 && insideCodeBlock &&
+                        markdown.Substring(pos, lineInfo.EndOfLine - pos).TrimStart('`').Trim().Length > 0)
+                    {
+                        // Quillpad: a closing fence has no info string, the same as in the editor.
+                        // ```js inside a block is a line of code.
+                        pos = lineInfo.StartOfLine;
+                    }
+                    else if (backTickCount == 3)
                     {
                         insideCodeBlock = !insideCodeBlock;
 
