@@ -82,7 +82,13 @@ namespace Notepads.Controls.TextEditor
 
         void ResetEditorState(TextEditorStateMetaData metadata, string newText = null);
 
-        Task ReloadFromEditingFileAsync(Encoding encoding = null);
+        /// <summary>
+        /// Returns false, with the tab unchanged, when text was typed during the read, or, with
+        /// <paramref name="requireUnchangedFile"/>, when another app wrote the file during the read.
+        /// </summary>
+        Task<bool> ReloadFromEditingFileAsync(Encoding encoding = null, bool requireUnchangedFile = false);
+
+        Task RefreshFileStatusAsync();
 
         LineEnding GetLineEnding();
 

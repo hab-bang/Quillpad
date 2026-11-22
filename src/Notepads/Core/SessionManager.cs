@@ -444,7 +444,10 @@ namespace Notepads.Core
 
         private async Task<TextEditorSessionDataV1> GetTextEditorSessionDataAsync(ITextEditor textEditor)
         {
-            if (_sessionDataCache.TryGetValue(textEditor.Id, out TextEditorSessionDataV1 textEditorSessionData))
+            // A tab out of view gets no text events here (they are unbound on Unloaded), but its file can be deleted
+            // outside, which makes it modified. An entry built while it was clean has no backup files, so build it again.
+            if (_sessionDataCache.TryGetValue(textEditor.Id, out TextEditorSessionDataV1 textEditorSessionData) &&
+                textEditorSessionData.StateMetaData?.IsModified == textEditor.IsModified)
             {
                 // We will not create new backup files for this text editor unless it has content changes
                 // But we should update latest TextEditor state meta data
@@ -459,7 +462,7 @@ namespace Notepads.Core
                     return null;
                 }
 
-                _sessionDataCache.TryAdd(textEditor.Id, textEditorSessionData);
+                _sessionDataCache[textEditor.Id] = textEditorSessionData;
             }
 
             return textEditorSessionData;
@@ -667,6 +670,9 @@ namespace Notepads.Core
         {
             try
             {
+                // In the tab's encoding when it holds the text, else UTF-8 with a byte order mark. The restore
+                // reads with the tab's encoding but follows the mark, so no character turns into "?".
+                encoding = EncodingFitUtility.GetBackupEncoding(text, encoding);
                 await FileSystemUtility.WriteTextToFileAsync(file, LineEndingUtility.ApplyLineEnding(text, lineEnding), encoding);
                 return true;
             }

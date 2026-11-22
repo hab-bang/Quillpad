@@ -14,6 +14,7 @@ namespace Notepads
     using Notepads.Services;
     using Notepads.Settings;
     using Notepads.Utilities;
+    using Notepads.Views.MainPage;
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
     using Windows.ApplicationModel.Core;
@@ -63,6 +64,28 @@ namespace Notepads
             InitializeComponent();
 
             Suspending += OnSuspending;
+        }
+
+        /// <summary>
+        /// The main window keeps the session backup, Settings and the folder memory, and holds the mutex while it is open.
+        /// When it closes, the mutex goes, and the next window to call this becomes the main window. Without this,
+        /// every later launch went to a window that had none of the three.
+        /// </summary>
+        public static bool TryBecomePrimaryInstance()
+        {
+            if (IsPrimaryInstance || IsGameBarWidget) return false;
+
+            var mutex = new Mutex(true, App.ApplicationName, out bool isNew);
+            if (!isNew)
+            {
+                mutex.Dispose();
+                return false;
+            }
+
+            InstanceHandlerMutex = mutex;
+            IsPrimaryInstance = true;
+            LoggingService.LogInfo($"[{nameof(App)}] Instance {InstanceId} is now the primary instance.");
+            return true;
         }
 
         /// <summary>
@@ -137,6 +160,13 @@ namespace Notepads
             };
 
             LoggingService.LogInfo($"[{nameof(App)}] Editor settings: \n{string.Join("\n", appLaunchEditorSettings.Select(x => x.Key + "=" + x.Value).ToArray())}.");
+
+            // A launch that Windows sent to this window because the main window closed: take over first,
+            // so the restored session comes before the files this launch opens
+            if (!rootFrameCreated && rootFrame.Content is NotepadsMainPage mainPage)
+            {
+                await mainPage.TryBecomePrimaryInstanceAsync();
+            }
 
             await ActivationService.ActivateAsync(rootFrame, e);
 

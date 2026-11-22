@@ -133,7 +133,20 @@
             {
                 if (_fileModificationState != value)
                 {
+                    var previousState = _fileModificationState;
                     _fileModificationState = value;
+
+                    // With its file gone, the tab holds the only copy of the text. As a modified tab, closing it asks,
+                    // the session backs its text up, and Save All writes it.
+                    if (value == FileModificationState.RenamedMovedOrDeleted)
+                    {
+                        IsModified = true;
+                    }
+                    else if (previousState == FileModificationState.RenamedMovedOrDeleted)
+                    {
+                        IsModified = !NoChangesSinceLastSaved(); // The file is back
+                    }
+
                     FileModificationStateChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -511,11 +524,27 @@
             _loaded = true;
         }
 
-        public async Task ReloadFromEditingFileAsync(Encoding encoding = null)
+        public async Task<bool> ReloadFromEditingFileAsync(Encoding encoding = null, bool requireUnchangedFile = false)
         {
             if (EditingFile != null)
             {
+                string textBeforeRead = TextEditorCore.GetText();
                 var textFile = await FileSystemUtility.ReadFileAsync(EditingFile, ignoreFileSizeLimit: false, encoding: encoding);
+
+                // The read took the file's time first. A newer time now means another app wrote during the read,
+                // so the text may be cut short. The next status check sees the change again.
+                if (requireUnchangedFile &&
+                    DiskChangeUtility.HasChangedOnDisk(textFile.DateModifiedFileTime, await TryGetEditingFileDateModifiedAsync()))
+                {
+                    return false;
+                }
+
+                // Text typed during the read is not in the file. Replacing it here would lose it without a word.
+                if (!string.Equals(textBeforeRead, TextEditorCore.GetText(), StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
                 _loaded = false; // Like Init: the new text is not a user edit
                 TextEditorCore.SetText(textFile.Content, keepPosition: true); // A reload should not jump to the top
                 textFile.Content = TextEditorCore.GetText(); // The editor's form of the text, with its line breaks
@@ -526,6 +555,37 @@
                 CloseSideBySideDiffViewer();
                 HideGoToControl();
                 FileReloaded?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<long?> TryGetEditingFileDateModifiedAsync()
+        {
+            try
+            {
+                return await FileSystemUtility.GetDateModifiedAsync(EditingFile);
+            }
+            catch (Exception)
+            {
+                return null; // Can't tell, so nothing says it changed
+            }
+        }
+
+        /// <summary>
+        /// Checks now whether the file still exists or was changed outside, like the timed check of the selected tab does.
+        /// Other tabs are not checked on a timer, so a tab must call this before it closes without asking.
+        /// </summary>
+        public async Task RefreshFileStatusAsync()
+        {
+            try
+            {
+                await CheckAndUpdateFileStatusAsync(CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogInfo($"[{nameof(TextEditor)}] Failed to check status for file [{EditingFile?.Path}]: {ex.Message}", consoleOnly: true);
             }
         }
 
@@ -880,6 +940,9 @@
         public bool NoChangesSinceLastSaved(bool compareTextOnly = false)
         {
             if (!_loaded) return true;
+
+            // Undoing back to the saved text must not mark the tab clean while its file is gone
+            if (EditingFile != null && FileModificationState == FileModificationState.RenamedMovedOrDeleted) return false;
 
             if (!compareTextOnly)
             {

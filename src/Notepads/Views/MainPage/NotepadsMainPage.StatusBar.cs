@@ -311,8 +311,10 @@ namespace Notepads.Views.MainPage
             {
                 try
                 {
-                    await selectedEditor.ReloadFromEditingFileAsync();
-                    NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                    if (await selectedEditor.ReloadFromEditingFileAsync())
+                    {
+                        NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -735,8 +737,10 @@ namespace Notepads.Views.MainPage
 
                 try
                 {
-                    await selectedTextEditor.ReloadFromEditingFileAsync(encoding);
-                    NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                    if (await selectedTextEditor.ReloadFromEditingFileAsync(encoding))
+                    {
+                        NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -770,8 +774,10 @@ namespace Notepads.Views.MainPage
                 {
                     try
                     {
-                        await selectedTextEditor.ReloadFromEditingFileAsync(encoding);
-                        NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                        if (await selectedTextEditor.ReloadFromEditingFileAsync(encoding))
+                        {
+                            NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileReloaded"), 1500);
+                        }
                     }
                     catch (Exception ex)
                     {

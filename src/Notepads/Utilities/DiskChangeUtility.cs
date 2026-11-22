@@ -21,6 +21,15 @@ namespace Notepads.Utilities
         }
 
         /// <summary>
+        /// True when two looks at the file, a moment apart, found the same time and size. Sync tools and
+        /// other apps can write a file in parts, and a reload in between would take the first part only.
+        /// </summary>
+        public static bool HasStoppedChanging(long fileTimeBefore, ulong sizeBefore, long fileTimeAfter, ulong sizeAfter)
+        {
+            return fileTimeBefore == fileTimeAfter && sizeBefore == sizeAfter;
+        }
+
+        /// <summary>
         /// True when the file on disk holds the same text as the editor, so a save over it loses nothing.
         /// Git and sync tools often write a file back with the same text and a new time. The editor keeps
         /// each line break as a single CR, so the file's line breaks are compared in that form.

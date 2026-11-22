@@ -66,6 +66,13 @@ namespace Notepads.Views.MainPage
             MainMenuButtonFlyout.Opening += MainMenuButtonFlyout_Opening;
         }
 
+        // Undoes what InitializeMainMenu does for a second window, once this window is the main window
+        private void UpdateMainMenuForPrimaryInstance()
+        {
+            MainMenuButton.ClearValue(Control.ForegroundProperty);
+            MenuSettingsButton.IsEnabled = !App.IsGameBarWidget;
+        }
+
         private void MainMenuButtonFlyout_Opening(object sender, object e)
         {
             var selectedTextEditor = NotepadsCore.GetSelectedTextEditor();
