@@ -39,5 +39,43 @@ namespace Quillpad.Tests
         {
             Assert.False(DiskChangeUtility.HasChangedOnDisk(LoadedAt, null));
         }
+
+        [Fact]
+        public void SameTextWithCrlfOnDiskIsTheSame()
+        {
+            // The editor keeps each line break as CR, the file has CR LF
+            Assert.True(DiskChangeUtility.HasSameText("She left.\r\nThe door shut.", "She left.\rThe door shut."));
+        }
+
+        [Fact]
+        public void SameTextWithLfOnDiskIsTheSame()
+        {
+            Assert.True(DiskChangeUtility.HasSameText("one\ntwo\n", "one\rtwo\r"));
+        }
+
+        [Fact]
+        public void ChangedWordIsNotTheSame()
+        {
+            Assert.False(DiskChangeUtility.HasSameText("She left.\r\n", "She stayed.\r"));
+        }
+
+        [Fact]
+        public void ExtraLineBreakIsNotTheSame()
+        {
+            Assert.False(DiskChangeUtility.HasSameText("one\r\ntwo\r\n", "one\rtwo"));
+        }
+
+        [Fact]
+        public void CaseCounts()
+        {
+            Assert.False(DiskChangeUtility.HasSameText("she left", "She left"));
+        }
+
+        [Fact]
+        public void MissingTextIsNeverTheSame()
+        {
+            Assert.False(DiskChangeUtility.HasSameText(null, "text"));
+            Assert.False(DiskChangeUtility.HasSameText("text", null));
+        }
     }
 }

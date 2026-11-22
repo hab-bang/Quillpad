@@ -232,6 +232,16 @@ namespace Notepads.Views.MainPage
 
             if (!DiskChangeUtility.HasChangedOnDisk(textEditor.LastSavedSnapshot.DateModifiedFileTime, fileTime)) return true;
 
+            try
+            {
+                if (DiskChangeUtility.HasSameText(await ReadFileOnDiskAsync(textEditor), textEditor.GetText())) return true;
+            }
+            catch (Exception ex)
+            {
+                // Can't tell, so ask
+                LoggingService.LogWarning($"[{nameof(NotepadsMainPage)}] Failed to read the file before a save: {ex.Message}");
+            }
+
             NotepadsCore.SwitchTo(textEditor); // "Save all" can get here for a tab in the background
             var fileChangedOnDiskDialog = new FileChangedOnDiskDialog(textEditor.EditingFilePath);
             var result = await DialogManager.OpenDialogAsync(fileChangedOnDiskDialog, awaitPreviousDialog: false);
@@ -249,13 +259,21 @@ namespace Notepads.Views.MainPage
             return false;
         }
 
+        private static async Task<string> ReadFileOnDiskAsync(ITextEditor textEditor)
+        {
+            TextFile fileOnDisk = await FileSystemUtility.ReadFileAsync(textEditor.EditingFile, ignoreFileSizeLimit: true, textEditor.LastSavedSnapshot.Encoding);
+            return fileOnDisk.Content;
+        }
+
         private async Task CompareWithFileOnDiskAsync(ITextEditor textEditor)
         {
             try
             {
-                TextFile fileOnDisk = await FileSystemUtility.ReadFileAsync(textEditor.EditingFile, ignoreFileSizeLimit: true, textEditor.LastSavedSnapshot.Encoding);
+                string fileOnDiskText = await ReadFileOnDiskAsync(textEditor);
+                // An open diff of the changes since the last save would stay on screen, and look like this one
+                textEditor.CloseSideBySideDiffViewer();
                 // The editor keeps each line break as a single CR, so compare in that form
-                textEditor.OpenSideBySideDiffViewer(LineEndingUtility.ApplyLineEnding(fileOnDisk.Content, LineEnding.Cr));
+                textEditor.OpenSideBySideDiffViewer(LineEndingUtility.ApplyLineEnding(fileOnDiskText, LineEnding.Cr));
             }
             catch (Exception ex)
             {

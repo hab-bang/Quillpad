@@ -5,6 +5,8 @@
 
 namespace Notepads.Utilities
 {
+    using System;
+
     public static class DiskChangeUtility
     {
         /// <summary>
@@ -16,6 +18,17 @@ namespace Notepads.Utilities
         public static bool HasChangedOnDisk(long lastKnownFileTime, long? currentFileTime)
         {
             return currentFileTime.HasValue && currentFileTime.Value != lastKnownFileTime;
+        }
+
+        /// <summary>
+        /// True when the file on disk holds the same text as the editor, so a save over it loses nothing.
+        /// Git and sync tools often write a file back with the same text and a new time. The editor keeps
+        /// each line break as a single CR, so the file's line breaks are compared in that form.
+        /// </summary>
+        public static bool HasSameText(string fileOnDiskText, string editorText)
+        {
+            if (fileOnDiskText == null || editorText == null) return false;
+            return string.Equals(LineEndingUtility.ApplyLineEnding(fileOnDiskText, LineEnding.Cr), editorText, StringComparison.Ordinal);
         }
     }
 }
