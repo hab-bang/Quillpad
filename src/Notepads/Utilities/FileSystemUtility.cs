@@ -613,7 +613,9 @@ namespace Notepads.Utilities
             {
                 StorageFolder folder = await file.GetParentAsync(); // Null when the app may use the file but not its folder
                 if (folder == null) return false;
-                tempFile = await folder.CreateFileAsync(file.Name + BackupFileUtility.SaveTempFileSuffix, CreationCollisionOption.GenerateUniqueName);
+                // One fixed name, so the next save clears what a stopped save left. Saves of one file don't overlap:
+                // session saves take turns, and a file is open in one tab only.
+                tempFile = await folder.CreateFileAsync(file.Name + BackupFileUtility.SaveTempFileSuffix, CreationCollisionOption.ReplaceExisting);
             }
             catch (Exception ex)
             {
