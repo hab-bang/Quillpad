@@ -12,7 +12,7 @@ namespace Notepads.Utilities
     public enum MarkdownLineContext : byte
     {
         Normal,
-        Fence,  // A ``` or ~~~ line that opens or closes a code block
+        Fence,  // A ``` line that opens or closes a code block
         InCode, // A line inside a fenced code block
     }
 
@@ -42,7 +42,7 @@ namespace Notepads.Utilities
 
         private const char Masked = '\u0001'; // Replaces characters that emphasis must not see
 
-        private static readonly Regex FenceRegex = new Regex(@"^ {0,3}(`{3,}|~{3,})", RegexOptions.CultureInvariant);
+        private static readonly Regex FenceRegex = new Regex(@"^ {0,3}(`{3,})", RegexOptions.CultureInvariant);
         private static readonly Regex HorizontalRuleRegex = new Regex(@"^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$", RegexOptions.CultureInvariant);
         private static readonly Regex HeadingRegex = new Regex(@"^ {0,3}(#{1,6})(?=[ \t]|$)", RegexOptions.CultureInvariant);
         private static readonly Regex QuoteRegex = new Regex(@"^(?: {0,3}>[ \t]?)+", RegexOptions.CultureInvariant);
@@ -74,35 +74,49 @@ namespace Notepads.Utilities
                    (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeMailto);
         }
 
+        /// <summary>
+        /// Finds the fenced code blocks. A fence opens only when a closing fence follows it, so a stray
+        /// ``` line does not turn the rest of the document into code. Only backtick fences count: writers
+        /// use ~~~ as a scene break, and the preview does not know ~~~ fences either.
+        /// </summary>
         public static MarkdownLineContext[] GetLineContexts(string[] lines)
         {
             var contexts = new MarkdownLineContext[lines.Length];
-            char fenceChar = '\0';
-            var fenceLength = 0;
 
+            // fenceLengths[i]: length of the backtick run that starts line i, or 0 when it is no fence.
+            // longestCloseBelow[i]: the longest fence below line i that could close a block (nothing after it).
+            var fenceLengths = new int[lines.Length];
+            var canClose = new bool[lines.Length];
             for (var i = 0; i < lines.Length; i++)
             {
                 var match = FenceRegex.Match(lines[i]);
+                if (!match.Success) continue;
+                fenceLengths[i] = match.Groups[1].Length;
+                canClose[i] = lines[i].Substring(match.Index + match.Length).Trim().Length == 0;
+            }
 
-                if (fenceChar == '\0')
+            var longestCloseBelow = new int[lines.Length];
+            for (int i = lines.Length - 2, longest = 0; i >= 0; i--)
+            {
+                if (canClose[i + 1]) longest = Math.Max(longest, fenceLengths[i + 1]);
+                longestCloseBelow[i] = longest;
+            }
+
+            var openLength = 0;
+            for (var i = 0; i < lines.Length; i++)
+            {
+                var length = fenceLengths[i];
+
+                if (openLength == 0)
                 {
-                    if (match.Success && !(match.Groups[1].Value[0] == '`' && lines[i].IndexOf('`', match.Index + match.Length) >= 0))
-                    {
-                        fenceChar = match.Groups[1].Value[0];
-                        fenceLength = match.Groups[1].Length;
-                        contexts[i] = MarkdownLineContext.Fence;
-                    }
-                    else
-                    {
-                        contexts[i] = MarkdownLineContext.Normal;
-                    }
+                    // CommonMark: a backtick fence cannot have a backtick in its info string
+                    var isOpening = length > 0 && length <= longestCloseBelow[i] && lines[i].IndexOf('`', lines[i].IndexOf('`') + length) < 0;
+                    if (isOpening) openLength = length;
+                    contexts[i] = isOpening ? MarkdownLineContext.Fence : MarkdownLineContext.Normal;
                 }
-                else if (match.Success &&
-                         match.Groups[1].Value[0] == fenceChar &&
-                         match.Groups[1].Length >= fenceLength &&
-                         lines[i].Substring(match.Index + match.Length).Trim().Length == 0)
+                else if (canClose[i] && length >= openLength)
                 {
-                    fenceChar = '\0';
+                    openLength = 0;
                     contexts[i] = MarkdownLineContext.Fence;
                 }
                 else
