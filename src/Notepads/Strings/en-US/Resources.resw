@@ -826,7 +826,7 @@
     <comment>AboutPage: {0} is the latest released version. Shown in the Quillpad-Dev app.</comment>
   </data>
   <data name="AboutPage_Update_Installing" xml:space="preserve">
-    <value>Downloading and installing v{0}... Quillpad will close when it is ready.</value>
+    <value>Downloading and installing v{0}... Typing is paused, and Quillpad will close when it is ready.</value>
     <comment>AboutPage: {0} is the new version.</comment>
   </data>
   <data name="AboutPage_Update_CheckFailed" xml:space="preserve">

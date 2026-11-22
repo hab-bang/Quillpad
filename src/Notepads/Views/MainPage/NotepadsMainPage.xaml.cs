@@ -44,6 +44,7 @@ namespace Notepads.Views.MainPage
 
         private bool _loaded = false;
         private bool _lastTabMovedToAnotherInstance = false;
+        private bool _editingLockedForUpdate = false;
 
         private INotepadsCore _notepadsCore;
 
@@ -298,6 +299,7 @@ namespace Notepads.Views.MainPage
             await BuildOpenRecentButtonSubItemsAsync();
 
             UpdateService.SaveBeforeInstallAsync = SaveBeforeUpdateInstallAsync;
+            UpdateService.InstallStopped = () => SetEditingLockedForUpdate(false);
 
             if (!App.IsGameBarWidget)
             {
@@ -334,15 +336,29 @@ namespace Notepads.Views.MainPage
         // Returns false when unsaved text would be lost: a tab has unsaved changes and the session does not hold them.
         private async Task<bool> SaveBeforeUpdateInstallAsync()
         {
+            // The install downloads first and then closes the app with no warning. Text typed in between
+            // would be in neither the session nor the file, so the editors take no typing until then.
+            SetEditingLockedForUpdate(true);
+
             bool sessionSaved = AppSettingsService.IsSessionSnapshotEnabled && await SessionManager.SaveSessionAsync();
 
             if (!sessionSaved && NotepadsCore.HaveUnsavedTextEditor())
             {
+                SetEditingLockedForUpdate(false);
                 return false;
             }
 
             await Workspace.SaveAsync();
             return true;
+        }
+
+        private void SetEditingLockedForUpdate(bool locked)
+        {
+            _editingLockedForUpdate = locked;
+            foreach (ITextEditor textEditor in NotepadsCore.GetAllTextEditors())
+            {
+                textEditor.SetEditingLocked(locked);
+            }
         }
 
         public void ExecuteProtocol(Uri uri)
@@ -521,6 +537,11 @@ namespace Notepads.Views.MainPage
 
         private void OnTextEditorLoaded(object sender, ITextEditor textEditor)
         {
+            if (_editingLockedForUpdate)
+            {
+                textEditor.SetEditingLocked(true); // A tab opened during the update download
+            }
+
             if (NotepadsCore.GetSelectedTextEditor() == textEditor)
             {
                 SetupStatusBar(textEditor);

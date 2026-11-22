@@ -165,6 +165,8 @@
 
         private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk
 
+        private bool _editingLocked;
+
         public TextEditorMode Mode
         {
             get => _mode;
@@ -668,6 +670,15 @@
             SideBySideDiffViewer.Focus();
         }
 
+        public void SetEditingLocked(bool locked)
+        {
+            _editingLocked = locked;
+            if (Mode == TextEditorMode.Editing) // The diff viewer disables the editor on its own
+            {
+                TextEditorCore.IsEnabled = !locked;
+            }
+        }
+
         private void RenderDiff(ElementTheme theme)
         {
             if (_diffFileOnDiskText == null)
@@ -685,7 +696,7 @@
         {
             if (Mode != TextEditorMode.DiffPreview) return;
             Mode = TextEditorMode.Editing;
-            TextEditorCore.IsEnabled = true;
+            TextEditorCore.IsEnabled = !_editingLocked;
             EditorRowDefinition.Height = new GridLength(1, GridUnitType.Star);
             SideBySideDiffViewRowDefinition.Height = new GridLength(0);
             SideBySideDiffViewer.Visibility = Visibility.Collapsed;

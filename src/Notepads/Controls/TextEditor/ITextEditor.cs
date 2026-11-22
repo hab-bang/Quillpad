@@ -106,6 +106,9 @@ namespace Notepads.Controls.TextEditor
 
         void CloseSideBySideDiffViewer();
 
+        // While locked, the editor takes no typing (used while an update installs)
+        void SetEditingLocked(bool locked);
+
         /// <summary>
         /// Returns 1-based indexing values
         /// </summary>
