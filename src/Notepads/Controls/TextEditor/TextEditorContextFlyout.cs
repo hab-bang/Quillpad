@@ -298,12 +298,6 @@ namespace Notepads.Controls.TextEditor
                         Glyph = "\uE721"
                     }
                 };
-                _webSearch.KeyboardAccelerators.Add(new KeyboardAccelerator()
-                {
-                    Modifiers = VirtualKeyModifiers.Control,
-                    Key = VirtualKey.E,
-                    IsEnabled = false,
-                });
                 _webSearch.Click += async (sender, args) => await _textEditorCore.SearchInWebAsync();
 
                 return _webSearch;

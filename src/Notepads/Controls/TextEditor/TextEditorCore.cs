@@ -247,7 +247,8 @@ namespace Notepads.Controls.TextEditor
         {
             var swallowedKeys = new List<VirtualKey>()
             {
-                VirtualKey.B, VirtualKey.I, VirtualKey.U, VirtualKey.Tab,
+                // E and R would center or right-align the paragraph, a format that is never saved
+                VirtualKey.B, VirtualKey.I, VirtualKey.U, VirtualKey.E, VirtualKey.R, VirtualKey.Tab,
                 VirtualKey.Number1, VirtualKey.Number2, VirtualKey.Number3,
                 VirtualKey.Number4, VirtualKey.Number5, VirtualKey.Number6,
                 VirtualKey.Number7, VirtualKey.Number8, VirtualKey.Number9,
@@ -267,7 +268,8 @@ namespace Notepads.Controls.TextEditor
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number0, (args) => ResetFontSizeToDefault()),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.NumberPad0, (args) => ResetFontSizeToDefault()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F5, (args) => InsertDateTimeString()),
-                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.E, async (args) => await SearchInWebAsync()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.B, (args) => ToggleMarkdownEmphasis(MarkdownEmphasisUtility.Bold)),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.I, (args) => ToggleMarkdownEmphasis(MarkdownEmphasisUtility.Italic)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.D, (args) => DuplicateText()),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.J, (args) => JoinText()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.Tab, (args) => AddIndentation(AppSettingsService.EditorDefaultTabIndents)),
@@ -278,12 +280,12 @@ namespace Notepads.Controls.TextEditor
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.Right, (args) => MoveTextRight()),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, true, true, VirtualKey.D, (args) => ShowEasterEgg(), requiredHits: 10),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.L, (args) => SwitchTextFlowDirection(FlowDirection.LeftToRight)),
-                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.R, (args) => SwitchTextFlowDirection(FlowDirection.RightToLeft)),
                 // By default, RichEditBox insert '\v' when user hit "Shift + Enter"
                 // This should be converted to '\r' to match same behaviour as single "Enter"
                 new KeyboardCommand<KeyRoutedEventArgs>(false, false, true, VirtualKey.Enter, (args) => EnterWithAutoIndentation()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.Enter, (args) => EnterWithAutoIndentation()),
-                // Disable RichEditBox default shortcuts (Bold, Underline, Italic)
+                // Disable RichEditBox default shortcuts (Bold, Underline, Italic, paragraph alignment).
+                // Right to left is in the context menu: on Ctrl+R it flipped the text by accident.
                 // https://docs.microsoft.com/en-us/windows/desktop/controls/about-rich-edit-controls
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, swallowedKeys, null, shouldHandle: false, shouldSwallow: true),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, swallowedKeys, null, shouldHandle: false, shouldSwallow: true),

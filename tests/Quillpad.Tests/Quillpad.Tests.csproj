@@ -54,4 +54,9 @@
     <Compile Include="$(AppSource)Utilities\WorkspaceFolderLock.cs" Link="Linked\WorkspaceFolderLock.cs" />
   </ItemGroup>
 
+  <!-- Issue #10: writing features -->
+  <ItemGroup>
+    <Compile Include="$(AppSource)Utilities\MarkdownEmphasisUtility.cs" Link="Linked\MarkdownEmphasisUtility.cs" />
+  </ItemGroup>
+
 </Project>

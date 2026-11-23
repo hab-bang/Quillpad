@@ -99,6 +99,7 @@
                 FileType = FileTypeUtility.GetFileTypeByFileName(EditingFile.Name);
             }
 
+            TextEditorCore.FileType = FileType;
             TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile;
 
             // Hide content preview if current file type is not supported for previewing
