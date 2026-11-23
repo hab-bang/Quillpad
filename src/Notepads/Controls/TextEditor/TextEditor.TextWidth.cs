@@ -29,11 +29,29 @@ namespace Notepads.Controls.TextEditor
             _fullWidthEditorPadding = TextEditorCore.Padding;
             ApplyTextWidth(AppSettingsService.EditorTextWidth);
             AppSettingsService.OnTextWidthChanged += AppSettingsService_OnTextWidthChanged;
+            TextEditorCore.SizeChanged += TextEditorCore_OnSizeChangedForTypewriter;
+        }
+
+        public void SetTypewriterMode(bool enabled)
+        {
+            if (TextEditorCore.IsTypewriterModeEnabled == enabled) return;
+            TextEditorCore.IsTypewriterModeEnabled = enabled;
+            ApplyTextWidth(AppSettingsService.EditorTextWidth);
+        }
+
+        // The room below the text is half the editor's height
+        private void TextEditorCore_OnSizeChangedForTypewriter(object sender, SizeChangedEventArgs e)
+        {
+            if (TextEditorCore.IsTypewriterModeEnabled && e.PreviousSize.Height != e.NewSize.Height)
+            {
+                ApplyTextWidth(AppSettingsService.EditorTextWidth);
+            }
         }
 
         private void UnhookTextWidthEvents()
         {
             AppSettingsService.OnTextWidthChanged -= AppSettingsService_OnTextWidthChanged;
+            TextEditorCore.SizeChanged -= TextEditorCore_OnSizeChangedForTypewriter;
         }
 
         private async void AppSettingsService_OnTextWidthChanged(object sender, TextWidth textWidth)
@@ -50,13 +68,21 @@ namespace Notepads.Controls.TextEditor
             TextWidthEditorColumnDefinition.Width = new GridLength(editorFraction, GridUnitType.Star);
             TextWidthRightMarginColumnDefinition.Width = new GridLength(marginFraction, GridUnitType.Star);
 
-            TextEditorCore.Padding = textWidth == TextWidth.Full
+            var padding = textWidth == TextWidth.Full
                 ? _fullWidthEditorPadding
                 : new Thickness(
                     _fullWidthEditorPadding.Left,
                     _fullWidthEditorPadding.Top,
                     _fullWidthEditorPadding.Right + ExpandedScrollBarWidth,
                     _fullWidthEditorPadding.Bottom);
+
+            // Typewriter mode: room below the text, so the last line can scroll up to the middle too
+            if (TextEditorCore.IsTypewriterModeEnabled)
+            {
+                padding.Bottom += TypewriterUtility.GetBottomPadding(TextEditorCore.ActualHeight, TextEditorCore.GetSingleLineHeight());
+            }
+
+            TextEditorCore.Padding = padding;
         }
 
         // The side margins are not part of the editor control, so forward mouse wheel scrolling to it

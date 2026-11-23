@@ -1101,4 +1101,8 @@
     <value>Only the first {0} results are shown.</value>
     <comment>FolderSearchDialog: shown when the search stops at the result limit. {0} is the limit. DO NOT REMOVE it.</comment>
   </data>
+  <data name="MainMenu_Button_TypewriterMode.Text" xml:space="preserve">
+    <value>Typewriter Mode</value>
+    <comment>MainMenu: on/off item that keeps the line with the caret in the middle of the editor, for this window.</comment>
+  </data>
 </root>

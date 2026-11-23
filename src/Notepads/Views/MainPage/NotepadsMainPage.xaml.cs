@@ -665,6 +665,7 @@ namespace Notepads.Views.MainPage
             }
 
             _ = LoadWordGoalAsync(textEditor);
+            textEditor.SetTypewriterMode(_isTypewriterModeEnabled);
         }
 
         private async void OnTextEditorUnloaded(object sender, ITextEditor textEditor)

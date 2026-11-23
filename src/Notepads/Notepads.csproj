@@ -303,6 +303,8 @@
     <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />
     <Compile Include="Controls\TextEditor\TextEditorCore.Emphasis.cs" />
     <Compile Include="Controls\TextEditor\TextEditorCore.SmartPunctuation.cs" />
+    <Compile Include="Controls\TextEditor\TextEditorCore.Typewriter.cs" />
+    <Compile Include="Utilities\TypewriterUtility.cs" />
     <Compile Include="Utilities\SessionUtility.cs" />
     <Compile Include="Models\TextFile.cs" />
     <Compile Include="Models\WorkspaceFile.cs" />

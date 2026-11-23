@@ -458,6 +458,7 @@ namespace Notepads.Controls.TextEditor
         private void OnSizeChanged(object sender, SizeChangedEventArgs _)
         {
             UpdateLineHighlighterAndIndicator();
+            ScheduleCaretCentering();
         }
 
         private void OnTextWrappingChanged(object sender, TextWrapping _)
@@ -470,6 +471,7 @@ namespace Notepads.Controls.TextEditor
         private void OnSelectionChanged(object sender, RoutedEventArgs _)
         {
             UpdateLineHighlighterAndIndicator();
+            ScheduleCaretCentering();
         }
 
         private void OnVerticalScrollBarValueChanged(object sender, RangeBaseValueChangedEventArgs _)

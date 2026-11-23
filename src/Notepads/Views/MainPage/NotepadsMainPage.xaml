@@ -213,6 +213,7 @@
                                                     <KeyboardAccelerator Key="F12" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem x:Uid="MainMenu_Button_TypewriterMode" x:Name="MenuTypewriterModeButton"/>
                                             <MenuFlyoutSeparator x:Name="MenuPrintSeparator"/>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Print" x:Name="MenuPrintButton" Icon="Print">
                                                 <MenuFlyoutItem.KeyboardAccelerators>

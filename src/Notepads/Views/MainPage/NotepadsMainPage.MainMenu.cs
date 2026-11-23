@@ -42,6 +42,7 @@ namespace Notepads.Views.MainPage
             MenuPrintButton.Click += async (sender, args) => await PrintAsync(NotepadsCore.GetSelectedTextEditor());
             MenuPrintAllButton.Click += async (sender, args) => await PrintAllAsync(NotepadsCore.GetAllTextEditors());
             MenuSettingsButton.Click += (sender, args) => RootSplitView.IsPaneOpen = true;
+            MenuTypewriterModeButton.Click += (sender, args) => SetTypewriterMode(MenuTypewriterModeButton.IsChecked);
 
             if (!App.IsPrimaryInstance)
             {
@@ -70,6 +71,18 @@ namespace Notepads.Views.MainPage
             }
 
             MainMenuButtonFlyout.Opening += MainMenuButtonFlyout_Opening;
+        }
+
+        private bool _isTypewriterModeEnabled;
+
+        // For this window, until it closes
+        private void SetTypewriterMode(bool enabled)
+        {
+            _isTypewriterModeEnabled = enabled;
+            foreach (var textEditor in NotepadsCore.GetAllTextEditors())
+            {
+                textEditor.SetTypewriterMode(enabled);
+            }
         }
 
         // Alt+F, like the File menu of other apps
@@ -133,6 +146,7 @@ namespace Notepads.Views.MainPage
                     ? "App_ExitCompactOverlayMode_Text"
                     : "App_EnterCompactOverlayMode_Text");
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
+            MenuTypewriterModeButton.IsChecked = _isTypewriterModeEnabled;
             MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
             MenuOpenFileFromFolderButton.Visibility = MenuCloseFolderButton.Visibility;
             MenuFindInFolderButton.Visibility = MenuCloseFolderButton.Visibility;

@@ -129,6 +129,9 @@ namespace Notepads.Controls.TextEditor
         // While locked, the editor takes no typing (used while an update installs)
         void SetEditingLocked(bool locked);
 
+        /// <summary>Keeps the line with the caret in the middle of the editor.</summary>
+        void SetTypewriterMode(bool enabled);
+
         /// <summary>
         /// Returns 1-based indexing values
         /// </summary>
