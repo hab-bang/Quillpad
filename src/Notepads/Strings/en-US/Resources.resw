@@ -1005,4 +1005,56 @@
     <value>Open a folder first, from the main menu.</value>
     <comment>Notification for Ctrl+Shift+O when no folder is open.</comment>
   </data>
+  <data name="Tab_ContextFlyout_TakeSnapshotButtonDisplayText" xml:space="preserve">
+    <value>Take snapshot</value>
+    <comment>Tab context menu: keeps a copy of the tab's text, to compare or restore later.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotsButtonDisplayText" xml:space="preserve">
+    <value>Snapshots</value>
+    <comment>Tab context menu: submenu with the snapshots of the tab's file, newest first.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotCompareButtonDisplayText" xml:space="preserve">
+    <value>Compare</value>
+    <comment>Tab context menu: shows the differences between a snapshot and the text now.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotRestoreButtonDisplayText" xml:space="preserve">
+    <value>Restore</value>
+    <comment>Tab context menu: puts the snapshot's text back in the tab.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeReplaceAll" xml:space="preserve">
+    <value>{0} (before Replace All)</value>
+    <comment>Tab context menu: a snapshot taken automatically before Replace All. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeReload" xml:space="preserve">
+    <value>{0} (before reload)</value>
+    <comment>Tab context menu: a snapshot taken automatically before the file was reloaded from disk. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeRestore" xml:space="preserve">
+    <value>{0} (before restore)</value>
+    <comment>Tab context menu: a snapshot taken automatically before another snapshot was restored. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="DiffViewer_Header_Snapshot" xml:space="preserve">
+    <value>Snapshot {0}</value>
+    <comment>DiffViewer: header of the left side when it shows a snapshot. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotTaken" xml:space="preserve">
+    <value>Snapshot taken</value>
+    <comment>Notification after Take snapshot.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotUnchanged" xml:space="preserve">
+    <value>No changes since the last snapshot</value>
+    <comment>Notification when Take snapshot finds the same text as the newest snapshot.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotRestored" xml:space="preserve">
+    <value>Snapshot restored. Ctrl+Z brings back the text before it.</value>
+    <comment>Notification after a snapshot was restored.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotUnreadable" xml:space="preserve">
+    <value>This snapshot could not be read</value>
+    <comment>Notification when a snapshot file is gone or cannot be read.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotSameAsText" xml:space="preserve">
+    <value>This snapshot is the same as the text now</value>
+    <comment>Notification when Compare or Restore picks a snapshot equal to the current text.</comment>
+  </data>
 </root>

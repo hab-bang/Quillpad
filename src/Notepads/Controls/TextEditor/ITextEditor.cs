@@ -117,7 +117,12 @@ namespace Notepads.Controls.TextEditor
         /// Shows the changes since the last save. With <paramref name="fileOnDiskText"/>, shows the
         /// differences from that text instead, which is the file as another app left it.
         /// </summary>
-        void OpenSideBySideDiffViewer(string fileOnDiskText = null);
+        void OpenSideBySideDiffViewer(string fileOnDiskText = null, string leftHeader = null);
+
+        /// <summary>
+        /// Replaces the whole text as one edit, so Ctrl+Z brings the old text back. Used to restore a snapshot.
+        /// </summary>
+        void RestoreText(string text);
 
         void CloseSideBySideDiffViewer();
 

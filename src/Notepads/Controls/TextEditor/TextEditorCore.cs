@@ -557,6 +557,17 @@ namespace Notepads.Controls.TextEditor
         }
 
         /// <summary>
+        /// Replaces the whole text as one range edit, so it is one undo step, and puts the caret at the start.
+        /// Markdown styling then fixes the lines that changed.
+        /// </summary>
+        public void ReplaceAllTextAsEdit(string text)
+        {
+            text = LineEndingUtility.ApplyLineEnding(text ?? string.Empty, LineEnding.Cr);
+            Document.GetRange(0, GetText().Length).SetText(TextSetOptions.None, text);
+            Document.Selection.SetRange(0, 0);
+        }
+
+        /// <summary>
         /// Puts the view back where it was before an edit. The new text is laid out after the edit, and after
         /// a range edit the editor also scrolls to the caret on its own. So the view is put back each time it
         /// moves, until the dispatcher is idle.

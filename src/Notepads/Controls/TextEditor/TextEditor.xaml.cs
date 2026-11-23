@@ -177,7 +177,8 @@
 
         private SearchContext _lastSearchContext = new SearchContext(string.Empty);
 
-        private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk
+        private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk or a snapshot
+        private string _diffLeftHeader;
 
         private bool _editingLocked;
 
@@ -580,6 +581,12 @@
                     return false;
                 }
 
+                // The text the reload replaces may be the only copy of it
+                if (!string.Equals(textBeforeRead, LineEndingUtility.ApplyLineEnding(textFile.Content, LineEnding.Cr), StringComparison.Ordinal))
+                {
+                    _ = SnapshotService.TakeSnapshotAsync(EditingFilePath, Id, textBeforeRead, SnapshotKind.BeforeReload);
+                }
+
                 _loaded = false; // Like Init: the new text is not a user edit
                 TextEditorCore.SetText(textFile.Content, keepPosition: true); // A reload should not jump to the top
                 textFile.Content = TextEditorCore.GetText(); // The editor's form of the text, with its line breaks
@@ -752,12 +759,13 @@
             }
         }
 
-        public void OpenSideBySideDiffViewer(string fileOnDiskText = null)
+        public void OpenSideBySideDiffViewer(string fileOnDiskText = null, string leftHeader = null)
         {
             if (string.Equals(fileOnDiskText ?? LastSavedSnapshot.Content, TextEditorCore.GetText())) return;
             if (Mode == TextEditorMode.DiffPreview) return;
             if (SideBySideDiffViewer == null) LoadSideBySideDiffViewer();
             _diffFileOnDiskText = fileOnDiskText;
+            _diffLeftHeader = leftHeader;
             Mode = TextEditorMode.DiffPreview;
             TextEditorCore.IsEnabled = false;
             EditorRowDefinition.Height = new GridLength(0);
@@ -765,6 +773,14 @@
             SideBySideDiffViewer.Visibility = Visibility.Visible;
             RenderDiff(ThemeSettingsService.ThemeMode);
             SideBySideDiffViewer.Focus();
+        }
+
+        public void RestoreText(string text)
+        {
+            if (text == null) return;
+            CloseSideBySideDiffViewer();
+            if (!TextEditorCore.IsEnabled) return;
+            TextEditorCore.ReplaceAllTextAsEdit(text);
         }
 
         public void SetEditingLocked(bool locked)
@@ -793,7 +809,7 @@
             else
             {
                 SideBySideDiffViewer.RenderDiff(_diffFileOnDiskText, TextEditorCore.GetText(), theme,
-                    _resourceLoader.GetString("DiffViewer_Header_FileOnDisk"));
+                    _diffLeftHeader ?? _resourceLoader.GetString("DiffViewer_Header_FileOnDisk"));
             }
         }
 
@@ -1216,10 +1232,15 @@
                             out regexError);
                     break;
                 case FindAndReplaceMode.ReplaceAll:
+                    var textBeforeReplaceAll = TextEditorCore.GetText();
                     found = TextEditorCore.TryFindAndReplaceAll(
                         findAndReplaceEventArgs.SearchContext,
                         findAndReplaceEventArgs.ReplaceText,
                         out regexError);
+                    if (found)
+                    {
+                        _ = SnapshotService.TakeSnapshotAsync(EditingFilePath, Id, textBeforeReplaceAll, SnapshotKind.BeforeReplaceAll);
+                    }
                     break;
             }
 
