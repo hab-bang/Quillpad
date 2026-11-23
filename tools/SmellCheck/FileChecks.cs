@@ -171,7 +171,6 @@ public static class FileChecks
         foreach (var trivia in root.DescendantTrivia())
         {
             if (!trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) || trivia.SpanStart < headerEnd) continue;
-            if (trivia.ToString().StartsWith("///", StringComparison.Ordinal)) continue;
 
             var line = text.Lines.GetLineFromPosition(trivia.SpanStart);
             var before = text.ToString(TextSpan.FromBounds(line.Start, trivia.SpanStart));
@@ -198,12 +197,11 @@ public static class FileChecks
     private static void CheckSuppressions(SyntaxTree tree, List<Finding> findings)
     {
         var root = tree.GetRoot();
-        var text = tree.GetText();
 
         foreach (var pragma in root.DescendantNodes(descendIntoTrivia: true).OfType<PragmaWarningDirectiveTriviaSyntax>())
         {
             if (pragma.DisableOrRestoreKeyword.IsKind(SyntaxKind.DisableKeyword)
-                && !HasCommentOnLine(text, pragma.SpanStart))
+                && !HasReasonOnLine(root, pragma.SpanStart))
             {
                 findings.Add(new Finding(Checks.Suppression, tree.FilePath, LineOf(tree, pragma.SpanStart),
                     MemberAt(root, pragma.SpanStart), "#pragma warning disable without a // reason on the same line"));
@@ -213,7 +211,7 @@ public static class FileChecks
         foreach (var attribute in root.DescendantNodes().OfType<AttributeSyntax>())
         {
             if (LastName(attribute.Name) is not ("SuppressMessage" or "SuppressMessageAttribute")) continue;
-            if (HasJustification(attribute) || HasCommentOnLine(text, attribute.SpanStart)) continue;
+            if (HasJustification(attribute) || HasReasonOnLine(root, attribute.SpanStart)) continue;
 
             findings.Add(At(Checks.Suppression, attribute, "[SuppressMessage] without a Justification"));
         }

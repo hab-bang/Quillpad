@@ -1,4 +1,4 @@
-// expect duplicate: 4
+// expect duplicate: 6
 using System;
 using System.Collections.Generic;
 
@@ -64,6 +64,26 @@ public class Duplicate
         Save(1);
         Save(1);
         Save(1);
+    }
+
+    // Different try blocks with the same short catch block: one finding each
+    public bool TryOpen(string path)
+    {
+        try { return path.Length > 0; }
+        catch (Exception ex) { Console.WriteLine(ex.Message); return false; }
+    }
+
+    public bool TrySave(List<string> lines)
+    {
+        try { Save(lines.Count); return true; }
+        catch (Exception error) { Console.WriteLine(error.Message); return true; }
+    }
+
+    // A catch block that does something else: fine
+    public bool TryClose()
+    {
+        try { return true; }
+        catch (Exception ex) { Console.WriteLine(ex.StackTrace); return false; }
     }
 
     private static void Save(int value) { }

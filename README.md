@@ -79,14 +79,14 @@ The counts are per file. The check fails when a count goes up. It also fails whe
 | `method-length` | A method, constructor, accessor or local function over 60 lines. |
 | `parameters` | More than 5 parameters, or more than 1 `bool` parameter. |
 | `file-length` | A file over 500 lines. The baseline holds its line count, so it may not grow. |
-| `duplicate` | A method body (3 or more statements) or a run of 5 or more statements that is the same as code elsewhere after variable names and literals are normalized. A variable is a local, a parameter, or another name that starts with a lower-case letter or `_`. Member, type and method names stay. |
+| `duplicate` | A method body (3 or more statements), a `catch` block (2 or more), or a run of 5 or more statements that is the same as code elsewhere after variable names and literals are normalized. A variable is a local, a parameter, or another name that starts with a lower-case letter or `_`. Member, type and method names stay. |
 | `catch-all` | `catch (Exception)` or a bare `catch` without a `when` filter. |
 | `empty-catch` | A `catch` block with no statements. A comment alone doesn't count as one. |
-| `comment-run` | 3 or more `//` comment lines in a row. `///` docs and the license header don't count. |
+| `comment-run` | 3 or more `//` comment lines in a row, `////` too. `///` docs and the license header don't count. |
 | `delay` | `Task.Delay` and `Thread.Sleep`. |
-| `suppression` | `#pragma warning disable`, `[SuppressMessage]` or `<NoWarn>` without a reason on the same line: a `//` comment, a `Justification`, or an `<!-- -->` comment. |
+| `suppression` | `#pragma warning disable`, `[SuppressMessage]` or `<NoWarn>` without a reason on the same line: a `//` comment with text in it, a `Justification`, or an `<!-- -->` comment with text in it. `<NoWarn>` is also checked in `Directory.Build.props` and `Directory.Build.targets` at the repo root. |
 
-The baseline also holds a hash of `src/.editorconfig`. If a rule changes there, the check fails until the baseline is updated.
+The baseline also holds a hash of every `.editorconfig` and `.globalconfig` under `src/`. If a rule changes in one of them, or a new one is added, the check fails until the baseline is updated.
 
 When the check fails, it names the file, the member and the line of each finding of that kind in the file. Fix the code if you can. If a new count is right, or a count went down, update the baseline and say why in the commit:
 

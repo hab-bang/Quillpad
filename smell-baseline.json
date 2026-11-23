@@ -1,5 +1,5 @@
 {
-  "editorconfig": "sha256:ad7137923ccbc223aae12a207b2bad7c4e971266d92f89f548781d16d45a21fa",
+  "editorconfig": "sha256:798671b98d29f4c3185026e57ea8ce4fdaf8d40753438125061ab455cf8b6e7a",
   "files": {
     "src/Notepads/App.xaml.cs": {
       "catch-all": 2,
@@ -9,6 +9,7 @@
     },
     "src/Notepads/Brushes/HostBackdropAcrylicBrush.cs": {
       "catch-all": 3,
+      "duplicate": 1,
       "method-length": 1
     },
     "src/Notepads/Commands/CommandHandlerResult.cs": {
@@ -85,7 +86,7 @@
     },
     "src/Notepads/Controls/TextEditor/TextEditorCore.FindAndReplace.cs": {
       "catch-all": 4,
-      "duplicate": 2,
+      "duplicate": 5,
       "method-length": 1,
       "parameters": 4
     },
@@ -132,13 +133,15 @@
     "src/Notepads/Core/SessionManager.cs": {
       "catch-all": 17,
       "comment-run": 3,
+      "duplicate": 2,
       "empty-catch": 2,
       "file-length": 769,
       "method-length": 5
     },
     "src/Notepads/Core/TabContextFlyout.cs": {
       "catch-all": 3,
-      "delay": 1
+      "delay": 1,
+      "duplicate": 1
     },
     "src/Notepads/Core/WorkspaceManager.cs": {
       "catch-all": 4
@@ -170,7 +173,8 @@
       "method-length": 1
     },
     "src/Notepads/Services/MRUService.cs": {
-      "catch-all": 4
+      "catch-all": 4,
+      "duplicate": 1
     },
     "src/Notepads/Services/NotepadsProtocolService.cs": {
       "catch-all": 2
@@ -227,6 +231,7 @@
     "src/Notepads/Views/MainPage/NotepadsMainPage.IO.cs": {
       "catch-all": 8,
       "comment-run": 1,
+      "duplicate": 2,
       "empty-catch": 1,
       "method-length": 1,
       "parameters": 1
@@ -236,7 +241,7 @@
     },
     "src/Notepads/Views/MainPage/NotepadsMainPage.StatusBar.cs": {
       "catch-all": 6,
-      "duplicate": 2,
+      "duplicate": 3,
       "file-length": 809,
       "method-length": 1
     },

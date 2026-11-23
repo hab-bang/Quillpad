@@ -27,6 +27,7 @@ public sealed record Limits
     public int MaxFileLines { get; init; } = 500;
     public int MinDuplicateRunStatements { get; init; } = 5;
     public int MinDuplicateBodyStatements { get; init; } = 3;
+    public int MinDuplicateCatchStatements { get; init; } = 2;
     public int MinCommentRunLines { get; init; } = 3;
 }
 

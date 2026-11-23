@@ -10,7 +10,7 @@ namespace SmellCheck;
 
 /// <summary>
 /// Finds code that is the same after names and literals are normalized: whole method bodies,
-/// and runs of statements. Variable names become v0, v1... in the order they show up, and every
+/// whole catch blocks, and runs of statements. Variable names become v0, v1... in the order they show up, and every
 /// literal becomes the same token. A variable is a local or parameter of the member, or any other
 /// simple name that starts with a lower-case letter or '_', such as a field or a parameter of the
 /// method the code was copied from. Member, type and method names stay, so two blocks only match
@@ -74,8 +74,8 @@ public static class DuplicateFinder
             {
                 case BlockSyntax block:
                     AddRuns(block.Statements, limits, fragments);
-                    if (block.Parent is BaseMethodDeclarationSyntax or LocalFunctionStatementSyntax or AccessorDeclarationSyntax
-                        && block.Statements.Sum(Weight) >= limits.MinDuplicateBodyStatements)
+                    var minimum = WholeBlockMinimum(block, limits);
+                    if (minimum != null && block.Statements.Sum(Weight) >= minimum)
                     {
                         fragments.Add(MakeFragment(block.Statements, 0, block.Statements.Count - 1));
                     }
@@ -86,6 +86,15 @@ public static class DuplicateFinder
             }
         }
     }
+
+    // Method bodies and catch blocks are also compared whole. A catch block has a lower limit,
+    // so short copied catch-and-log blocks are found.
+    private static int? WholeBlockMinimum(BlockSyntax block, Limits limits) => block.Parent switch
+    {
+        BaseMethodDeclarationSyntax or LocalFunctionStatementSyntax or AccessorDeclarationSyntax => limits.MinDuplicateBodyStatements,
+        CatchClauseSyntax => limits.MinDuplicateCatchStatements,
+        _ => null,
+    };
 
     // For each start, the shortest run of statements that holds enough statements, nested ones included.
     private static void AddRuns(SyntaxList<StatementSyntax> statements, Limits limits, List<Fragment> fragments)

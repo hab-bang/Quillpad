@@ -45,7 +45,7 @@ public sealed record Problem(ProblemKind Kind, string File, string Check, int Al
     public string Describe() => Kind switch
     {
         ProblemKind.EditorConfigChanged =>
-            $"{File} changed. A rule may have been turned off. If the change is meant, update the baseline.",
+            "An .editorconfig or .globalconfig under src/ changed. A rule may have been turned off. If the change is meant, update the baseline.",
         ProblemKind.WentUp when Check == Checks.FileLength && Allowed == 0 =>
             $"{File}: {Now} lines, over the limit of 500.",
         ProblemKind.WentUp when Check == Checks.FileLength =>
@@ -68,7 +68,7 @@ public static class BaselineComparer
         var problems = new List<Problem>();
         if (baseline.EditorConfigHash != scan.EditorConfigHash)
         {
-            problems.Add(new Problem(ProblemKind.EditorConfigChanged, Scanner.EditorConfigPath, "", 0, 0, Array.Empty<Finding>()));
+            problems.Add(new Problem(ProblemKind.EditorConfigChanged, Scanner.AnalyzerConfigFolder, "", 0, 0, Array.Empty<Finding>()));
         }
 
         var files = baseline.Files.Keys.Union(scan.Counts.Keys).OrderBy(f => f, StringComparer.Ordinal);

@@ -48,6 +48,39 @@ public sealed class ScannerTests : IDisposable
         Assert.NotEqual(crlf, Scanner.HashEditorConfig(_root));
     }
 
+    [Theory]
+    [InlineData("src/App/.editorconfig", "[*.cs]\ndotnet_diagnostic.CA2242.severity = none\n")]
+    [InlineData("src/App/.globalconfig", "is_global = true\ndotnet_diagnostic.CA2242.severity = none\n")]
+    [InlineData("src/Notepads.Controls/.editorconfig", "[*.cs]\ndotnet_diagnostic.CA2242.severity = none\n")]
+    public void NewNestedAnalyzerConfigChangesTheHash(string path, string text)
+    {
+        var before = Scanner.HashEditorConfig(_root);
+
+        Write(path, text);
+
+        Assert.NotEqual(before, Scanner.HashEditorConfig(_root));
+    }
+
+    [Fact]
+    public void NestedAnalyzerConfigHashIgnoresLineEndings()
+    {
+        Write("src/App/.globalconfig", "is_global = true\r\ndotnet_diagnostic.CA2242.severity = none\r\n");
+        var crlf = Scanner.HashEditorConfig(_root);
+
+        Write("src/App/.globalconfig", "is_global = true\ndotnet_diagnostic.CA2242.severity = none\n");
+        Assert.Equal(crlf, Scanner.HashEditorConfig(_root));
+    }
+
+    [Theory]
+    [InlineData("Directory.Build.props")]
+    [InlineData("Directory.Build.targets")]
+    public void ScansProjectFilesAtTheRoot(string file)
+    {
+        Write(file, "<Project><PropertyGroup><NoWarn>$(NoWarn);CS0168</NoWarn></PropertyGroup></Project>");
+
+        Assert.Equal(1, Scanner.Scan(_root).Counts.Get(file, Checks.Suppression));
+    }
+
     [Fact]
     public void UpdatedBaselinePassesAndANewSmellFails()
     {

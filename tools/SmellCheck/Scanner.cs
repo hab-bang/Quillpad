@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace SmellCheck;
@@ -37,7 +38,10 @@ public sealed record ScanResult(List<Finding> Findings, Counts Counts, string Ed
 /// <summary>Walks src/ and runs every check.</summary>
 public static class Scanner
 {
-    public const string EditorConfigPath = "src/.editorconfig";
+    public const string AnalyzerConfigFolder = "src";
+
+    /// <summary>Files at the repository root that MSBuild reads for every project under src/.</summary>
+    public static readonly string[] RootProjectFiles = { "Directory.Build.props", "Directory.Build.targets" };
 
     /// <summary>Vendored Windows Community Toolkit code that we don't change.</summary>
     public static readonly string[] ExcludedFolders = { "src/Notepads.Controls" };
@@ -65,6 +69,11 @@ public static class Scanner
             {
                 findings.AddRange(ProjectFileChecks.Run(file, text));
             }
+        }
+
+        foreach (var file in RootProjectFiles.Where(f => File.Exists(Path.Combine(root, f))))
+        {
+            findings.AddRange(ProjectFileChecks.Run(file, File.ReadAllText(Path.Combine(root, file))));
         }
 
         findings.AddRange(DuplicateFinder.Find(trees, limits));
@@ -103,19 +112,29 @@ public static class Scanner
         Path.GetRelativePath(root, path).Replace('\\', '/');
 
     /// <summary>
-    /// A hash of src/.editorconfig with line endings made the same, so Windows and Linux agree.
+    /// A hash of every .editorconfig and .globalconfig under src/, with their paths, so a rule
+    /// turned off in a new nested file changes it too. Line endings are made the same first,
+    /// so Windows and Linux agree.
     /// </summary>
     public static string HashEditorConfig(string root)
     {
-        var path = Path.Combine(root, EditorConfigPath);
-        if (!File.Exists(path)) return "none";
+        var files = EnumerateFiles(root, AnalyzerConfigFolder, skipExcludedFolders: false)
+            .Where(f => Path.GetFileName(f) is ".editorconfig" or ".globalconfig")
+            .ToList();
+        if (files.Count == 0) return "none";
 
-        var text = File.ReadAllText(path).Replace("\r\n", "\n");
-        return "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text))).ToLowerInvariant();
+        var text = new StringBuilder();
+        foreach (var file in files)
+        {
+            text.Append(file).Append('\n')
+                .Append(File.ReadAllText(Path.Combine(root, file)).Replace("\r\n", "\n")).Append('\n');
+        }
+
+        return "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text.ToString()))).ToLowerInvariant();
     }
 }
 
-/// <summary>NoWarn in project files. A reason is an XML comment on the same line.</summary>
+/// <summary>NoWarn in project files. A reason is an XML comment with text in it on the same line.</summary>
 public static class ProjectFileChecks
 {
     public static List<Finding> Run(string file, string text)
@@ -124,8 +143,9 @@ public static class ProjectFileChecks
         var lines = text.Replace("\r\n", "\n").Split('\n');
         for (var i = 0; i < lines.Length; i++)
         {
-            if (lines[i].Contains("<NoWarn>", StringComparison.OrdinalIgnoreCase)
-                && !lines[i].Contains("<!--", StringComparison.Ordinal))
+            // "<NoWarn" also matches <NoWarn Condition="...">, and not the closing </NoWarn>
+            if (lines[i].Contains("<NoWarn", StringComparison.OrdinalIgnoreCase)
+                && !Regex.IsMatch(lines[i], @"<!--\s*[^\s-]"))
             {
                 findings.Add(new Finding(Checks.Suppression, file, i + 1, "(project)",
                     "<NoWarn> without a <!-- reason --> on the same line"));

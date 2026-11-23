@@ -66,11 +66,16 @@ internal static class SyntaxHelpers
         _ => null,
     };
 
-    /// <summary>True when the line that holds the position also has a // comment after it.</summary>
-    public static bool HasCommentOnLine(SourceText text, int position)
+    /// <summary>
+    /// True when the line that holds the position has a // comment after it, with some text in it.
+    /// A // inside a string, such as a URL, is not a comment.
+    /// </summary>
+    public static bool HasReasonOnLine(SyntaxNode root, int position)
     {
-        var line = text.Lines.GetLineFromPosition(position);
-        var rest = text.ToString(TextSpan.FromBounds(position, line.End));
-        return rest.Contains("//", StringComparison.Ordinal);
+        var line = root.SyntaxTree.GetText().Lines.GetLineFromPosition(position);
+        return root.DescendantTrivia(TextSpan.FromBounds(position, line.End), descendIntoTrivia: true)
+            .Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia)
+                && t.SpanStart >= position && t.SpanStart < line.End
+                && t.ToString().TrimStart('/').Trim().Length > 0);
     }
 }
