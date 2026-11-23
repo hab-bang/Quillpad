@@ -21,7 +21,8 @@ namespace Notepads.Views.MainPage
     {
         private void InitializeMainMenu()
         {
-            MainMenuButton.Click += (sender, args) => FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+            MainMenuButton.Click += (sender, args) => ShowMainMenu();
+            ToolTipService.SetToolTip(MainMenuButton, _resourceLoader.GetString("MainMenu_Button_ToolTip"));
 
             MenuCreateNewButton.Click += (sender, args) => NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
             MenuCreateNewWindowButton.Click += async (sender, args) => await OpenNewAppInstanceAsync();
@@ -64,6 +65,12 @@ namespace Notepads.Views.MainPage
             }
 
             MainMenuButtonFlyout.Opening += MainMenuButtonFlyout_Opening;
+        }
+
+        // Alt+F, like the File menu of other apps
+        private void ShowMainMenu()
+        {
+            FlyoutBase.ShowAttachedFlyout(MainMenuButton);
         }
 
         // Undoes what InitializeMainMenu does for a second window, once this window is the main window

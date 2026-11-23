@@ -113,7 +113,7 @@
                                                     <KeyboardAccelerator Key="N" Modifiers="Control" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem x:Uid="MainMenu_Button_New_Window" x:Name="MenuCreateNewWindowButton" AccessKey="N">
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_New_Window" x:Name="MenuCreateNewWindowButton" AccessKey="W">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE737;"/>
                                                 </MenuFlyoutItem.Icon>

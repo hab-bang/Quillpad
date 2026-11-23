@@ -913,4 +913,8 @@
     <value>"{0}" is open in another Quillpad window. Two windows on one folder would write over each other's list of open tabs, so use that window, or close the folder there first.</value>
     <comment>FolderOpenInAnotherWindowDialog: "Content" display text, {0} stands for the folder name. You can change the order but DO NOT REMOVE it from the string.</comment>
   </data>
+  <data name="MainMenu_Button_ToolTip" xml:space="preserve">
+    <value>Menu (Alt+F)</value>
+    <comment>MainMenu: tooltip of the menu button at the top left. Alt+F is the shortcut that opens the menu.</comment>
+  </data>
 </root>
