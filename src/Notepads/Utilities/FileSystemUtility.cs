@@ -742,10 +742,10 @@ namespace Notepads.Utilities
                     fileUpdateStatus = status.ToString();
                 }
 
-                if (retryAttempts > 1) // Retry attempts were used
+                if (retryAttempts > 1) // File name, path and content stay out of the log
                 {
-                    // Track retry attempts to better understand the failed scenarios
-                    // File name, path and content are not included to respect/protect user privacy
+                    LoggingService.LogWarning($"[{nameof(FileSystemUtility)}] {operationName} took {retryAttempts} attempts. " +
+                        $"Errors: [{string.Join(", ", errorCodes)}], update status: [{fileUpdateStatus}]");
                 }
             }
         }

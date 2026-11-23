@@ -46,17 +46,5 @@ namespace Notepads.Utilities
             }
             return false;
         }
-
-        private static int GetFutureAccessListItemCount()
-        {
-            try
-            {
-                return StorageApplicationPermissions.FutureAccessList.Entries.Count;
-            }
-            catch
-            {
-                return -1;
-            }
-        }
     }
 }
