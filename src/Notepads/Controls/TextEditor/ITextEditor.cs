@@ -63,6 +63,12 @@ namespace Notepads.Controls.TextEditor
 
         bool DisplayLineHighlighter { get; set; }
 
+        /// <summary>The word count goal of this tab, or null.</summary>
+        int? WordGoal { get; set; }
+
+        /// <summary>The number of words when the tab was first shown in this run of the app.</summary>
+        int GetWordCountAtFirstOpen();
+
         void Init(TextFile textFile,
             StorageFile file,
             bool resetLastSavedSnapshot = true,

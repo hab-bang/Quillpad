@@ -18,5 +18,8 @@ namespace Notepads.Core.WorkspaceDataModels
         public string SelectedFile { get; set; }
 
         public List<WorkspaceFileDataV1> Files { get; set; } = new List<WorkspaceFileDataV1>();
+
+        /// <summary>Word count goals by relative path, also for files that are not open.</summary>
+        public Dictionary<string, int> WordGoals { get; set; } = new Dictionary<string, int>();
     }
 }

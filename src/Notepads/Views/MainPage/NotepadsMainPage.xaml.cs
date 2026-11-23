@@ -661,6 +661,8 @@ namespace Notepads.Views.MainPage
                 SetupStatusBar(textEditor);
                 NotepadsCore.FocusOnSelectedTextEditor();
             }
+
+            _ = LoadWordGoalAsync(textEditor);
         }
 
         private async void OnTextEditorUnloaded(object sender, ITextEditor textEditor)

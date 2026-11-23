@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="$(AppSource)Utilities\MarkdownEmphasisUtility.cs" Link="Linked\MarkdownEmphasisUtility.cs" />
     <Compile Include="$(AppSource)Utilities\NewInstallUtility.cs" Link="Linked\NewInstallUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\WordGoalUtility.cs" Link="Linked\WordGoalUtility.cs" />
   </ItemGroup>
 
 </Project>

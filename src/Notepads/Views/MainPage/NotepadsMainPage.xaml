@@ -563,7 +563,21 @@
                            Tapped="StatusBarComponent_OnTapped">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout x:Name="WordCountFlyout" Placement="TopEdgeAlignedRight" Closing="StatusBarFlyout_OnClosing">
-                            <TextBlock x:Name="WordCountFlyoutText" FontSize="12" LineHeight="20" IsTextSelectionEnabled="True"/>
+                            <StackPanel MinWidth="200">
+                                <TextBlock x:Name="WordCountFlyoutText" FontSize="12" LineHeight="20" IsTextSelectionEnabled="True"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBox x:Name="WordGoalTextBox"
+                                             x:Uid="TextEditor_WordCountFlyout_GoalTextBox"
+                                             Width="110"
+                                             InputScope="Number"
+                                             IsSpellCheckEnabled="False"
+                                             KeyDown="WordGoalTextBox_OnKeyDown"/>
+                                    <Button x:Uid="TextEditor_WordCountFlyout_SetGoalButton"
+                                            Margin="8,0,0,0"
+                                            Click="SetWordGoalButton_OnClick"/>
+                                </StackPanel>
+                                <TextBlock x:Uid="TextEditor_WordCountFlyout_GoalHint" FontSize="12" Opacity="0.7" Margin="0,6,0,0" TextWrapping="Wrap" MaxWidth="240"/>
+                            </StackPanel>
                         </Flyout>
                     </FlyoutBase.AttachedFlyout>
                 </TextBlock>

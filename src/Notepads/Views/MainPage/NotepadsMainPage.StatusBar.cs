@@ -10,6 +10,7 @@ namespace Notepads.Views.MainPage
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading.Tasks;
     using Windows.ApplicationModel.DataTransfer;
@@ -217,6 +218,11 @@ namespace Notepads.Views.MainPage
                 WordCountIndicator.Text = string.Format(_resourceLoader.GetString("TextEditor_WordCountIndicator_SelectionText"),
                     WordCountUtility.FormatNumber(selection.Value.Words), total);
             }
+            else if (textEditor.WordGoal.HasValue)
+            {
+                WordCountIndicator.Text = string.Format(_resourceLoader.GetString("TextEditor_WordCountIndicator_GoalText"),
+                    total, WordCountUtility.FormatNumber(textEditor.WordGoal.Value));
+            }
             else
             {
                 WordCountIndicator.Text = string.Format(document.Words == 1
@@ -237,8 +243,93 @@ namespace Notepads.Views.MainPage
             }
             AppendWordCountDetails(builder, _resourceLoader.GetString("TextEditor_WordCountFlyout_DocumentTitle"), document);
 
+            builder.Append('\n');
+            if (selectedEditor.WordGoal.HasValue)
+            {
+                builder.Append(string.Format(_resourceLoader.GetString("TextEditor_WordCountFlyout_Goal"),
+                    WordCountUtility.FormatNumber(selectedEditor.WordGoal.Value),
+                    WordGoalUtility.ProgressPercent(document.Words, selectedEditor.WordGoal.Value))).Append('\n');
+            }
+
+            var added = WordGoalUtility.WordsAddedThisSession(document.Words, selectedEditor.GetWordCountAtFirstOpen());
+            builder.Append(string.Format(_resourceLoader.GetString("TextEditor_WordCountFlyout_SessionWords"),
+                WordGoalUtility.FormatSigned(added, CultureInfo.CurrentCulture))).Append('\n');
+
             WordCountFlyoutText.Text = builder.ToString().TrimEnd('\n');
+            WordGoalTextBox.Text = selectedEditor.WordGoal.HasValue ? WordCountUtility.FormatNumber(selectedEditor.WordGoal.Value) : string.Empty;
             FlyoutBase.ShowAttachedFlyout(WordCountIndicator);
+        }
+
+        private void WordGoalTextBox_OnKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key != VirtualKey.Enter) return;
+            e.Handled = true;
+            SetWordGoalButton_OnClick(sender, null);
+        }
+
+        private async void SetWordGoalButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedEditor = NotepadsCore.GetSelectedTextEditor();
+            if (selectedEditor == null) return;
+
+            int? goal = null;
+            if (!string.IsNullOrWhiteSpace(WordGoalTextBox.Text))
+            {
+                if (!WordGoalUtility.TryParseGoal(WordGoalTextBox.Text, out var parsedGoal))
+                {
+                    NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_InvalidWordGoal"), 2500);
+                    return;
+                }
+
+                goal = parsedGoal;
+            }
+
+            WordCountFlyout.Hide();
+            await SetWordGoalAsync(selectedEditor, goal);
+        }
+
+        /// <summary>
+        /// Files in the workspace folder keep their goal in the folder, other files in the app settings.
+        /// An untitled tab keeps it in the session only.
+        /// </summary>
+        private async Task SetWordGoalAsync(ITextEditor textEditor, int? goal)
+        {
+            textEditor.WordGoal = goal;
+            _wordGoalsLoaded.GetValue(textEditor, _ => new object());
+            if (NotepadsCore.GetSelectedTextEditor() == textEditor) UpdateWordCountIndicator(textEditor);
+
+            var filePath = textEditor.EditingFilePath;
+            if (filePath == null) return;
+
+            if (!await Workspace.TrySetWordGoalAsync(filePath, goal))
+            {
+                WordGoalStore.Set(filePath, goal);
+            }
+        }
+
+        // Editors whose goal was looked up already, so a goal the user removed does not come back
+        private readonly ConditionalWeakTable<ITextEditor, object> _wordGoalsLoaded = new ConditionalWeakTable<ITextEditor, object>();
+
+        private async Task LoadWordGoalAsync(ITextEditor textEditor)
+        {
+            if (_wordGoalsLoaded.TryGetValue(textEditor, out _)) return;
+            _wordGoalsLoaded.GetValue(textEditor, _ => new object());
+
+            var filePath = textEditor.EditingFilePath;
+            if (textEditor.WordGoal.HasValue || filePath == null) return;
+
+            try
+            {
+                var goal = await Workspace.GetWordGoalAsync(filePath) ?? WordGoalStore.Get(filePath);
+                if (goal == null || textEditor.WordGoal.HasValue || !NotepadsCore.GetAllTextEditors().Contains(textEditor)) return;
+
+                textEditor.WordGoal = goal;
+                if (NotepadsCore.GetSelectedTextEditor() == textEditor) UpdateWordCountIndicator(textEditor);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(NotepadsMainPage)}] Failed to load a word goal: {ex.Message}");
+            }
         }
 
         private void AppendWordCountDetails(StringBuilder builder, string title, TextStatistics stats)

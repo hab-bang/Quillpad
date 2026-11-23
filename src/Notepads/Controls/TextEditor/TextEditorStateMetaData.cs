@@ -38,5 +38,7 @@ namespace Notepads.Controls.TextEditor
         public bool IsContentPreviewPanelOpened { get; set; }
 
         public bool IsInDiffPreviewMode { get; set; }
+
+        public int? WordGoal { get; set; }
     }
 }

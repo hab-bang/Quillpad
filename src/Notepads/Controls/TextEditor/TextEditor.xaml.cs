@@ -206,6 +206,23 @@
             set => TextEditorCore.DisplayLineHighlighter = value;
         }
 
+        public int? WordGoal { get; set; }
+
+        // The text when the tab was first shown, until its words are counted (see GetWordCountAtFirstOpen)
+        private string _textAtFirstOpen;
+        private int? _wordCountAtFirstOpen;
+
+        public int GetWordCountAtFirstOpen()
+        {
+            if (!_wordCountAtFirstOpen.HasValue)
+            {
+                _wordCountAtFirstOpen = WordCountUtility.Count(_textAtFirstOpen ?? GetText()).Words;
+                _textAtFirstOpen = null;
+            }
+
+            return _wordCountAtFirstOpen.Value;
+        }
+
         public TextEditor()
         {
             InitializeComponent();
@@ -368,7 +385,8 @@
                 ScrollViewerVerticalOffset = verticalOffset,
                 FontZoomFactor = TextEditorCore.GetFontZoomFactor() / 100,
                 IsContentPreviewPanelOpened = _isContentPreviewPanelOpened,
-                IsInDiffPreviewMode = (Mode == TextEditorMode.DiffPreview)
+                IsInDiffPreviewMode = (Mode == TextEditorMode.DiffPreview),
+                WordGoal = WordGoal,
             };
 
             if (RequestedEncoding != null)
@@ -386,6 +404,10 @@
 
         private void TextEditor_Loaded(object sender, RoutedEventArgs e)
         {
+            // Restored text is in place by now, and the user cannot have typed in a tab never shown.
+            // Only the reference is kept, so the words are counted once, when the status bar asks.
+            if (_textAtFirstOpen == null && !_wordCountAtFirstOpen.HasValue) _textAtFirstOpen = GetText();
+
             Loaded?.Invoke(this, e);
 
             StartCheckingFileStatusPeriodically();
@@ -618,6 +640,8 @@
             {
                 TextEditorCore.SetText(newText);
             }
+
+            if (metadata.WordGoal > 0) WordGoal = metadata.WordGoal;
 
             TextEditorCore.TextWrapping = metadata.WrapWord ? TextWrapping.Wrap : TextWrapping.NoWrap;
             TextEditorCore.FontSize = metadata.FontZoomFactor * AppSettingsService.EditorFontSize;

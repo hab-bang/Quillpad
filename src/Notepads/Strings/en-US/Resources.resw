@@ -917,4 +917,36 @@
     <value>Menu (Alt+F)</value>
     <comment>MainMenu: tooltip of the menu button at the top left. Alt+F is the shortcut that opens the menu.</comment>
   </data>
+  <data name="TextEditor_WordCountIndicator_GoalText" xml:space="preserve">
+    <value>{0} / {1} words</value>
+    <comment>TextEditor: WordCountIndicator text in the status bar when the file has a word goal. {0} is the word count, {1} is the goal. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_Goal" xml:space="preserve">
+    <value>Goal: {0} words ({1}%)</value>
+    <comment>TextEditor: WordCountFlyout line with the word goal. {0} is the goal, {1} is the percent reached. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_SessionWords" xml:space="preserve">
+    <value>This session: {0} words</value>
+    <comment>TextEditor: WordCountFlyout line with the words written since the file was opened in this run. {0} is a signed number like +412. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalTextBox.PlaceholderText" xml:space="preserve">
+    <value>Word goal</value>
+    <comment>TextEditor: WordCountFlyout box where the user types a word goal.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalTextBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Word goal</value>
+    <comment>TextEditor: WordCountFlyout word goal box, name for screen readers.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_SetGoalButton.Content" xml:space="preserve">
+    <value>Set goal</value>
+    <comment>TextEditor: WordCountFlyout button that saves the word goal.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalHint.Text" xml:space="preserve">
+    <value>Leave the box empty to remove the goal.</value>
+    <comment>TextEditor: WordCountFlyout hint under the word goal box.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_InvalidWordGoal" xml:space="preserve">
+    <value>Type the goal as a number of words, like 3000.</value>
+    <comment>TextEditor: notification when the word goal is not a number.</comment>
+  </data>
 </root>
