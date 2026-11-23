@@ -124,7 +124,8 @@
                                                               OnDismissKeyDown="FindAndReplaceControl_OnDismissKeyDown"
                                                               OnToggleReplaceModeButtonClicked="FindAndReplaceControl_OnToggleReplaceModeButtonClicked"
                                                               OnFindReplaceControlKeyDown="TextEditorCore_OnKeyDown"
-                                                              OnFindAndReplaceButtonClicked="FindAndReplaceControl_OnFindAndReplaceButtonClicked"/>
+                                                              OnFindAndReplaceButtonClicked="FindAndReplaceControl_OnFindAndReplaceButtonClicked"
+                                                              OnSearchContextChanged="FindAndReplaceControl_OnSearchContextChanged"/>
                     </controls:InAppNotification.Content>
                 </controls:InAppNotification>
                 <controls:InAppNotification x:Name="GoToPlaceholder"

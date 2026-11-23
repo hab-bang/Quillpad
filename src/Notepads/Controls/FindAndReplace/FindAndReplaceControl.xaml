@@ -47,7 +47,7 @@
                                                   RelativePanel.AlignRightWithPanel="True"
                                                   HorizontalAlignment="Stretch"
                                                   VerticalAlignment="Stretch"
-                                                  Padding="10,3,32,6"
+                                                  Padding="10,3,96,6"
                                                   IsSpellCheckEnabled="False"
                                                   TextAlignment="Left"
                                                   BorderThickness="0"
@@ -56,6 +56,14 @@
                                                   KeyDown="FindBar_OnKeyDown"
                                                   GotFocus="FindBar_GotFocus"
                                                   LostFocus="FindBar_LostFocus"/>
+
+            <TextBlock x:Name="MatchCountText"
+                       RelativePanel.LeftOf="OptionButtonGrid"
+                       RelativePanel.AlignVerticalCenterWithPanel="True"
+                       Margin="0,0,4,2"
+                       FontSize="12"
+                       Opacity="0.7"
+                       IsHitTestVisible="False"/>
 
             <Grid RelativePanel.AlignRightWithPanel="True" x:Name="OptionButtonGrid" Background="Transparent">
                 <Border x:Name="OptionButtonSelectionIndicator"

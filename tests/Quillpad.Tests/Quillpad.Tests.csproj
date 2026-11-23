@@ -63,6 +63,7 @@
     <Compile Include="$(AppSource)Utilities\Ao3HtmlConverter.cs" Link="Linked\Ao3HtmlConverter.cs" />
     <Compile Include="$(AppSource)Utilities\OutlineUtility.cs" Link="Linked\OutlineUtility.cs" />
     <Compile Include="$(AppSource)Utilities\SnapshotUtility.cs" Link="Linked\SnapshotUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\FolderSearchUtility.cs" Link="Linked\FolderSearchUtility.cs" />
   </ItemGroup>
 
 </Project>

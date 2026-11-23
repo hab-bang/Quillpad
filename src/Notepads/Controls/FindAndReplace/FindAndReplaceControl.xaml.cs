@@ -25,6 +25,9 @@ namespace Notepads.Controls.FindAndReplace
         public event EventHandler<bool> OnToggleReplaceModeButtonClicked;
         public event EventHandler<KeyRoutedEventArgs> OnFindReplaceControlKeyDown;
 
+        /// <summary>Raised when the search text or an option changes, so the match count can be updated.</summary>
+        public event EventHandler<SearchContext> OnSearchContextChanged;
+
         private readonly IList<KeyboardCommand<bool>> _nativeKeyboardCommands = new List<KeyboardCommand<bool>>
         {
             new KeyboardCommand<bool>(VirtualKey.F3, null),
@@ -139,8 +142,16 @@ namespace Notepads.Controls.FindAndReplace
             OnDismissKeyDown?.Invoke(sender, e);
         }
 
+        /// <summary>Shows the match count next to the search text. Empty hides it.</summary>
+        public void SetMatchCount(string text)
+        {
+            MatchCountText.Text = text ?? string.Empty;
+        }
+
         private void FindBar_OnTextChanged(object sender, TextChangedEventArgs e)
         {
+            OnSearchContextChanged?.Invoke(this, GetSearchContext());
+
             if (!string.IsNullOrEmpty(FindBar.Text))
             {
                 SearchForwardButton.IsEnabled = true;
@@ -267,6 +278,7 @@ namespace Notepads.Controls.FindAndReplace
 
         private void OptionButtonFlyoutItem_OnClick(object sender, RoutedEventArgs e)
         {
+            OnSearchContextChanged?.Invoke(this, GetSearchContext());
             MatchWholeWordToggle.IsEnabled = !UseRegexToggle.IsChecked;
             UseRegexToggle.IsEnabled = !MatchWholeWordToggle.IsChecked;
 

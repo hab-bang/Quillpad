@@ -187,6 +187,7 @@
                                                     <KeyboardAccelerator Key="F" Modifiers="Control,Shift" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_FindInFolder" x:Name="MenuFindInFolderButton" Icon="Find" Visibility="Collapsed"/>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Outline" x:Name="MenuOutlineButton">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE8FD;" />
@@ -423,6 +424,9 @@
                                     <KeyboardAccelerator Key="O" Modifiers="Control,Shift" IsEnabled="False"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
                             </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_FindInFolder"
+                                            Icon="Find"
+                                            Click="WorkspaceIndicatorFindInFolder_OnClick"/>
                             <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer"
                                             Click="WorkspaceIndicatorOpenInFileExplorer_OnClick">
                                 <MenuFlyoutItem.Icon>

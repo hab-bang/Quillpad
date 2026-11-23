@@ -33,6 +33,7 @@ namespace Notepads.Views.MainPage
             MenuCopyAsHtmlButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.CopyAsHtmlToWindowsClipboard();
             MenuExportAsHtmlButton.Click += async (sender, args) => await ExportAsHtmlAsync(NotepadsCore.GetSelectedTextEditor());
             MenuOutlineButton.Click += (sender, args) => ShowOutline();
+            MenuFindInFolderButton.Click += async (sender, args) => await ShowFolderSearchAsync();
             MenuOpenFileFromFolderButton.Click += async (sender, args) => await ShowWorkspaceFileListAsync();
             MenuFindButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: false);
             MenuReplaceButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: true);
@@ -134,6 +135,7 @@ namespace Notepads.Views.MainPage
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
             MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
             MenuOpenFileFromFolderButton.Visibility = MenuCloseFolderButton.Visibility;
+            MenuFindInFolderButton.Visibility = MenuCloseFolderButton.Visibility;
         }
 
         private async Task BuildOpenRecentButtonSubItemsAsync()

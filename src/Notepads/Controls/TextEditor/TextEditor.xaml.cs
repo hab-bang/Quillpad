@@ -1127,6 +1127,12 @@
             TextChanging?.Invoke(this, EventArgs.Empty);
 
             GoToPlaceholder?.Dismiss();
+
+            // The count is out of date now. It comes back with the next search.
+            if (FindAndReplacePlaceholder?.Visibility == Visibility.Visible && FindAndReplacePlaceholder.Content is FindAndReplaceControl findAndReplaceControl)
+            {
+                findAndReplaceControl.SetMatchCount(string.Empty);
+            }
         }
 
         private void TextEditorCore_CopyTextToWindowsClipboardRequested(object sender, TextControlCopyingToClipboardEventArgs e)
@@ -1244,6 +1250,11 @@
                     break;
             }
 
+            if (FindAndReplacePlaceholder?.Visibility == Visibility.Visible)
+            {
+                UpdateMatchCount(findAndReplaceEventArgs.SearchContext);
+            }
+
             if (!found)
             {
                 if (findAndReplaceEventArgs.SearchContext.UseRegex && regexError)
@@ -1255,6 +1266,57 @@
                     NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("FindAndReplace_NotificationMsg_NotFound"), 1500);
                 }
             }
+        }
+
+        private DispatcherTimer _matchCountTimer;
+        private SearchContext _matchCountSearchContext;
+
+        // Counting reads the whole text, so it waits until typing in the find bar pauses
+        private void FindAndReplaceControl_OnSearchContextChanged(object sender, SearchContext searchContext)
+        {
+            _matchCountSearchContext = searchContext;
+
+            if (_matchCountTimer == null)
+            {
+                _matchCountTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+                _matchCountTimer.Tick += (s, args) =>
+                {
+                    _matchCountTimer.Stop();
+                    UpdateMatchCount(_matchCountSearchContext);
+                };
+            }
+
+            _matchCountTimer.Stop();
+            _matchCountTimer.Start();
+        }
+
+        private void UpdateMatchCount(SearchContext searchContext)
+        {
+            if (!(FindAndReplacePlaceholder?.Content is FindAndReplaceControl findAndReplaceControl)) return;
+
+            if (searchContext == null || string.IsNullOrEmpty(searchContext.SearchText))
+            {
+                findAndReplaceControl.SetMatchCount(string.Empty);
+                return;
+            }
+
+            string text;
+
+            try
+            {
+                TextEditorCore.GetTextSelectionPosition(out var start, out var end);
+                var count = FindReplaceUtility.CountMatches(TextEditorCore.GetText(), searchContext, start, end - start, out var current);
+
+                text = count == 0 ? _resourceLoader.GetString("FindAndReplace_MatchCount_None")
+                    : current > 0 ? string.Format(_resourceLoader.GetString("FindAndReplace_MatchCount_Current"), current, count)
+                    : string.Format(_resourceLoader.GetString(count == 1 ? "FindAndReplace_MatchCount_One" : "FindAndReplace_MatchCount_Many"), count);
+            }
+            catch (Exception)
+            {
+                text = string.Empty; // A regex that is not finished yet, or too slow
+            }
+
+            findAndReplaceControl.SetMatchCount(text);
         }
 
         private void FindAndReplacePlaceholder_Closed(object sender, InAppNotificationClosedEventArgs e)
@@ -1293,6 +1355,19 @@
 
         public void GoToLine(int lineNumber)
         {
+            // A tab that was just opened is not shown yet. Moving the caret before it has a width is slow, see SetTextSelectionPosition.
+            if (!TextEditorCore.IsLoaded)
+            {
+                RoutedEventHandler onLoaded = null;
+                onLoaded = (sender, args) =>
+                {
+                    TextEditorCore.Loaded -= onLoaded;
+                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => GoToLine(lineNumber));
+                };
+                TextEditorCore.Loaded += onLoaded;
+                return;
+            }
+
             if (!TextEditorCore.IsEnabled || Mode != TextEditorMode.Editing) return;
             HideGoToControl();
             if (TextEditorCore.GoTo(lineNumber)) TextEditorCore.Focus(FocusState.Programmatic);
