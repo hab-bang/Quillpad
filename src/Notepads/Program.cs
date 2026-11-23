@@ -15,7 +15,7 @@ namespace Notepads
 
     public static class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             // Release builds log too (warnings and errors only), so a failure in a shipped build leaves a trace
             Task.Run(LoggingService.InitializeFileSystemLoggingAsync);

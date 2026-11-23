@@ -1,0 +1,265 @@
+{
+  "editorconfig": "sha256:798671b98d29f4c3185026e57ea8ce4fdaf8d40753438125061ab455cf8b6e7a",
+  "files": {
+    "src/Notepads/App.xaml.cs": {
+      "catch-all": 2,
+      "comment-run": 3,
+      "empty-catch": 2,
+      "method-length": 1
+    },
+    "src/Notepads/Brushes/HostBackdropAcrylicBrush.cs": {
+      "catch-all": 3,
+      "duplicate": 1,
+      "method-length": 1
+    },
+    "src/Notepads/Commands/CommandHandlerResult.cs": {
+      "parameters": 1
+    },
+    "src/Notepads/Commands/IKeyboardCommand.cs": {
+      "parameters": 1
+    },
+    "src/Notepads/Commands/IMouseCommand.cs": {
+      "parameters": 2
+    },
+    "src/Notepads/Commands/KeyboardCommand.cs": {
+      "parameters": 6
+    },
+    "src/Notepads/Commands/MouseCommand.cs": {
+      "parameters": 6
+    },
+    "src/Notepads/Controls/Dialog/AppCloseSaveReminderDialog.cs": {
+      "duplicate": 1
+    },
+    "src/Notepads/Controls/Dialog/FileChangedOnDiskDialog.cs": {
+      "duplicate": 1
+    },
+    "src/Notepads/Controls/Dialog/SetCloseSaveReminderDialog.cs": {
+      "duplicate": 1
+    },
+    "src/Notepads/Controls/Dialog/WorkspaceFileOpenDialog.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Controls/Dialog/WorkspaceSaveReminderDialog.cs": {
+      "duplicate": 1
+    },
+    "src/Notepads/Controls/DiffViewer/ScrollViewerSynchronizer.cs": {
+      "duplicate": 4
+    },
+    "src/Notepads/Controls/DiffViewer/SideBySideDiffViewer.xaml.cs": {
+      "comment-run": 4,
+      "delay": 2,
+      "duplicate": 3,
+      "method-length": 1
+    },
+    "src/Notepads/Controls/FindAndReplace/SearchContext.cs": {
+      "parameters": 1
+    },
+    "src/Notepads/Controls/Markdown/MarkdownExtensionView.xaml.cs": {
+      "catch-all": 2,
+      "comment-run": 3
+    },
+    "src/Notepads/Controls/Print/ContinuationPageFormat.xaml.cs": {
+      "duplicate": 2
+    },
+    "src/Notepads/Controls/Print/PrintArgs.cs": {
+      "catch-all": 1,
+      "duplicate": 4,
+      "method-length": 3
+    },
+    "src/Notepads/Controls/Print/PrintPageFormat.xaml.cs": {
+      "duplicate": 2
+    },
+    "src/Notepads/Controls/TextEditor/ITextEditor.cs": {
+      "parameters": 3
+    },
+    "src/Notepads/Controls/TextEditor/TextEditor.xaml.cs": {
+      "catch-all": 4,
+      "delay": 3,
+      "duplicate": 1,
+      "empty-catch": 2,
+      "file-length": 1254,
+      "method-length": 1,
+      "parameters": 3
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.DuplicateText.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.FindAndReplace.cs": {
+      "catch-all": 4,
+      "duplicate": 5,
+      "method-length": 1,
+      "parameters": 4
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.Indentation.cs": {
+      "duplicate": 3,
+      "method-length": 2
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.JoinText.cs": {
+      "catch-all": 1,
+      "duplicate": 1
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.LineNumbers.cs": {
+      "method-length": 1
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.MarkdownStyling.cs": {
+      "catch-all": 2,
+      "comment-run": 1,
+      "duplicate": 2,
+      "file-length": 806,
+      "method-length": 2
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.MoveText.cs": {
+      "comment-run": 2,
+      "duplicate": 2,
+      "parameters": 2
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.WebSearch.cs": {
+      "catch-all": 1,
+      "comment-run": 1
+    },
+    "src/Notepads/Controls/TextEditor/TextEditorCore.cs": {
+      "catch-all": 2,
+      "comment-run": 2,
+      "duplicate": 1,
+      "file-length": 946,
+      "parameters": 1
+    },
+    "src/Notepads/Core/NotepadsCore.cs": {
+      "catch-all": 4,
+      "empty-catch": 1,
+      "file-length": 842,
+      "method-length": 2
+    },
+    "src/Notepads/Core/SessionManager.cs": {
+      "catch-all": 17,
+      "comment-run": 3,
+      "duplicate": 2,
+      "empty-catch": 2,
+      "file-length": 769,
+      "method-length": 5
+    },
+    "src/Notepads/Core/TabContextFlyout.cs": {
+      "catch-all": 3,
+      "delay": 1,
+      "duplicate": 1
+    },
+    "src/Notepads/Core/WorkspaceManager.cs": {
+      "catch-all": 4
+    },
+    "src/Notepads/Extensions/StringExtensions.cs": {
+      "duplicate": 2
+    },
+    "src/Notepads/Notepads.csproj": {
+      "suppression": 9
+    },
+    "src/Notepads/Program.cs": {
+      "comment-run": 1,
+      "method-length": 1
+    },
+    "src/Notepads/Properties/AssemblyInfo.cs": {
+      "comment-run": 2
+    },
+    "src/Notepads/Services/AppSettingsService.cs": {
+      "catch-all": 1,
+      "duplicate": 2,
+      "file-length": 692
+    },
+    "src/Notepads/Services/JumpListService.cs": {
+      "catch-all": 2
+    },
+    "src/Notepads/Services/LoggingService.cs": {
+      "catch-all": 5,
+      "delay": 1,
+      "method-length": 1
+    },
+    "src/Notepads/Services/MRUService.cs": {
+      "catch-all": 4,
+      "duplicate": 1
+    },
+    "src/Notepads/Services/NotepadsProtocolService.cs": {
+      "catch-all": 2
+    },
+    "src/Notepads/Services/ThemeSettingsService.cs": {
+      "catch-all": 2,
+      "empty-catch": 1
+    },
+    "src/Notepads/Services/UpdateService.cs": {
+      "catch-all": 3,
+      "comment-run": 1,
+      "empty-catch": 1
+    },
+    "src/Notepads/Settings/ApplicationSettings.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Utilities/BrushUtility.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Utilities/DialogManager.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Utilities/EncodingUtility.cs": {
+      "catch-all": 5
+    },
+    "src/Notepads/Utilities/FileSystemUtility.cs": {
+      "catch-all": 13,
+      "comment-run": 4,
+      "delay": 1,
+      "file-length": 813,
+      "method-length": 1
+    },
+    "src/Notepads/Utilities/FontUtility.cs": {
+      "catch-all": 1
+    },
+    "src/Notepads/Utilities/FutureAccessListUtility.cs": {
+      "catch-all": 2
+    },
+    "src/Notepads/Utilities/MarkdownLiveStyleParser.cs": {
+      "method-length": 2
+    },
+    "src/Notepads/Utilities/SessionUtility.cs": {
+      "catch-all": 1,
+      "comment-run": 1,
+      "delay": 1,
+      "empty-catch": 1
+    },
+    "src/Notepads/Utilities/WordCountUtility.cs": {
+      "duplicate": 2
+    },
+    "src/Notepads/Utilities/WorkspaceUtility.cs": {
+      "catch-all": 2
+    },
+    "src/Notepads/Views/MainPage/NotepadsMainPage.IO.cs": {
+      "catch-all": 8,
+      "comment-run": 1,
+      "duplicate": 2,
+      "empty-catch": 1,
+      "method-length": 1,
+      "parameters": 1
+    },
+    "src/Notepads/Views/MainPage/NotepadsMainPage.MainMenu.cs": {
+      "method-length": 1
+    },
+    "src/Notepads/Views/MainPage/NotepadsMainPage.StatusBar.cs": {
+      "catch-all": 6,
+      "duplicate": 3,
+      "file-length": 809,
+      "method-length": 1
+    },
+    "src/Notepads/Views/MainPage/NotepadsMainPage.Workspace.cs": {
+      "catch-all": 3
+    },
+    "src/Notepads/Views/MainPage/NotepadsMainPage.xaml.cs": {
+      "catch-all": 3,
+      "comment-run": 1,
+      "delay": 1,
+      "file-length": 873,
+      "method-length": 2
+    },
+    "src/Notepads/Views/Settings/AboutPage.xaml.cs": {
+      "comment-run": 1
+    },
+    "src/Notepads/Views/Settings/TextAndEditorSettingsPage.xaml.cs": {
+      "catch-all": 1
+    }
+  }
+}

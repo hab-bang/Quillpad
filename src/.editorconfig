@@ -303,6 +303,9 @@ dotnet_diagnostic.CA2240.severity = warning
 dotnet_diagnostic.CA2241.severity = warning
 dotnet_diagnostic.CA2242.severity = warning
 dotnet_diagnostic.CA1031.severity = none # Disable https://docs.microsoft.com/en-us/visualstudio/code-quality/ca1031?view=vs-2019
+dotnet_diagnostic.IDE0051.severity = warning # Unused private member
+dotnet_diagnostic.IDE0052.severity = warning # Private member is written but never read
+dotnet_diagnostic.IDE0060.severity = warning # Unused parameter
 dotnet_diagnostic.SA1011.severity = none
 dotnet_diagnostic.SA1101.severity = none
 dotnet_diagnostic.SA1118.severity = none

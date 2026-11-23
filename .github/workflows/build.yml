@@ -26,3 +26,31 @@ jobs:
 
       - name: Unit tests
         run: dotnet test tests/Quillpad.Tests --nologo
+
+  # Counts code smells and fails when a count differs from smell-baseline.json. See README.md.
+  # It reads the code as syntax trees only, so it runs on Linux without MSBuild.
+  smell-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # The reports compare with the base branch
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Tool tests
+        run: dotnet test tools/SmellCheck.Tests --nologo
+
+      - name: Smell check
+        run: dotnet run --project tools/SmellCheck -c Release
+
+      - name: Reports for the job summary
+        if: ${{ !cancelled() }}
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: dotnet run --project tools/SmellCheck -c Release -- --report --base "origin/$BASE_REF" --title "$PR_TITLE"

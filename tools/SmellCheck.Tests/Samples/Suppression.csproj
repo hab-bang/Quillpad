@@ -1,0 +1,9 @@
+<Project>
+  <!-- expect suppression: 3 -->
+  <PropertyGroup>
+    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008</NoWarn> <!-- CS2008 comes from the project template -->
+    <NoWarn Condition="'$(Configuration)' == 'Debug'">;2008;CS0618</NoWarn>
+    <NoWarn>;2008</NoWarn> <!-- -->
+  </PropertyGroup>
+</Project>
