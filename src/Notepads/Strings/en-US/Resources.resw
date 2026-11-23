@@ -1325,4 +1325,12 @@
     <value>Go to line</value>
     <comment>GoTo: name of the Go button, for screen readers.</comment>
   </data>
+  <data name="UpdateService_Error_GitHubAnswer" xml:space="preserve">
+    <value>GitHub answered {0} {1}</value>
+    <comment>Update check error. {0} is the HTTP status code, {1} its reason, like 404 Not Found. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="UpdateService_Error_UnexpectedTag" xml:space="preserve">
+    <value>The latest release has an unexpected tag: {0}</value>
+    <comment>Update check error. {0} is the release tag found on GitHub. DO NOT REMOVE it.</comment>
+  </data>
 </root>

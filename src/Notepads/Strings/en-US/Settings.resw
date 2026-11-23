@@ -461,4 +461,8 @@
     <value>In .md and .txt files, -- becomes an em dash, ... becomes an ellipsis, and straight quotes become curly quotes as you type. Ctrl+Z right after gives back what you typed. Code is left as it is.</value>
     <comment>TextAndEditorPage SmartPunctuationSettings Description display text. Keep --, ... and Ctrl+Z as they are.</comment>
   </data>
+  <data name="AboutPage_CommitHistoryLink.Text" xml:space="preserve">
+    <value>Quillpad commit history</value>
+    <comment>AboutPage: link to the list of changes on GitHub.</comment>
+  </data>
 </root>

@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>जैकी (जियाकी) लियू द्वारा डिजाइन और लागू किए गए स्वतंत्र और खुले स्रोत पाठ संपादक</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad, Notepads का एक निजी फ़ोर्क है। Notepads एक मुफ़्त और ओपन सोर्स टेक्स्ट एडिटर है, जिसे Jackie (Jiaqi) Liu ने डिज़ाइन और विकसित किया है:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>रिपोर्टिंग और सुविधा अनुरोध जारी करने के लिए:</value>

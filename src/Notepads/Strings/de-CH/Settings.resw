@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>Kostenloser Open-Source Texteditor entworfen und implementiert durch Jackie (Jiaqi) Liu</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad ist ein persönlicher Fork von Notepads, dem kostenlosen Open-Source-Texteditor, entworfen und implementiert von Jackie (Jiaqi) Liu:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Für Fehlermeldungen oder Featureanfrage:</value>

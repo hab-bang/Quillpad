@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>უფასო და ოფენ სოურს ტექსტ ედიტორის დიზაინი და იმპლემენტაცია Jackie (Jiaqi) Liu-სგან</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad არის Notepads-ის პირადი ფორკი. Notepads არის უფასო და ღია კოდის ტექსტური რედაქტორი, რომლის დიზაინი და იმპლემენტაცია ეკუთვნის Jackie (Jiaqi) Liu-ს:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>იშუების რეპორტებისთვის და ფიჩერების მოთხოვნისთვის:</value>

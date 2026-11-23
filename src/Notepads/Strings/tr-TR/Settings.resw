@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>Jackie (Jiaqi) Liu tarafından oluşturulmuş, özgür ve açık kaynak bir metin düzenleyicisi</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad, Jackie (Jiaqi) Liu tarafından tasarlanıp geliştirilen özgür ve açık kaynak metin düzenleyicisi Notepads'in kişisel bir çatalıdır:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Hata bildirimleri ve özellik istekleri için:</value>
