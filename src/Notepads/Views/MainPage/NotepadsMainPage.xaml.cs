@@ -132,6 +132,9 @@ namespace Notepads.Views.MainPage
             RootSplitView.PaneOpening += delegate { SettingsFrame.Navigate(typeof(SettingsPage), null, new SuppressNavigationTransitionInfo()); };
             RootSplitView.PaneClosed += delegate { NotepadsCore.FocusOnSelectedTextEditor(); };
             NewSetButton.Click += delegate { NotepadsCore.OpenNewTextEditor(_defaultNewFileName); };
+            TabListButton.Click += (sender, args) => ShowTabList();
+            ToolTipService.SetToolTip(TabListButton, _resourceLoader.GetString("App_TabListButton_ToolTip"));
+            ToolTipService.SetToolTip(NewSetButton, _resourceLoader.GetString("App_NewTabButton_ToolTip"));
         }
 
         private void InitializeKeyboardShortcuts()

@@ -296,6 +296,7 @@
     <Compile Include="Utilities\Ao3HtmlConverter.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Html.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Outline.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.TabList.cs" />
     <Compile Include="Utilities\OutlineUtility.cs" />
     <Compile Include="Utilities\SnapshotUtility.cs" />
     <Compile Include="Services\SnapshotService.cs" />

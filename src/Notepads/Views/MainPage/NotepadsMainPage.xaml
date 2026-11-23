@@ -260,21 +260,35 @@
                         </controls:SetsView.SetsStartHeader>
 
                         <controls:SetsView.SetsActionHeader>
-                            <Button x:Name="NewSetButton"
-                                    Grid.Column="0"
-                                    IsTabStop="False"
-                                    Width="42"
-                                    Height="{StaticResource SetsViewItemHeaderMinHeight}"
-                                    Margin="-1,0,0,0"
-                                    BorderThickness="0"
-                                    Background="Transparent"
-                                    Style="{ThemeResource ButtonRevealStyle}">
-                                    <Viewbox MaxWidth="14"
-                                        MaxHeight="14">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                            Glyph="&#xE710;" />
-                                    </Viewbox>
-                            </Button>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="NewSetButton"
+                                        IsTabStop="False"
+                                        Width="42"
+                                        Height="{StaticResource SetsViewItemHeaderMinHeight}"
+                                        Margin="-1,0,0,0"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Style="{ThemeResource ButtonRevealStyle}">
+                                        <Viewbox MaxWidth="14"
+                                            MaxHeight="14">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE710;" />
+                                        </Viewbox>
+                                </Button>
+                                <Button x:Name="TabListButton"
+                                        IsTabStop="False"
+                                        Width="32"
+                                        Height="{StaticResource SetsViewItemHeaderMinHeight}"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Style="{ThemeResource ButtonRevealStyle}">
+                                        <Viewbox MaxWidth="10"
+                                            MaxHeight="10">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE70D;" />
+                                        </Viewbox>
+                                </Button>
+                            </StackPanel>
                         </controls:SetsView.SetsActionHeader>
 
                         <controls:SetsView.SetsPaddingHeader>

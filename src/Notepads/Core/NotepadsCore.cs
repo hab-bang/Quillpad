@@ -430,8 +430,15 @@ namespace Notepads.Core
 
             textEditorSetsViewItem.Icon.Visibility = textEditor.IsModified ? Visibility.Visible : Visibility.Collapsed;
             textEditorSetsViewItem.ContextFlyout = new TabContextFlyout(this, textEditor);
+            UpdateTabToolTip(textEditorSetsViewItem, textEditor);
 
             return textEditorSetsViewItem;
+        }
+
+        // The full path, since the tab shows only the file name
+        private static void UpdateTabToolTip(SetsViewItem item, ITextEditor textEditor)
+        {
+            ToolTipService.SetToolTip(item, textEditor.EditingFilePath ?? textEditor.FileNamePlaceholder);
         }
 
         private SetsViewItem GetTextEditorSetsViewItem(StorageFile file)
@@ -481,6 +488,7 @@ namespace Notepads.Core
                 {
                     item.Header = textEditor.EditingFileName;
                 }
+                UpdateTabToolTip(item, textEditor); // Save As can change the path
                 item.Icon.Visibility = Visibility.Collapsed;
             }
         }
@@ -580,6 +588,7 @@ namespace Notepads.Core
             var item = GetTextEditorSetsViewItem(textEditor);
             if (item == null) return;
             item.Header = textEditor.EditingFileName ?? textEditor.FileNamePlaceholder;
+            UpdateTabToolTip(item, textEditor);
             TextEditorRenamed?.Invoke(this, textEditor);
         }
 

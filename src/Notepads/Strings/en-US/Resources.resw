@@ -1265,4 +1265,16 @@
     <value>This list</value>
     <comment>Keyboard shortcut list: what the keys do.</comment>
   </data>
+  <data name="App_TabListButton_ToolTip" xml:space="preserve">
+    <value>All tabs</value>
+    <comment>Tooltip of the button after the tabs that lists every open tab.</comment>
+  </data>
+  <data name="App_NewTabButton_ToolTip" xml:space="preserve">
+    <value>New tab (Ctrl+N)</value>
+    <comment>Tooltip of the + button that opens a new tab.</comment>
+  </data>
+  <data name="App_TabList_ModifiedTabText" xml:space="preserve">
+    <value>{0} (unsaved)</value>
+    <comment>Tab list: a tab with unsaved changes. {0} is the file name. DO NOT REMOVE it.</comment>
+  </data>
 </root>
