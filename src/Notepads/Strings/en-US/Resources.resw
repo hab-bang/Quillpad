@@ -1105,4 +1105,164 @@
     <value>Typewriter Mode</value>
     <comment>MainMenu: on/off item that keeps the line with the caret in the middle of the editor, for this window.</comment>
   </data>
+  <data name="MainMenu_Button_ReopenClosedTab.Text" xml:space="preserve">
+    <value>Reopen Closed Tab</value>
+    <comment>MainMenu: opens the file of the tab closed last.</comment>
+  </data>
+  <data name="MainMenu_Button_KeyboardShortcuts.Text" xml:space="preserve">
+    <value>Keyboard Shortcuts</value>
+    <comment>MainMenu: shows the list of keyboard shortcuts.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_NoClosedTab" xml:space="preserve">
+    <value>No closed tab to reopen</value>
+    <comment>Notification for Ctrl+Shift+T when no closed tab can be reopened.</comment>
+  </data>
+  <data name="KeyboardShortcutsDialog_Title" xml:space="preserve">
+    <value>Keyboard shortcuts</value>
+    <comment>KeyboardShortcutsDialog: title.</comment>
+  </data>
+  <data name="KeyboardShortcutsDialog_CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+    <comment>KeyboardShortcutsDialog: close button.</comment>
+  </data>
+  <data name="Shortcut_NewTab" xml:space="preserve">
+    <value>New tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_NewWindow" xml:space="preserve">
+    <value>New window</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_OpenFile" xml:space="preserve">
+    <value>Open a file</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_OpenFileFromFolder" xml:space="preserve">
+    <value>Open a file from the open folder</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_SaveAs" xml:space="preserve">
+    <value>Save as</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_CloseTab" xml:space="preserve">
+    <value>Close the tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ReopenClosedTab" xml:space="preserve">
+    <value>Reopen the tab closed last</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_SwitchTab" xml:space="preserve">
+    <value>Next or previous tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_GoToTab" xml:space="preserve">
+    <value>Go to tab 1 to 9</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Find" xml:space="preserve">
+    <value>Find</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Replace" xml:space="preserve">
+    <value>Find and replace</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_FindNext" xml:space="preserve">
+    <value>Find next or previous</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_GoToLine" xml:space="preserve">
+    <value>Go to a line</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Outline" xml:space="preserve">
+    <value>Outline: headings and scene breaks</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_BoldItalic" xml:space="preserve">
+    <value>Bold or italic in markdown files</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_UndoRedo" xml:space="preserve">
+    <value>Undo or redo</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_DuplicateLine" xml:space="preserve">
+    <value>Duplicate the line or selection</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_JoinLines" xml:space="preserve">
+    <value>Join lines</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_MoveLine" xml:space="preserve">
+    <value>Move the line up or down</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_InsertDateTime" xml:space="preserve">
+    <value>Insert the date and time</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Zoom" xml:space="preserve">
+    <value>Zoom in, zoom out, reset the zoom</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_WordWrap" xml:space="preserve">
+    <value>Word wrap on or off</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_TextWidth" xml:space="preserve">
+    <value>Change the text width</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Preview" xml:space="preserve">
+    <value>Markdown preview</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ShowChanges" xml:space="preserve">
+    <value>Show the changes since the last save</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Reload" xml:space="preserve">
+    <value>Reload the file from disk</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Rename" xml:space="preserve">
+    <value>Rename the file</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Print" xml:space="preserve">
+    <value>Print, or print all tabs</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_StatusBar" xml:space="preserve">
+    <value>Status bar menu</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Menu" xml:space="preserve">
+    <value>Main menu</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Settings" xml:space="preserve">
+    <value>Settings</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_FullScreen" xml:space="preserve">
+    <value>Full screen</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_CompactOverlay" xml:space="preserve">
+    <value>Compact overlay (always on top)</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ShortcutList" xml:space="preserve">
+    <value>This list</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
 </root>

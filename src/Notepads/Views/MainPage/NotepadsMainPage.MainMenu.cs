@@ -42,6 +42,8 @@ namespace Notepads.Views.MainPage
             MenuPrintButton.Click += async (sender, args) => await PrintAsync(NotepadsCore.GetSelectedTextEditor());
             MenuPrintAllButton.Click += async (sender, args) => await PrintAllAsync(NotepadsCore.GetAllTextEditors());
             MenuSettingsButton.Click += (sender, args) => RootSplitView.IsPaneOpen = true;
+            MenuReopenClosedTabButton.Click += async (sender, args) => await ReopenClosedTabAsync();
+            MenuKeyboardShortcutsButton.Click += async (sender, args) => await ShowKeyboardShortcutsAsync();
             MenuTypewriterModeButton.Click += (sender, args) => SetTypewriterMode(MenuTypewriterModeButton.IsChecked);
 
             if (!App.IsPrimaryInstance)
@@ -146,6 +148,7 @@ namespace Notepads.Views.MainPage
                     ? "App_ExitCompactOverlayMode_Text"
                     : "App_EnterCompactOverlayMode_Text");
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
+            MenuReopenClosedTabButton.IsEnabled = _closedTabs.Count > 0;
             MenuTypewriterModeButton.IsChecked = _isTypewriterModeEnabled;
             MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
             MenuOpenFileFromFolderButton.Visibility = MenuCloseFolderButton.Visibility;

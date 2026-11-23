@@ -126,6 +126,14 @@
                                                     <KeyboardAccelerator Key="O" Modifiers="Control" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_ReopenClosedTab" x:Name="MenuReopenClosedTabButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE7A7;"/>
+                                                </MenuFlyoutItem.Icon>
+                                                <MenuFlyoutItem.KeyboardAccelerators>
+                                                    <KeyboardAccelerator Key="T" Modifiers="Control,Shift" IsEnabled="False"/>
+                                                </MenuFlyoutItem.KeyboardAccelerators>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_OpenFolder" x:Name="MenuOpenFolderButton">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE838;"/>
@@ -229,6 +237,11 @@
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutSeparator x:Name="MenuSettingsSeparator" />
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_KeyboardShortcuts" x:Name="MenuKeyboardShortcutsButton" KeyboardAcceleratorTextOverride="Ctrl+/">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE765;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Settings" x:Name="MenuSettingsButton" Icon="Setting">
                                                 <MenuFlyoutItem.KeyboardAccelerators>
                                                     <KeyboardAccelerator Key="F1" IsEnabled="False"/>

@@ -160,6 +160,8 @@
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
     <Compile Include="Controls\Dialog\FolderSearchDialog.cs" />
+    <Compile Include="Controls\Dialog\KeyboardShortcutsDialog.cs" />
+    <Compile Include="Utilities\ClosedTabHistory.cs" />
     <Compile Include="Utilities\FolderSearchUtility.cs" />
     <Compile Include="Controls\Dialog\WorkspaceSaveReminderDialog.cs" />
     <Compile Include="Controls\FindAndReplace\FindAndReplaceControl.xaml.cs">

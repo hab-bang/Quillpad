@@ -65,6 +65,7 @@
     <Compile Include="$(AppSource)Utilities\SnapshotUtility.cs" Link="Linked\SnapshotUtility.cs" />
     <Compile Include="$(AppSource)Utilities\FolderSearchUtility.cs" Link="Linked\FolderSearchUtility.cs" />
     <Compile Include="$(AppSource)Utilities\TypewriterUtility.cs" Link="Linked\TypewriterUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\ClosedTabHistory.cs" Link="Linked\ClosedTabHistory.cs" />
   </ItemGroup>
 
 </Project>

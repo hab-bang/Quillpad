@@ -150,6 +150,8 @@ namespace Notepads.Views.MainPage
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.P, async (args) => await PrintAllAsync(NotepadsCore.GetAllTextEditors())),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.R, (args) => ReloadFileFromDiskAsync(this, new RoutedEventArgs())),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.N, async (args) => await OpenNewAppInstanceAsync()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.T, async (args) => await ReopenClosedTabAsync()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, (VirtualKey)191, async (args) => await ShowKeyboardShortcutsAsync()), // (VirtualKey)191: /
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number1, (args) => NotepadsCore.SwitchTo(0)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number2, (args) => NotepadsCore.SwitchTo(1)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number3, (args) => NotepadsCore.SwitchTo(2)),
@@ -813,7 +815,7 @@ namespace Notepads.Views.MainPage
             }
             else if (!textEditor.IsModified)
             {
-                NotepadsCore.DeleteTextEditor(textEditor);
+                DeleteTextEditorAndRemember(textEditor);
             }
             else // Remind user to save uncommitted changes
             {
@@ -824,14 +826,14 @@ namespace Notepads.Views.MainPage
                     {
                         if (NotepadsCore.GetAllTextEditors().Contains(textEditor) && await SaveAsync(textEditor, saveAs: false))
                         {
-                            NotepadsCore.DeleteTextEditor(textEditor);
+                            DeleteTextEditorAndRemember(textEditor);
                         }
                     },
                     skipSavingAction: () =>
                     {
                         if (NotepadsCore.GetAllTextEditors().Contains(textEditor))
                         {
-                            NotepadsCore.DeleteTextEditor(textEditor);
+                            DeleteTextEditorAndRemember(textEditor);
                         }
                     });
 
@@ -850,6 +852,39 @@ namespace Notepads.Views.MainPage
                     NotepadsCore.FocusOnSelectedTextEditor();
                 }
             }
+        }
+
+        private readonly ClosedTabHistory<StorageFile> _closedTabs = new ClosedTabHistory<StorageFile>(20, file => file.Path);
+
+        // Tabs the user closed, so Ctrl+Shift+T can bring their files back. Untitled tabs have nothing to reopen.
+        private void DeleteTextEditorAndRemember(ITextEditor textEditor)
+        {
+            if (textEditor.EditingFile != null) _closedTabs.Push(textEditor.EditingFile);
+            NotepadsCore.DeleteTextEditor(textEditor);
+        }
+
+        private async Task ReopenClosedTabAsync()
+        {
+            while (_closedTabs.TryPop(out var file))
+            {
+                var openEditor = NotepadsCore.GetTextEditor(file);
+                if (openEditor != null)
+                {
+                    NotepadsCore.SwitchTo(openEditor);
+                    return;
+                }
+
+                if (await FileSystemUtility.FileExistsAsync(file) && await OpenFileAsync(file)) return;
+            }
+
+            NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_NoClosedTab"), 1500);
+        }
+
+        private async Task ShowKeyboardShortcutsAsync()
+        {
+            var dialog = new KeyboardShortcutsDialog();
+            await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+            if (!dialog.IsAborted) NotepadsCore.FocusOnSelectedTextEditor();
         }
 
         private void OnTextEditorKeyDown(object sender, KeyRoutedEventArgs e)
