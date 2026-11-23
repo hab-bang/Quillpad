@@ -67,6 +67,41 @@ The first build takes a few minutes. After that, `make run` only builds again wh
 | `make build` | Builds only |
 | `make uninstall` | Removes the app |
 
+**Code quality check**
+
+`make check` counts some code smells in `src/` and compares the counts with `smell-baseline.json`. CI runs it too, on Linux, in the `smell-check` job. It needs the .NET 8 SDK or later, but not MSBuild: it reads each `.cs` file as a syntax tree and doesn't build anything. `src/Notepads.Controls` is left out, because it's mostly vendored Toolkit code.
+
+The counts are per file. The check fails when a count goes up. It also fails when a count goes down, until the lower count is in the baseline. So the numbers can only go down, and code can't move to another file to pass.
+
+| Check | What counts |
+|---|---|
+| `nesting` | A statement nested deeper than 4 levels (`if`, loops, `try`, `switch`, `using`, `lock`). Lambdas, initializers and `else if` don't add a level. |
+| `method-length` | A method, constructor, accessor or local function over 60 lines. |
+| `parameters` | More than 5 parameters, or more than 1 `bool` parameter. |
+| `file-length` | A file over 500 lines. The baseline holds its line count, so it may not grow. |
+| `duplicate` | A method body (3 or more statements) or a run of 5 or more statements that is the same as code elsewhere after local names and literals are normalized. |
+| `catch-all` | `catch (Exception)` or a bare `catch` without a `when` filter. |
+| `empty-catch` | A `catch` block with no statements. A comment alone doesn't count as one. |
+| `comment-run` | 3 or more `//` comment lines in a row. `///` docs and the license header don't count. |
+| `delay` | `Task.Delay` and `Thread.Sleep`. |
+| `suppression` | `#pragma warning disable`, `[SuppressMessage]` or `<NoWarn>` without a reason on the same line: a `//` comment, a `Justification`, or an `<!-- -->` comment. |
+
+The baseline also holds a hash of `src/.editorconfig`. If a rule changes there, the check fails until the baseline is updated.
+
+When the check fails, it names the file, the member and the line of each finding of that kind in the file. Fix the code if you can. If a new count is right, or a count went down, update the baseline and say why in the commit:
+
+```
+make baseline
+```
+
+`dotnet run --project tools/SmellCheck -- --list` prints every finding, old and new.
+
+The CI job also writes some reports to the job summary. They never fail the build:
+
+- For a PR titled `fix:`, the lines it adds and removes, with a warning when it adds more than 5 for each one it removes.
+- Changed `.cs` files that `tests/Quillpad.Tests` doesn't compile, so no unit test can reach them.
+- Tests with no `Assert` in them.
+
 **Credits and license**
 
 Quillpad is based on Notepads, made by Jackie (Jiaqi) Liu and many contributors, and most of the code here is theirs. The original project, with its contributors and translators, is at [0x7c13/Notepads](https://github.com/0x7c13/Notepads). Quillpad keeps the same MIT License: see [LICENSE.txt](LICENSE.txt).

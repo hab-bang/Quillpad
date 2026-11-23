@@ -1,0 +1,7 @@
+<Project>
+  <!-- expect suppression: 1 -->
+  <PropertyGroup>
+    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008</NoWarn> <!-- CS2008 comes from the project template -->
+  </PropertyGroup>
+</Project>

@@ -5,19 +5,22 @@
 #   make run        Same as build, then install and open the dev app
 #   make dev        Always run MSBuild (it is incremental itself), then install and open the dev app
 #   make uninstall  Remove the installed dev app
-#   make test       Run the unit tests in tests/Quillpad.Tests (needs the .NET 8 SDK or later)
+#   make test       Run the unit tests in tests/Quillpad.Tests and tools/SmellCheck.Tests (needs the .NET 8 SDK or later)
+#   make check      Count code smells in src/ and fail if a count differs from smell-baseline.json
+#   make baseline   Write the current counts to smell-baseline.json
 #
 # The dev app installs as "Quillpad-Dev", next to (not over) an installed Quillpad or Notepads.
 
 BUILD_SCRIPT := powershell -NoProfile -ExecutionPolicy Bypass -File build.ps1
 BUILD_STAMP  := src/Notepads/bin/x64/Debug/.make-build-stamp
 MARK_BUILT   := powershell -NoProfile -Command "Set-Content -Path '$(BUILD_STAMP)' -Value built"
+SMELL_CHECK  := dotnet run --project tools/SmellCheck -c Release --
 
 # Every file under src/ that git tracks or would track. $(wildcard) drops deleted files, and also
 # the halves of the few paths that contain spaces, which make cannot use as prerequisites.
 SOURCES := $(wildcard $(shell git ls-files --cached --others --exclude-standard src))
 
-.PHONY: build run dev uninstall test
+.PHONY: build run dev uninstall test check baseline
 
 build: $(BUILD_STAMP)
 
@@ -38,3 +41,10 @@ uninstall:
 
 test:
 	dotnet test tests/Quillpad.Tests --nologo
+	dotnet test tools/SmellCheck.Tests --nologo
+
+check:
+	$(SMELL_CHECK)
+
+baseline:
+	$(SMELL_CHECK) --update
