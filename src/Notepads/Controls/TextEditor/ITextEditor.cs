@@ -162,6 +162,9 @@ namespace Notepads.Controls.TextEditor
 
         void ShowGoToControl();
 
+        /// <summary>Puts the caret at the start of the line (1-based) and shows it.</summary>
+        void GoToLine(int lineNumber);
+
         void HideGoToControl();
 
         void Dispose();

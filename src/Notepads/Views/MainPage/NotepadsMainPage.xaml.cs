@@ -160,6 +160,8 @@ namespace Notepads.Views.MainPage
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number8, (args) => NotepadsCore.SwitchTo(7)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number9, (args) => NotepadsCore.SwitchTo(8)),
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.F, (args) => ShowMainMenu()),
+                new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.O, (args) => ShowOutline()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.O, (args) => ShowWorkspaceFileList()),
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.W, (args) => AppSettingsService.EditorTextWidth = TextWidthUtility.Next(AppSettingsService.EditorTextWidth)),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F11, (args) => EnterExitFullScreenMode()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F12, (args) => EnterExitCompactOverlayMode()),

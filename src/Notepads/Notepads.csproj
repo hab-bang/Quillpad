@@ -291,6 +291,8 @@
     <Compile Include="Utilities\SmartPunctuationUtility.cs" />
     <Compile Include="Utilities\Ao3HtmlConverter.cs" />
     <Compile Include="Views\MainPage\NotepadsMainPage.Html.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.Outline.cs" />
+    <Compile Include="Utilities\OutlineUtility.cs" />
     <Compile Include="Services\WordGoalStore.cs" />
     <Compile Include="Utilities\WorkspaceUtility.cs" />
     <Compile Include="Utilities\MarkdownLiveStyleParser.cs" />

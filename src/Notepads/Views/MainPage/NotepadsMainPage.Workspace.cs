@@ -262,6 +262,12 @@ namespace Notepads.Views.MainPage
 
         private async void WorkspaceIndicatorOpenFile_OnClick(object sender, RoutedEventArgs e)
         {
+            await ShowWorkspaceFileListAsync();
+        }
+
+        // Also Ctrl+Shift+O
+        private async Task ShowWorkspaceFileListAsync()
+        {
             var folder = Workspace.Folder;
             if (folder == null) return;
 

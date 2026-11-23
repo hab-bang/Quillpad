@@ -1270,6 +1270,13 @@
             goToControl.Focus();
         }
 
+        public void GoToLine(int lineNumber)
+        {
+            if (!TextEditorCore.IsEnabled || Mode != TextEditorMode.Editing) return;
+            HideGoToControl();
+            if (TextEditorCore.GoTo(lineNumber)) TextEditorCore.Focus(FocusState.Programmatic);
+        }
+
         public void HideGoToControl()
         {
             GoToPlaceholder?.Dismiss();

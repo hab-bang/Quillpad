@@ -981,4 +981,28 @@
     <value>Could not export as HTML: {0}</value>
     <comment>TextEditor: notification when Export as HTML fails. {0} is the error message. DO NOT REMOVE it.</comment>
   </data>
+  <data name="MainMenu_Button_Outline.Text" xml:space="preserve">
+    <value>Outline</value>
+    <comment>MainMenu: button that lists the headings and scene breaks of the file.</comment>
+  </data>
+  <data name="MainMenu_Button_OpenFileFromFolder.Text" xml:space="preserve">
+    <value>Open File from Folder</value>
+    <comment>MainMenu: button that lists the files of the open folder, with a filter. Shown only while a folder is open.</comment>
+  </data>
+  <data name="Outline_EmptyText" xml:space="preserve">
+    <value>No headings or scene breaks</value>
+    <comment>Outline: shown when the file has no markdown headings and no scene breaks.</comment>
+  </data>
+  <data name="Outline_SceneBreakText" xml:space="preserve">
+    <value>Scene break</value>
+    <comment>Outline: a scene break (*** or ---) with no text after it.</comment>
+  </data>
+  <data name="Outline_SceneBreakWithTextText" xml:space="preserve">
+    <value>Scene break: {0}</value>
+    <comment>Outline: a scene break. {0} is the start of the text after it. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Workspace_NotificationMsg_NoFolderOpen" xml:space="preserve">
+    <value>Open a folder first, from the main menu.</value>
+    <comment>Notification for Ctrl+Shift+O when no folder is open.</comment>
+  </data>
 </root>

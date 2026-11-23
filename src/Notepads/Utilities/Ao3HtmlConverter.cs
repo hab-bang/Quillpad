@@ -79,6 +79,12 @@ namespace Notepads.Utilities
             return html.ToString();
         }
 
+        /// <summary>True for a line of three or more *, -, _ or ~, spaces allowed.</summary>
+        public static bool IsSceneBreak(string line)
+        {
+            return SceneBreakRegex.IsMatch(line ?? string.Empty);
+        }
+
         /// <summary>A whole HTML file with the converted text, for "Export as HTML".</summary>
         public static string ToHtmlDocument(string markdown, string title)
         {

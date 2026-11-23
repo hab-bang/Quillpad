@@ -32,6 +32,8 @@ namespace Notepads.Views.MainPage
             MenuSaveAllButton.Click += async (sender, args) => await SaveAllAsync(NotepadsCore.GetAllTextEditors());
             MenuCopyAsHtmlButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.CopyAsHtmlToWindowsClipboard();
             MenuExportAsHtmlButton.Click += async (sender, args) => await ExportAsHtmlAsync(NotepadsCore.GetSelectedTextEditor());
+            MenuOutlineButton.Click += (sender, args) => ShowOutline();
+            MenuOpenFileFromFolderButton.Click += async (sender, args) => await ShowWorkspaceFileListAsync();
             MenuFindButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: false);
             MenuReplaceButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: true);
             MenuFullScreenButton.Click += (sender, args) => EnterExitFullScreenMode();
@@ -94,6 +96,7 @@ namespace Notepads.Views.MainPage
                 MenuSaveAsButton.IsEnabled = false;
                 MenuFindButton.IsEnabled = false;
                 MenuReplaceButton.IsEnabled = false;
+                MenuOutlineButton.IsEnabled = false;
                 MenuPrintButton.IsEnabled = false;
                 MenuPrintAllButton.IsEnabled = false;
             }
@@ -103,6 +106,7 @@ namespace Notepads.Views.MainPage
                 MenuSaveAsButton.IsEnabled = true;
                 MenuFindButton.IsEnabled = false;
                 MenuReplaceButton.IsEnabled = false;
+                MenuOutlineButton.IsEnabled = false;
             }
             else
             {
@@ -110,6 +114,7 @@ namespace Notepads.Views.MainPage
                 MenuSaveAsButton.IsEnabled = true;
                 MenuFindButton.IsEnabled = true;
                 MenuReplaceButton.IsEnabled = true;
+                MenuOutlineButton.IsEnabled = true;
 
                 if (PrintManager.IsSupported())
                 {
@@ -128,6 +133,7 @@ namespace Notepads.Views.MainPage
                     : "App_EnterCompactOverlayMode_Text");
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
             MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
+            MenuOpenFileFromFolderButton.Visibility = MenuCloseFolderButton.Visibility;
         }
 
         private async Task BuildOpenRecentButtonSubItemsAsync()
