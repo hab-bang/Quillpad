@@ -62,7 +62,7 @@
     },
     "src/Notepads/Controls/Print/PrintArgs.cs": {
       "catch-all": 1,
-      "duplicate": 2,
+      "duplicate": 4,
       "method-length": 3
     },
     "src/Notepads/Controls/Print/PrintPageFormat.xaml.cs": {
@@ -119,6 +119,7 @@
     "src/Notepads/Controls/TextEditor/TextEditorCore.cs": {
       "catch-all": 2,
       "comment-run": 2,
+      "duplicate": 1,
       "file-length": 946,
       "parameters": 1
     },

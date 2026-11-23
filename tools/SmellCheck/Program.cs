@@ -53,7 +53,7 @@ internal static class Cli
 {
     private const string UpdateHint =
         "To record the new counts, run `make baseline` (or `dotnet run --project tools/SmellCheck -- --update`)\n" +
-        "and commit smell-baseline.json. Say in the commit why a count went up.";
+        "and commit smell-baseline.json. If a count went up, say why in the commit.";
 
     public static int Check(string root)
     {
@@ -82,9 +82,10 @@ internal static class Cli
         var up = problems.Where(p => p.Kind != ProblemKind.WentDown).ToList();
         var down = problems.Where(p => p.Kind == ProblemKind.WentDown).ToList();
 
+        Console.WriteLine("Smell check failed.\n");
         if (up.Count > 0)
         {
-            Console.WriteLine($"Smell check failed: {up.Count} count(s) went up.\n");
+            Console.WriteLine($"{up.Count} new problem(s). Fix them, or record them if they are meant:\n");
             foreach (var problem in up)
             {
                 Console.WriteLine(problem.Describe());
@@ -95,7 +96,7 @@ internal static class Cli
 
         if (down.Count > 0)
         {
-            Console.WriteLine($"{down.Count} count(s) went down. The baseline must go down with them:\n");
+            Console.WriteLine($"{down.Count} count(s) went down. Record the lower baseline, so they can't come back:\n");
             foreach (var problem in down) Console.WriteLine(problem.Describe());
             Console.WriteLine();
         }

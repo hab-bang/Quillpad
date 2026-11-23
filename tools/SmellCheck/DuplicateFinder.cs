@@ -10,9 +10,11 @@ namespace SmellCheck;
 
 /// <summary>
 /// Finds code that is the same after names and literals are normalized: whole method bodies,
-/// and runs of statements. Local variables and parameters become v0, v1... in the order they
-/// show up, and every literal becomes the same token. Member and type names stay, so two blocks
-/// only match when they call the same things.
+/// and runs of statements. Variable names become v0, v1... in the order they show up, and every
+/// literal becomes the same token. A variable is a local or parameter of the member, or any other
+/// simple name that starts with a lower-case letter or '_', such as a field or a parameter of the
+/// method the code was copied from. Member, type and method names stay, so two blocks only match
+/// when they call the same things.
 /// </summary>
 public static class DuplicateFinder
 {
@@ -145,7 +147,7 @@ public static class DuplicateFinder
             case SyntaxKind.FalseKeyword:
             case SyntaxKind.NullKeyword:
                 return "#lit";
-            case SyntaxKind.IdentifierToken when locals.Contains(token.ValueText) && IsLocalName(token):
+            case SyntaxKind.IdentifierToken when IsVariable(token, locals):
                 if (!renamed.TryGetValue(token.ValueText, out var name))
                 {
                     name = "#v" + renamed.Count;
@@ -157,19 +159,25 @@ public static class DuplicateFinder
         }
     }
 
-    // A local is used as a simple name, not as the member part of a.b or as a named argument.
-    private static bool IsLocalName(SyntaxToken token) => token.Parent switch
+    private static bool IsVariable(SyntaxToken token, HashSet<string> locals) => token.Parent switch
     {
-        IdentifierNameSyntax name => name.Parent switch
-        {
-            MemberAccessExpressionSyntax access => access.Expression == name,
-            QualifiedNameSyntax or NameColonSyntax => false,
-            _ => true,
-        },
+        IdentifierNameSyntax name => IsSimpleName(name)
+            && (locals.Contains(token.ValueText) || HasVariableStyle(token.ValueText)),
         VariableDeclaratorSyntax or ParameterSyntax or ForEachStatementSyntax
             or CatchDeclarationSyntax or SingleVariableDesignationSyntax => true,
         _ => false,
     };
+
+    // Not the member part of a.b, not a method called by its name, and not a named argument
+    private static bool IsSimpleName(IdentifierNameSyntax name) => name.Parent switch
+    {
+        MemberAccessExpressionSyntax access => access.Expression == name,
+        InvocationExpressionSyntax call => call.Expression != name,
+        QualifiedNameSyntax or AliasQualifiedNameSyntax or NameColonSyntax => false,
+        _ => true,
+    };
+
+    private static bool HasVariableStyle(string name) => name[0] == '_' || char.IsLower(name[0]);
 
     private static HashSet<string> LocalNames(SyntaxNode scope)
     {

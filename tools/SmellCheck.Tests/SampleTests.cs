@@ -99,6 +99,48 @@ public class SampleTests
         Assert.Equal(new[] { "One.cs", "Two.cs" }, findings.Select(f => f.File).OrderBy(f => f));
         Assert.Contains("Two.cs", findings.First(f => f.File == "One.cs").Message);
     }
+
+    [Fact]
+    public void CopyThatStillUsesTheNamesOfItsOldMethodIsFound()
+    {
+        // The pasted block names "items" and "limit", which only the first method declares
+        const string source = """
+            class A
+            {
+                int First(int[] items, int limit)
+                {
+                    int count = 0;
+                    foreach (var item in items) { count += item; if (count > limit) break; }
+                    return count;
+                }
+
+                int Second()
+                {
+                    int count = 0;
+                    foreach (var item in items) { count += item; if (count > limit) break; }
+                    return 0;
+                }
+            }
+            """;
+
+        var findings = DuplicateFinder.Find(new[] { SyntaxHelpers.Parse("A.cs", source) });
+
+        Assert.Equal(new[] { "A.First", "A.Second" }, findings.Select(f => f.Member).OrderBy(m => m));
+    }
+
+    [Fact]
+    public void SameShapeCallingOtherMembersIsNotADuplicate()
+    {
+        const string source = """
+            class A
+            {
+                void First() { var a = Load(); Check(a); Save(a); Log(a); Done(); }
+                void Second() { var a = Load(); Check(a); Save(a); Log(a); Cancel(); }
+            }
+            """;
+
+        Assert.Empty(DuplicateFinder.Find(new[] { SyntaxHelpers.Parse("A.cs", source) }));
+    }
 }
 
 internal static class Samples

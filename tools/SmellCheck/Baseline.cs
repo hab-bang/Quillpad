@@ -52,8 +52,8 @@ public sealed record Problem(ProblemKind Kind, string File, string Check, int Al
             $"{File}: grew from {Allowed} to {Now} lines. Files over 500 lines may not grow.",
         ProblemKind.WentUp => $"{File}: {Check} went up from {Allowed} to {Now}.",
         ProblemKind.WentDown when Check == Checks.FileLength =>
-            $"{File}: went down from {Allowed} to {Now} lines. Good. Record the lower baseline.",
-        _ => $"{File}: {Check} went down from {Allowed} to {Now}. Good. Record the lower baseline.",
+            $"{File}: went down from {Allowed} to {Now} lines.",
+        _ => $"{File}: {Check} went down from {Allowed} to {Now}.",
     };
 }
 
