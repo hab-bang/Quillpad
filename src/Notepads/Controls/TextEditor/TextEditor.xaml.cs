@@ -942,6 +942,27 @@
             TextEditorCore.Document.Selection.SetText(TextSetOptions.None, string.Empty);
         }
 
+        public void CopyAsHtmlToWindowsClipboard()
+        {
+            try
+            {
+                var html = Ao3HtmlConverter.ToHtml(GetContentForSharing());
+                var dataPackage = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+
+                // The text is the HTML source, for AO3's HTML editor. The HTML format pastes as formatted text elsewhere.
+                dataPackage.SetText(html.Replace("\n", "\r\n"));
+                dataPackage.SetHtmlFormat(HtmlFormatHelper.CreateHtmlFormat(html));
+
+                Clipboard.SetContentWithOptions(dataPackage, new ClipboardContentOptions() { IsAllowedInHistory = true, IsRoamable = true });
+                Clipboard.Flush();
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_HtmlCopied"), 1500);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(TextEditor)}] Failed to copy as HTML: {ex.Message}");
+            }
+        }
+
         private void CopyTextToWindowsClipboardInternal(bool clearLineSelection)
         {
             try

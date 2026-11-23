@@ -30,6 +30,8 @@ namespace Notepads.Views.MainPage
             MenuSaveButton.Click += async (sender, args) => await SaveAsync(NotepadsCore.GetSelectedTextEditor(), saveAs: false);
             MenuSaveAsButton.Click += async (sender, args) => await SaveAsync(NotepadsCore.GetSelectedTextEditor(), saveAs: true);
             MenuSaveAllButton.Click += async (sender, args) => await SaveAllAsync(NotepadsCore.GetAllTextEditors());
+            MenuCopyAsHtmlButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.CopyAsHtmlToWindowsClipboard();
+            MenuExportAsHtmlButton.Click += async (sender, args) => await ExportAsHtmlAsync(NotepadsCore.GetSelectedTextEditor());
             MenuFindButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: false);
             MenuReplaceButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: true);
             MenuFullScreenButton.Click += (sender, args) => EnterExitFullScreenMode();
@@ -83,6 +85,8 @@ namespace Notepads.Views.MainPage
         private void MainMenuButtonFlyout_Opening(object sender, object e)
         {
             var selectedTextEditor = NotepadsCore.GetSelectedTextEditor();
+
+            MenuCopyAsHtmlButton.IsEnabled = MenuExportAsHtmlButton.IsEnabled = !string.IsNullOrEmpty(selectedTextEditor?.GetText());
 
             if (selectedTextEditor == null)
             {

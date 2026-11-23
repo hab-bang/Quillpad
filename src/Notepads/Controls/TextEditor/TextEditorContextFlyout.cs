@@ -28,6 +28,7 @@ namespace Notepads.Controls.TextEditor
         private MenuFlyoutItem _wordWrap;
         private MenuFlyoutItem _previewToggle;
         private MenuFlyoutItem _share;
+        private MenuFlyoutItem _copyAsHtml;
 
         private MenuFlyout _proofingFlyout;
         private readonly MenuFlyoutSeparator _proofingSeparator = new MenuFlyoutSeparator();
@@ -54,6 +55,7 @@ namespace Notepads.Controls.TextEditor
             Items.Add(WebSearch);
             Items.Add(PreviewToggle);
             Items.Add(Share);
+            Items.Add(CopyAsHtml);
 
             Opening += TextEditorContextFlyout_Opening;
             Closed += TextEditorContextFlyout_Closed;
@@ -137,6 +139,7 @@ namespace Notepads.Controls.TextEditor
             RightToLeftReadingOrder.Visibility = !string.IsNullOrEmpty(_textEditor.GetText()) ? Visibility.Visible : Visibility.Collapsed;
             WebSearch.Visibility = Visibility.Collapsed;
             Share.Text = _resourceLoader.GetString("TextEditor_ContextFlyout_ShareButtonDisplayText");
+            CopyAsHtml.Text = _resourceLoader.GetString("TextEditor_ContextFlyout_CopyAsHtmlButtonDisplayText");
         }
 
         public void PrepareForSelectionMode()
@@ -144,6 +147,7 @@ namespace Notepads.Controls.TextEditor
             RightToLeftReadingOrder.Visibility = !string.IsNullOrEmpty(_textEditor.GetText()) ? Visibility.Visible : Visibility.Collapsed;
             WebSearch.Visibility = Visibility.Visible;
             Share.Text = _resourceLoader.GetString("TextEditor_ContextFlyout_ShareSelectedButtonDisplayText");
+            CopyAsHtml.Text = _resourceLoader.GetString("TextEditor_ContextFlyout_CopySelectionAsHtmlButtonDisplayText");
         }
 
         public MenuFlyoutItem Cut
@@ -301,6 +305,26 @@ namespace Notepads.Controls.TextEditor
                 _webSearch.Click += async (sender, args) => await _textEditorCore.SearchInWebAsync();
 
                 return _webSearch;
+            }
+        }
+
+        public MenuFlyoutItem CopyAsHtml
+        {
+            get
+            {
+                if (_copyAsHtml != null) return _copyAsHtml;
+
+                _copyAsHtml = new MenuFlyoutItem
+                {
+                    Text = _resourceLoader.GetString("TextEditor_ContextFlyout_CopyAsHtmlButtonDisplayText"),
+                    Icon = new FontIcon()
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE943" // Code
+                    }
+                };
+                _copyAsHtml.Click += (sender, args) => _textEditor.CopyAsHtmlToWindowsClipboard();
+                return _copyAsHtml;
             }
         }
 

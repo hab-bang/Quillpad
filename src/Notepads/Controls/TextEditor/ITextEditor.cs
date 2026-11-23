@@ -102,6 +102,9 @@ namespace Notepads.Controls.TextEditor
 
         void CopyTextToWindowsClipboard(TextControlCopyingToClipboardEventArgs args);
 
+        /// <summary>Copies the selection, or the whole text when nothing is selected, as HTML for AO3.</summary>
+        void CopyAsHtmlToWindowsClipboard();
+
         void RevertAllChanges();
 
         bool TryChangeEncoding(Encoding encoding);

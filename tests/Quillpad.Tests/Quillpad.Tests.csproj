@@ -60,6 +60,7 @@
     <Compile Include="$(AppSource)Utilities\NewInstallUtility.cs" Link="Linked\NewInstallUtility.cs" />
     <Compile Include="$(AppSource)Utilities\WordGoalUtility.cs" Link="Linked\WordGoalUtility.cs" />
     <Compile Include="$(AppSource)Utilities\SmartPunctuationUtility.cs" Link="Linked\SmartPunctuationUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\Ao3HtmlConverter.cs" Link="Linked\Ao3HtmlConverter.cs" />
   </ItemGroup>
 
 </Project>

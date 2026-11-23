@@ -155,6 +155,16 @@
                                                     <FontIcon Glyph="&#xEA35;"/>
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_CopyAsHtml" x:Name="MenuCopyAsHtmlButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE943;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_ExportAsHtml" x:Name="MenuExportAsHtmlButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xEDE1;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Find" x:Name="MenuFindButton" Icon="Find">
                                                 <MenuFlyoutItem.KeyboardAccelerators>

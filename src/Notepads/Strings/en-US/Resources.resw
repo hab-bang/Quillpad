@@ -949,4 +949,36 @@
     <value>Type the goal as a number of words, like 3000.</value>
     <comment>TextEditor: notification when the word goal is not a number.</comment>
   </data>
+  <data name="TextEditor_ContextFlyout_CopyAsHtmlButtonDisplayText" xml:space="preserve">
+    <value>Copy as HTML</value>
+    <comment>TextEditor: context menu item that copies the whole text as HTML for AO3.</comment>
+  </data>
+  <data name="TextEditor_ContextFlyout_CopySelectionAsHtmlButtonDisplayText" xml:space="preserve">
+    <value>Copy selection as HTML</value>
+    <comment>TextEditor: context menu item that copies the selected text as HTML for AO3.</comment>
+  </data>
+  <data name="MainMenu_Button_CopyAsHtml.Text" xml:space="preserve">
+    <value>Copy as HTML</value>
+    <comment>MainMenu: button that copies the selection, or the whole file, as HTML for AO3.</comment>
+  </data>
+  <data name="MainMenu_Button_ExportAsHtml.Text" xml:space="preserve">
+    <value>Export as HTML</value>
+    <comment>MainMenu: button that saves the file as an HTML file.</comment>
+  </data>
+  <data name="ExportAsHtml_FileTypeName" xml:space="preserve">
+    <value>HTML file</value>
+    <comment>Export as HTML: name of the file type in the save dialog.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlCopied" xml:space="preserve">
+    <value>Copied as HTML</value>
+    <comment>TextEditor: notification after Copy as HTML.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlExported" xml:space="preserve">
+    <value>Exported as HTML</value>
+    <comment>TextEditor: notification after Export as HTML.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlExportFailed" xml:space="preserve">
+    <value>Could not export as HTML: {0}</value>
+    <comment>TextEditor: notification when Export as HTML fails. {0} is the error message. DO NOT REMOVE it.</comment>
+  </data>
 </root>
