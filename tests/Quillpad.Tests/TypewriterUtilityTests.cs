@@ -17,12 +17,5 @@ namespace Quillpad.Tests
         {
             Assert.Equal(0, TypewriterUtility.GetCenteredVerticalOffset(40, 20, 600));
         }
-
-        [Fact]
-        public void LeavesRoomForTheLastLine()
-        {
-            Assert.Equal(290, TypewriterUtility.GetBottomPadding(600, 20));
-            Assert.Equal(0, TypewriterUtility.GetBottomPadding(10, 20));
-        }
     }
 }

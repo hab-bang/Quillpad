@@ -775,6 +775,11 @@
             SideBySideDiffViewer.Focus();
         }
 
+        public void SetTypewriterMode(bool enabled)
+        {
+            TextEditorCore.IsTypewriterModeEnabled = enabled;
+        }
+
         public void RestoreText(string text)
         {
             if (text == null) return;
