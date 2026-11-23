@@ -58,6 +58,7 @@
                            VerticalAlignment="Center">
                 </TextBlock>
                 <Button x:Name="DismissButton"
+                        x:Uid="DiffViewer_DismissButton"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
                         IsTabStop="False"

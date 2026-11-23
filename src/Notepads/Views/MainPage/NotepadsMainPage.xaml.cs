@@ -26,6 +26,7 @@ namespace Notepads.Views.MainPage
     using Windows.System;
     using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Automation;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Input;
     using Windows.UI.Xaml.Media.Animation;
@@ -129,6 +130,9 @@ namespace Notepads.Views.MainPage
         private void InitializeControls()
         {
             ToolTipService.SetToolTip(ExitCompactOverlayButton, _resourceLoader.GetString("App_ExitCompactOverlayMode_Text"));
+            AutomationProperties.SetName(ExitCompactOverlayButton, _resourceLoader.GetString("App_ExitCompactOverlayMode_Text"));
+            AutomationProperties.SetName(NewSetButton, _resourceLoader.GetString("App_NewTabButton_Name"));
+            AutomationProperties.SetName(TabListButton, _resourceLoader.GetString("App_TabListButton_ToolTip"));
             RootSplitView.PaneOpening += delegate { SettingsFrame.Navigate(typeof(SettingsPage), null, new SuppressNavigationTransitionInfo()); };
             RootSplitView.PaneClosed += delegate { NotepadsCore.FocusOnSelectedTextEditor(); };
             NewSetButton.Click += delegate { NotepadsCore.OpenNewTextEditor(_defaultNewFileName); };
@@ -168,6 +172,7 @@ namespace Notepads.Views.MainPage
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.O, (args) => ShowOutline()),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.O, (args) => ShowWorkspaceFileList()),
                 new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.W, (args) => AppSettingsService.EditorTextWidth = TextWidthUtility.Next(AppSettingsService.EditorTextWidth)),
+                new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F6, (args) => ShowStatusBarMenu()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F11, (args) => EnterExitFullScreenMode()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F12, (args) => EnterExitCompactOverlayMode()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.Escape, (args) => { if (RootSplitView.IsPaneOpen) RootSplitView.IsPaneOpen = false; }),

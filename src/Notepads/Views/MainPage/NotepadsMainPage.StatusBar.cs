@@ -589,6 +589,54 @@ namespace Notepads.Views.MainPage
             }
         }
 
+        /// <summary>
+        /// F6: the status bar items cannot take keyboard focus, so this menu lists them. Picking one opens
+        /// the same menu as a click on it.
+        /// </summary>
+        private void ShowStatusBarMenu()
+        {
+            if (StatusBar == null || NotepadsCore.GetSelectedTextEditor() == null) return;
+
+            var flyout = new MenuFlyout { Placement = FlyoutPlacementMode.TopEdgeAlignedLeft };
+            var presenterStyle = new Style(typeof(MenuFlyoutPresenter));
+            presenterStyle.Setters.Add(new Setter(Control.BorderThicknessProperty, 0));
+            flyout.MenuFlyoutPresenterStyle = presenterStyle;
+            var picked = false;
+
+            void Add(FrameworkElement indicator, string text)
+            {
+                if (indicator.Visibility != Visibility.Visible || string.IsNullOrWhiteSpace(text)) return;
+
+                var item = new MenuFlyoutItem { Text = text };
+                item.Click += (sender, args) =>
+                {
+                    picked = true;
+                    // After this menu has closed, or the two menus fight over the focus
+                    _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => StatusBarComponent_OnTapped(indicator, null));
+                };
+                flyout.Items?.Add(item);
+            }
+
+            Add(FileModificationStateIndicator, ToolTipService.GetToolTip(FileModificationStateIndicator) as string);
+            Add(WorkspaceIndicator, WorkspaceIndicatorText.Text);
+            Add(PathIndicator, PathIndicator.Text);
+            Add(ModificationIndicator, ModificationIndicator.Text);
+            Add(WordCountIndicator, WordCountIndicator.Text);
+            Add(LineColumnIndicator, LineColumnIndicator.Text);
+            Add(FontZoomIndicator, FontZoomIndicator.Text);
+            Add(TextWidthIndicator, TextWidthIndicator.Text);
+            Add(LineEndingIndicator, LineEndingIndicator.Text);
+            Add(EncodingIndicator, EncodingIndicator.Text);
+            Add(ShadowWindowIndicator, ToolTipService.GetToolTip(ShadowWindowIndicator) as string);
+
+            // A picked item opens its own menu, which gives the focus back when it closes
+            flyout.Closed += (sender, args) =>
+            {
+                if (!picked) NotepadsCore.FocusOnSelectedTextEditor();
+            };
+            flyout.ShowAt(StatusBar);
+        }
+
         private void FileModificationStateIndicatorClicked(ITextEditor selectedEditor)
         {
             if (selectedEditor.FileModificationState == FileModificationState.Modified)

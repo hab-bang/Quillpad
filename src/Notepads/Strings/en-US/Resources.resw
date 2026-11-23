@@ -1277,4 +1277,52 @@
     <value>{0} (unsaved)</value>
     <comment>Tab list: a tab with unsaved changes. {0} is the file name. DO NOT REMOVE it.</comment>
   </data>
+  <data name="MainMenu_Button_Name" xml:space="preserve">
+    <value>Menu</value>
+    <comment>Name of the menu button at the top left, for screen readers.</comment>
+  </data>
+  <data name="App_NewTabButton_Name" xml:space="preserve">
+    <value>New tab</value>
+    <comment>Name of the + button that opens a new tab, for screen readers.</comment>
+  </data>
+  <data name="DiffViewer_DismissButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close (Esc)</value>
+    <comment>DiffViewer: tooltip of the button that closes the changes view.</comment>
+  </data>
+  <data name="DiffViewer_DismissButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close</value>
+    <comment>DiffViewer: name of the close button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ToggleReplaceModeButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Toggle Replace Mode</value>
+    <comment>FindAndReplace: name of the button that shows or hides the replace bar, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchOptionButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search options</value>
+    <comment>FindAndReplace: name of the search options button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchBackwardButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find Previous</value>
+    <comment>FindAndReplace: name of the Find Previous button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchForwardButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find Next</value>
+    <comment>FindAndReplace: name of the Find Next button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_DismissButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close</value>
+    <comment>FindAndReplace and GoTo: name of the close button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ReplaceButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Replace</value>
+    <comment>FindAndReplace: name of the Replace button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ReplaceAllButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Replace All</value>
+    <comment>FindAndReplace: name of the Replace All button, for screen readers.</comment>
+  </data>
+  <data name="GoTo_SearchButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Go to line</value>
+    <comment>GoTo: name of the Go button, for screen readers.</comment>
+  </data>
 </root>

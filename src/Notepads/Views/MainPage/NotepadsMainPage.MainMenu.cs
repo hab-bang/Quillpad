@@ -23,6 +23,7 @@ namespace Notepads.Views.MainPage
         {
             MainMenuButton.Click += (sender, args) => ShowMainMenu();
             ToolTipService.SetToolTip(MainMenuButton, _resourceLoader.GetString("MainMenu_Button_ToolTip"));
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(MainMenuButton, _resourceLoader.GetString("MainMenu_Button_Name"));
 
             MenuCreateNewButton.Click += (sender, args) => NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
             MenuCreateNewWindowButton.Click += async (sender, args) => await OpenNewAppInstanceAsync();
