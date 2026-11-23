@@ -72,7 +72,7 @@ namespace Notepads.Services
                     {
                         if (!response.IsSuccessStatusCode)
                         {
-                            return Failed($"GitHub answered {(int)response.StatusCode} {response.ReasonPhrase}");
+                            return Failed(string.Format(GetString("UpdateService_Error_GitHubAnswer"), (int)response.StatusCode, response.ReasonPhrase));
                         }
 
                         return ParseRelease(await response.Content.ReadAsStringAsync());
@@ -154,7 +154,7 @@ namespace Notepads.Services
 
             if (!Version.TryParse(tag.TrimStart('v'), out Version latest))
             {
-                return Failed($"The latest release has an unexpected tag: {tag}");
+                return Failed(string.Format(GetString("UpdateService_Error_UnexpectedTag"), tag));
             }
 
             // Tags are v1.2.3 and packages 1.2.3.0, so pad the tag to compare the two
@@ -177,6 +177,12 @@ namespace Notepads.Services
             }
 
             return result;
+        }
+
+        // The check can run off the UI thread, so the strings are not tied to a window
+        private static string GetString(string name)
+        {
+            return Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse().GetString(name);
         }
 
         private static UpdateCheckResult Failed(string error)

@@ -99,7 +99,8 @@
                 FileType = FileTypeUtility.GetFileTypeByFileName(EditingFile.Name);
             }
 
-            TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile;
+            TextEditorCore.FileType = FileType;
+            TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile && AppSettingsService.IsMarkdownLiveStylingEnabled;
 
             // Hide content preview if current file type is not supported for previewing
             if (!FileTypeUtility.IsPreviewSupported(FileType))
@@ -176,7 +177,8 @@
 
         private SearchContext _lastSearchContext = new SearchContext(string.Empty);
 
-        private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk
+        private string _diffFileOnDiskText; // Left side of the diff when it compares with the file on disk or a snapshot
+        private string _diffLeftHeader;
 
         private bool _editingLocked;
 
@@ -205,6 +207,23 @@
             set => TextEditorCore.DisplayLineHighlighter = value;
         }
 
+        public int? WordGoal { get; set; }
+
+        // The text when the tab was first shown, until its words are counted (see GetWordCountAtFirstOpen)
+        private string _textAtFirstOpen;
+        private int? _wordCountAtFirstOpen;
+
+        public int GetWordCountAtFirstOpen()
+        {
+            if (!_wordCountAtFirstOpen.HasValue)
+            {
+                _wordCountAtFirstOpen = WordCountUtility.Count(_textAtFirstOpen ?? GetText()).Words;
+                _textAtFirstOpen = null;
+            }
+
+            return _wordCountAtFirstOpen.Value;
+        }
+
         public TextEditor()
         {
             InitializeComponent();
@@ -220,6 +239,7 @@
             _keyboardCommandHandler = GetKeyboardCommandHandler();
 
             ThemeSettingsService.OnThemeChanged += ThemeSettingsService_OnThemeChanged;
+            AppSettingsService.OnMarkdownLiveStylingChanged += AppSettingsService_OnMarkdownLiveStylingChanged;
 
             HookTextWidthEvents();
 
@@ -252,6 +272,7 @@
             }
 
             ThemeSettingsService.OnThemeChanged -= ThemeSettingsService_OnThemeChanged;
+            AppSettingsService.OnMarkdownLiveStylingChanged -= AppSettingsService_OnMarkdownLiveStylingChanged;
 
             UnhookTextWidthEvents();
 
@@ -314,6 +335,14 @@
             });
         }
 
+        private async void AppSettingsService_OnMarkdownLiveStylingChanged(object sender, bool enabled)
+        {
+            await Dispatcher.CallOnUIThreadAsync(() =>
+            {
+                TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile && enabled;
+            });
+        }
+
         public async Task RenameAsync(string newFileName)
         {
             if (EditingFile == null)
@@ -357,7 +386,8 @@
                 ScrollViewerVerticalOffset = verticalOffset,
                 FontZoomFactor = TextEditorCore.GetFontZoomFactor() / 100,
                 IsContentPreviewPanelOpened = _isContentPreviewPanelOpened,
-                IsInDiffPreviewMode = (Mode == TextEditorMode.DiffPreview)
+                IsInDiffPreviewMode = (Mode == TextEditorMode.DiffPreview),
+                WordGoal = WordGoal,
             };
 
             if (RequestedEncoding != null)
@@ -375,6 +405,10 @@
 
         private void TextEditor_Loaded(object sender, RoutedEventArgs e)
         {
+            // Restored text is in place by now, and the user cannot have typed in a tab never shown.
+            // Only the reference is kept, so the words are counted once, when the status bar asks.
+            if (_textAtFirstOpen == null && !_wordCountAtFirstOpen.HasValue) _textAtFirstOpen = GetText();
+
             Loaded?.Invoke(this, e);
 
             StartCheckingFileStatusPeriodically();
@@ -547,6 +581,12 @@
                     return false;
                 }
 
+                // The text the reload replaces may be the only copy of it
+                if (!string.Equals(textBeforeRead, LineEndingUtility.ApplyLineEnding(textFile.Content, LineEnding.Cr), StringComparison.Ordinal))
+                {
+                    _ = SnapshotService.TakeSnapshotAsync(EditingFilePath, Id, textBeforeRead, SnapshotKind.BeforeReload);
+                }
+
                 _loaded = false; // Like Init: the new text is not a user edit
                 TextEditorCore.SetText(textFile.Content, keepPosition: true); // A reload should not jump to the top
                 textFile.Content = TextEditorCore.GetText(); // The editor's form of the text, with its line breaks
@@ -607,6 +647,8 @@
             {
                 TextEditorCore.SetText(newText);
             }
+
+            if (metadata.WordGoal > 0) WordGoal = metadata.WordGoal;
 
             TextEditorCore.TextWrapping = metadata.WrapWord ? TextWrapping.Wrap : TextWrapping.NoWrap;
             TextEditorCore.FontSize = metadata.FontZoomFactor * AppSettingsService.EditorFontSize;
@@ -717,12 +759,13 @@
             }
         }
 
-        public void OpenSideBySideDiffViewer(string fileOnDiskText = null)
+        public void OpenSideBySideDiffViewer(string fileOnDiskText = null, string leftHeader = null)
         {
             if (string.Equals(fileOnDiskText ?? LastSavedSnapshot.Content, TextEditorCore.GetText())) return;
             if (Mode == TextEditorMode.DiffPreview) return;
             if (SideBySideDiffViewer == null) LoadSideBySideDiffViewer();
             _diffFileOnDiskText = fileOnDiskText;
+            _diffLeftHeader = leftHeader;
             Mode = TextEditorMode.DiffPreview;
             TextEditorCore.IsEnabled = false;
             EditorRowDefinition.Height = new GridLength(0);
@@ -730,6 +773,19 @@
             SideBySideDiffViewer.Visibility = Visibility.Visible;
             RenderDiff(ThemeSettingsService.ThemeMode);
             SideBySideDiffViewer.Focus();
+        }
+
+        public void SetTypewriterMode(bool enabled)
+        {
+            TextEditorCore.IsTypewriterModeEnabled = enabled;
+        }
+
+        public void RestoreText(string text)
+        {
+            if (text == null) return;
+            CloseSideBySideDiffViewer();
+            if (!TextEditorCore.IsEnabled) return;
+            TextEditorCore.ReplaceAllTextAsEdit(text);
         }
 
         public void SetEditingLocked(bool locked)
@@ -758,7 +814,7 @@
             else
             {
                 SideBySideDiffViewer.RenderDiff(_diffFileOnDiskText, TextEditorCore.GetText(), theme,
-                    _resourceLoader.GetString("DiffViewer_Header_FileOnDisk"));
+                    _diffLeftHeader ?? _resourceLoader.GetString("DiffViewer_Header_FileOnDisk"));
             }
         }
 
@@ -905,6 +961,27 @@
 
             CopyTextToWindowsClipboardInternal(false);
             TextEditorCore.Document.Selection.SetText(TextSetOptions.None, string.Empty);
+        }
+
+        public void CopyAsHtmlToWindowsClipboard()
+        {
+            try
+            {
+                var html = Ao3HtmlConverter.ToHtml(GetContentForSharing());
+                var dataPackage = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+
+                // The text is the HTML source, for AO3's HTML editor. The HTML format pastes as formatted text elsewhere.
+                dataPackage.SetText(html.Replace("\n", "\r\n"));
+                dataPackage.SetHtmlFormat(HtmlFormatHelper.CreateHtmlFormat(html));
+
+                Clipboard.SetContentWithOptions(dataPackage, new ClipboardContentOptions() { IsAllowedInHistory = true, IsRoamable = true });
+                Clipboard.Flush();
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_HtmlCopied"), 1500);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(TextEditor)}] Failed to copy as HTML: {ex.Message}");
+            }
         }
 
         private void CopyTextToWindowsClipboardInternal(bool clearLineSelection)
@@ -1055,6 +1132,12 @@
             TextChanging?.Invoke(this, EventArgs.Empty);
 
             GoToPlaceholder?.Dismiss();
+
+            // The count is out of date now. It comes back with the next search.
+            if (FindAndReplacePlaceholder?.Visibility == Visibility.Visible && FindAndReplacePlaceholder.Content is FindAndReplaceControl findAndReplaceControl)
+            {
+                findAndReplaceControl.SetMatchCount(string.Empty);
+            }
         }
 
         private void TextEditorCore_CopyTextToWindowsClipboardRequested(object sender, TextControlCopyingToClipboardEventArgs e)
@@ -1160,11 +1243,21 @@
                             out regexError);
                     break;
                 case FindAndReplaceMode.ReplaceAll:
+                    var textBeforeReplaceAll = TextEditorCore.GetText();
                     found = TextEditorCore.TryFindAndReplaceAll(
                         findAndReplaceEventArgs.SearchContext,
                         findAndReplaceEventArgs.ReplaceText,
                         out regexError);
+                    if (found)
+                    {
+                        _ = SnapshotService.TakeSnapshotAsync(EditingFilePath, Id, textBeforeReplaceAll, SnapshotKind.BeforeReplaceAll);
+                    }
                     break;
+            }
+
+            if (FindAndReplacePlaceholder?.Visibility == Visibility.Visible)
+            {
+                UpdateMatchCount(findAndReplaceEventArgs.SearchContext);
             }
 
             if (!found)
@@ -1178,6 +1271,57 @@
                     NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("FindAndReplace_NotificationMsg_NotFound"), 1500);
                 }
             }
+        }
+
+        private DispatcherTimer _matchCountTimer;
+        private SearchContext _matchCountSearchContext;
+
+        // Counting reads the whole text, so it waits until typing in the find bar pauses
+        private void FindAndReplaceControl_OnSearchContextChanged(object sender, SearchContext searchContext)
+        {
+            _matchCountSearchContext = searchContext;
+
+            if (_matchCountTimer == null)
+            {
+                _matchCountTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+                _matchCountTimer.Tick += (s, args) =>
+                {
+                    _matchCountTimer.Stop();
+                    UpdateMatchCount(_matchCountSearchContext);
+                };
+            }
+
+            _matchCountTimer.Stop();
+            _matchCountTimer.Start();
+        }
+
+        private void UpdateMatchCount(SearchContext searchContext)
+        {
+            if (!(FindAndReplacePlaceholder?.Content is FindAndReplaceControl findAndReplaceControl)) return;
+
+            if (searchContext == null || string.IsNullOrEmpty(searchContext.SearchText))
+            {
+                findAndReplaceControl.SetMatchCount(string.Empty);
+                return;
+            }
+
+            string text;
+
+            try
+            {
+                TextEditorCore.GetTextSelectionPosition(out var start, out var end);
+                var count = FindReplaceUtility.CountMatches(TextEditorCore.GetText(), searchContext, start, end - start, out var current);
+
+                text = count == 0 ? _resourceLoader.GetString("FindAndReplace_MatchCount_None")
+                    : current > 0 ? string.Format(_resourceLoader.GetString("FindAndReplace_MatchCount_Current"), current, count)
+                    : string.Format(_resourceLoader.GetString(count == 1 ? "FindAndReplace_MatchCount_One" : "FindAndReplace_MatchCount_Many"), count);
+            }
+            catch (Exception)
+            {
+                text = string.Empty; // A regex that is not finished yet, or too slow
+            }
+
+            findAndReplaceControl.SetMatchCount(text);
         }
 
         private void FindAndReplacePlaceholder_Closed(object sender, InAppNotificationClosedEventArgs e)
@@ -1212,6 +1356,26 @@
             GetLineColumnSelection(out var startLine, out _, out _, out _, out _, out var lineCount);
             goToControl.SetLineData(startLine, lineCount);
             goToControl.Focus();
+        }
+
+        public void GoToLine(int lineNumber)
+        {
+            // A tab that was just opened is not shown yet. Moving the caret before it has a width is slow, see SetTextSelectionPosition.
+            if (!TextEditorCore.IsLoaded)
+            {
+                RoutedEventHandler onLoaded = null;
+                onLoaded = (sender, args) =>
+                {
+                    TextEditorCore.Loaded -= onLoaded;
+                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => GoToLine(lineNumber));
+                };
+                TextEditorCore.Loaded += onLoaded;
+                return;
+            }
+
+            if (!TextEditorCore.IsEnabled || Mode != TextEditorMode.Editing) return;
+            HideGoToControl();
+            if (TextEditorCore.GoTo(lineNumber)) TextEditorCore.Focus(FocusState.Programmatic);
         }
 
         public void HideGoToControl()

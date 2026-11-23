@@ -21,7 +21,9 @@ namespace Notepads.Views.MainPage
     {
         private void InitializeMainMenu()
         {
-            MainMenuButton.Click += (sender, args) => FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+            MainMenuButton.Click += (sender, args) => ShowMainMenu();
+            ToolTipService.SetToolTip(MainMenuButton, _resourceLoader.GetString("MainMenu_Button_ToolTip"));
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(MainMenuButton, _resourceLoader.GetString("MainMenu_Button_Name"));
 
             MenuCreateNewButton.Click += (sender, args) => NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
             MenuCreateNewWindowButton.Click += async (sender, args) => await OpenNewAppInstanceAsync();
@@ -29,6 +31,11 @@ namespace Notepads.Views.MainPage
             MenuSaveButton.Click += async (sender, args) => await SaveAsync(NotepadsCore.GetSelectedTextEditor(), saveAs: false);
             MenuSaveAsButton.Click += async (sender, args) => await SaveAsync(NotepadsCore.GetSelectedTextEditor(), saveAs: true);
             MenuSaveAllButton.Click += async (sender, args) => await SaveAllAsync(NotepadsCore.GetAllTextEditors());
+            MenuCopyAsHtmlButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.CopyAsHtmlToWindowsClipboard();
+            MenuExportAsHtmlButton.Click += async (sender, args) => await ExportAsHtmlAsync(NotepadsCore.GetSelectedTextEditor());
+            MenuOutlineButton.Click += (sender, args) => ShowOutline();
+            MenuFindInFolderButton.Click += async (sender, args) => await ShowFolderSearchAsync();
+            MenuOpenFileFromFolderButton.Click += async (sender, args) => await ShowWorkspaceFileListAsync();
             MenuFindButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: false);
             MenuReplaceButton.Click += (sender, args) => NotepadsCore.GetSelectedTextEditor()?.ShowFindAndReplaceControl(showReplaceBar: true);
             MenuFullScreenButton.Click += (sender, args) => EnterExitFullScreenMode();
@@ -36,6 +43,9 @@ namespace Notepads.Views.MainPage
             MenuPrintButton.Click += async (sender, args) => await PrintAsync(NotepadsCore.GetSelectedTextEditor());
             MenuPrintAllButton.Click += async (sender, args) => await PrintAllAsync(NotepadsCore.GetAllTextEditors());
             MenuSettingsButton.Click += (sender, args) => RootSplitView.IsPaneOpen = true;
+            MenuReopenClosedTabButton.Click += async (sender, args) => await ReopenClosedTabAsync();
+            MenuKeyboardShortcutsButton.Click += async (sender, args) => await ShowKeyboardShortcutsAsync();
+            MenuTypewriterModeButton.Click += (sender, args) => SetTypewriterMode(MenuTypewriterModeButton.IsChecked);
 
             if (!App.IsPrimaryInstance)
             {
@@ -66,6 +76,24 @@ namespace Notepads.Views.MainPage
             MainMenuButtonFlyout.Opening += MainMenuButtonFlyout_Opening;
         }
 
+        private bool _isTypewriterModeEnabled;
+
+        // For this window, until it closes
+        private void SetTypewriterMode(bool enabled)
+        {
+            _isTypewriterModeEnabled = enabled;
+            foreach (var textEditor in NotepadsCore.GetAllTextEditors())
+            {
+                textEditor.SetTypewriterMode(enabled);
+            }
+        }
+
+        // Alt+F, like the File menu of other apps
+        private void ShowMainMenu()
+        {
+            FlyoutBase.ShowAttachedFlyout(MainMenuButton);
+        }
+
         // Undoes what InitializeMainMenu does for a second window, once this window is the main window
         private void UpdateMainMenuForPrimaryInstance()
         {
@@ -77,12 +105,15 @@ namespace Notepads.Views.MainPage
         {
             var selectedTextEditor = NotepadsCore.GetSelectedTextEditor();
 
+            MenuCopyAsHtmlButton.IsEnabled = MenuExportAsHtmlButton.IsEnabled = !string.IsNullOrEmpty(selectedTextEditor?.GetText());
+
             if (selectedTextEditor == null)
             {
                 MenuSaveButton.IsEnabled = false;
                 MenuSaveAsButton.IsEnabled = false;
                 MenuFindButton.IsEnabled = false;
                 MenuReplaceButton.IsEnabled = false;
+                MenuOutlineButton.IsEnabled = false;
                 MenuPrintButton.IsEnabled = false;
                 MenuPrintAllButton.IsEnabled = false;
             }
@@ -92,6 +123,7 @@ namespace Notepads.Views.MainPage
                 MenuSaveAsButton.IsEnabled = true;
                 MenuFindButton.IsEnabled = false;
                 MenuReplaceButton.IsEnabled = false;
+                MenuOutlineButton.IsEnabled = false;
             }
             else
             {
@@ -99,6 +131,7 @@ namespace Notepads.Views.MainPage
                 MenuSaveAsButton.IsEnabled = true;
                 MenuFindButton.IsEnabled = true;
                 MenuReplaceButton.IsEnabled = true;
+                MenuOutlineButton.IsEnabled = true;
 
                 if (PrintManager.IsSupported())
                 {
@@ -116,7 +149,11 @@ namespace Notepads.Views.MainPage
                     ? "App_ExitCompactOverlayMode_Text"
                     : "App_EnterCompactOverlayMode_Text");
             MenuSaveAllButton.IsEnabled = NotepadsCore.HaveUnsavedTextEditor();
+            MenuReopenClosedTabButton.IsEnabled = _closedTabs.Count > 0;
+            MenuTypewriterModeButton.IsChecked = _isTypewriterModeEnabled;
             MenuCloseFolderButton.Visibility = Workspace.Folder != null ? Visibility.Visible : Visibility.Collapsed;
+            MenuOpenFileFromFolderButton.Visibility = MenuCloseFolderButton.Visibility;
+            MenuFindInFolderButton.Visibility = MenuCloseFolderButton.Visibility;
         }
 
         private async Task BuildOpenRecentButtonSubItemsAsync()

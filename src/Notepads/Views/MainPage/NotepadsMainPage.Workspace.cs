@@ -7,6 +7,7 @@ namespace Notepads.Views.MainPage
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Windows.Storage;
@@ -262,6 +263,12 @@ namespace Notepads.Views.MainPage
 
         private async void WorkspaceIndicatorOpenFile_OnClick(object sender, RoutedEventArgs e)
         {
+            await ShowWorkspaceFileListAsync();
+        }
+
+        // Also Ctrl+Shift+O
+        private async Task ShowWorkspaceFileListAsync()
+        {
             var folder = Workspace.Folder;
             if (folder == null) return;
 
@@ -277,6 +284,78 @@ namespace Notepads.Views.MainPage
             {
                 NotepadsCore.FocusOnSelectedTextEditor();
             }
+        }
+
+        private async void WorkspaceIndicatorFindInFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            await ShowFolderSearchAsync();
+        }
+
+        private async Task ShowFolderSearchAsync()
+        {
+            var folder = Workspace.Folder;
+            if (folder == null)
+            {
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("Workspace_NotificationMsg_NoFolderOpen"), 2500);
+                return;
+            }
+
+            var dialog = new FolderSearchDialog(folder.Name, query => SearchFolderAsync(folder, query));
+            await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+
+            var result = dialog.SelectedResult;
+            if (result == null)
+            {
+                if (!dialog.IsAborted) NotepadsCore.FocusOnSelectedTextEditor();
+                return;
+            }
+
+            var textEditor = NotepadsCore.GetTextEditor(result.File);
+            if (textEditor != null)
+            {
+                NotepadsCore.SwitchTo(textEditor);
+            }
+            else if (await OpenFileAsync(result.File))
+            {
+                textEditor = NotepadsCore.GetTextEditor(result.File);
+            }
+
+            textEditor?.GoToLine(result.Match.Line);
+        }
+
+        // Open tabs are searched as they are now, with their unsaved changes. Other files are read from disk.
+        private async Task<IReadOnlyList<FolderSearchResult>> SearchFolderAsync(StorageFolder folder, string query)
+        {
+            var results = new List<FolderSearchResult>();
+
+            foreach (var file in await WorkspaceUtility.GetFilesAsync(folder))
+            {
+                var extension = Path.GetExtension(file.RelativePath).ToLowerInvariant();
+                if (!FileExtensionProvider.AllSupportedFileExtensions.Contains(extension)) continue;
+
+                var text = NotepadsCore.GetTextEditor(file.File)?.GetText();
+                if (text == null)
+                {
+                    try
+                    {
+                        text = (await FileSystemUtility.ReadFileAsync(file.File, ignoreFileSizeLimit: false)).Content;
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.LogInfo($"[{nameof(NotepadsMainPage)}] Find in Folder skipped a file: {ex.Message}", consoleOnly: true);
+                        continue;
+                    }
+                }
+
+                foreach (var match in FolderSearchUtility.FindInText(text, query, matchCase: false, FolderSearchDialog.MaxResults - results.Count))
+                {
+                    results.Add(new FolderSearchResult(file.File, file.RelativePath, match));
+                }
+
+                if (results.Count >= FolderSearchDialog.MaxResults) break;
+            }
+
+            return results;
         }
 
         private async void WorkspaceIndicatorOpenInFileExplorer_OnClick(object sender, RoutedEventArgs e)

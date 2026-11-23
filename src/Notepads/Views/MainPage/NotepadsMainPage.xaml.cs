@@ -26,6 +26,7 @@ namespace Notepads.Views.MainPage
     using Windows.System;
     using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Automation;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Input;
     using Windows.UI.Xaml.Media.Animation;
@@ -129,9 +130,15 @@ namespace Notepads.Views.MainPage
         private void InitializeControls()
         {
             ToolTipService.SetToolTip(ExitCompactOverlayButton, _resourceLoader.GetString("App_ExitCompactOverlayMode_Text"));
+            AutomationProperties.SetName(ExitCompactOverlayButton, _resourceLoader.GetString("App_ExitCompactOverlayMode_Text"));
+            AutomationProperties.SetName(NewSetButton, _resourceLoader.GetString("App_NewTabButton_Name"));
+            AutomationProperties.SetName(TabListButton, _resourceLoader.GetString("App_TabListButton_ToolTip"));
             RootSplitView.PaneOpening += delegate { SettingsFrame.Navigate(typeof(SettingsPage), null, new SuppressNavigationTransitionInfo()); };
             RootSplitView.PaneClosed += delegate { NotepadsCore.FocusOnSelectedTextEditor(); };
             NewSetButton.Click += delegate { NotepadsCore.OpenNewTextEditor(_defaultNewFileName); };
+            TabListButton.Click += (sender, args) => ShowTabList();
+            ToolTipService.SetToolTip(TabListButton, _resourceLoader.GetString("App_TabListButton_ToolTip"));
+            ToolTipService.SetToolTip(NewSetButton, _resourceLoader.GetString("App_NewTabButton_ToolTip"));
         }
 
         private void InitializeKeyboardShortcuts()
@@ -150,6 +157,8 @@ namespace Notepads.Views.MainPage
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.P, async (args) => await PrintAllAsync(NotepadsCore.GetAllTextEditors())),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.R, (args) => ReloadFileFromDiskAsync(this, new RoutedEventArgs())),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.N, async (args) => await OpenNewAppInstanceAsync()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.T, async (args) => await ReopenClosedTabAsync()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, (VirtualKey)191, async (args) => await ShowKeyboardShortcutsAsync()), // (VirtualKey)191: /
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number1, (args) => NotepadsCore.SwitchTo(0)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number2, (args) => NotepadsCore.SwitchTo(1)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number3, (args) => NotepadsCore.SwitchTo(2)),
@@ -159,6 +168,11 @@ namespace Notepads.Views.MainPage
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number7, (args) => NotepadsCore.SwitchTo(6)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number8, (args) => NotepadsCore.SwitchTo(7)),
                 new KeyboardCommand<KeyRoutedEventArgs>(true, false, false, VirtualKey.Number9, (args) => NotepadsCore.SwitchTo(8)),
+                new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.F, (args) => ShowMainMenu()),
+                new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.O, (args) => ShowOutline()),
+                new KeyboardCommand<KeyRoutedEventArgs>(true, false, true, VirtualKey.O, (args) => ShowWorkspaceFileList()),
+                new KeyboardCommand<KeyRoutedEventArgs>(false, true, false, VirtualKey.W, (args) => AppSettingsService.EditorTextWidth = TextWidthUtility.Next(AppSettingsService.EditorTextWidth)),
+                new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F6, (args) => ShowStatusBarMenu()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F11, (args) => EnterExitFullScreenMode()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.F12, (args) => EnterExitCompactOverlayMode()),
                 new KeyboardCommand<KeyRoutedEventArgs>(VirtualKey.Escape, (args) => { if (RootSplitView.IsPaneOpen) RootSplitView.IsPaneOpen = false; }),
@@ -659,6 +673,9 @@ namespace Notepads.Views.MainPage
                 SetupStatusBar(textEditor);
                 NotepadsCore.FocusOnSelectedTextEditor();
             }
+
+            _ = LoadWordGoalAsync(textEditor);
+            textEditor.SetTypewriterMode(_isTypewriterModeEnabled);
         }
 
         private async void OnTextEditorUnloaded(object sender, ITextEditor textEditor)
@@ -806,7 +823,7 @@ namespace Notepads.Views.MainPage
             }
             else if (!textEditor.IsModified)
             {
-                NotepadsCore.DeleteTextEditor(textEditor);
+                DeleteTextEditorAndRemember(textEditor);
             }
             else // Remind user to save uncommitted changes
             {
@@ -817,14 +834,14 @@ namespace Notepads.Views.MainPage
                     {
                         if (NotepadsCore.GetAllTextEditors().Contains(textEditor) && await SaveAsync(textEditor, saveAs: false))
                         {
-                            NotepadsCore.DeleteTextEditor(textEditor);
+                            DeleteTextEditorAndRemember(textEditor);
                         }
                     },
                     skipSavingAction: () =>
                     {
                         if (NotepadsCore.GetAllTextEditors().Contains(textEditor))
                         {
-                            NotepadsCore.DeleteTextEditor(textEditor);
+                            DeleteTextEditorAndRemember(textEditor);
                         }
                     });
 
@@ -843,6 +860,39 @@ namespace Notepads.Views.MainPage
                     NotepadsCore.FocusOnSelectedTextEditor();
                 }
             }
+        }
+
+        private readonly ClosedTabHistory<StorageFile> _closedTabs = new ClosedTabHistory<StorageFile>(20, file => file.Path);
+
+        // Tabs the user closed, so Ctrl+Shift+T can bring their files back. Untitled tabs have nothing to reopen.
+        private void DeleteTextEditorAndRemember(ITextEditor textEditor)
+        {
+            if (textEditor.EditingFile != null) _closedTabs.Push(textEditor.EditingFile);
+            NotepadsCore.DeleteTextEditor(textEditor);
+        }
+
+        private async Task ReopenClosedTabAsync()
+        {
+            while (_closedTabs.TryPop(out var file))
+            {
+                var openEditor = NotepadsCore.GetTextEditor(file);
+                if (openEditor != null)
+                {
+                    NotepadsCore.SwitchTo(openEditor);
+                    return;
+                }
+
+                if (await FileSystemUtility.FileExistsAsync(file) && await OpenFileAsync(file)) return;
+            }
+
+            NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_NoClosedTab"), 1500);
+        }
+
+        private async Task ShowKeyboardShortcutsAsync()
+        {
+            var dialog = new KeyboardShortcutsDialog();
+            await DialogManager.OpenDialogAsync(dialog, awaitPreviousDialog: false);
+            if (!dialog.IsAborted) NotepadsCore.FocusOnSelectedTextEditor();
         }
 
         private void OnTextEditorKeyDown(object sender, KeyRoutedEventArgs e)

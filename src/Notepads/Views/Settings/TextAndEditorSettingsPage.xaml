@@ -45,6 +45,11 @@
                     <ToggleSwitch x:Uid="/Settings/TextAndEditorPage_SpellingSettings_HighlightMisspelledWordsToggleSwitch"
                                   Style="{StaticResource CustomToggleSwitchStyle}" 
                                   x:Name="HighlightMisspelledWordsToggle"/>
+                    <ToggleSwitch x:Uid="/Settings/TextAndEditorPage_SmartPunctuationSettings_ToggleSwitch"
+                                  Style="{StaticResource CustomToggleSwitchStyle}"
+                                  x:Name="SmartPunctuationToggle"
+                                  Margin="0,10,0,0"/>
+                    <TextBlock x:Uid="/Settings/TextAndEditorPage_SmartPunctuationSettings_Description" Style="{ThemeResource DescriptionTextBlockStyle}" Margin="0,8,0,0"/>
                 </StackPanel>
                 <TextBlock
                     x:Uid="/Settings/TextAndEditorPage_DisplaySettings_Title"
@@ -60,6 +65,21 @@
                                   Style="{StaticResource CustomToggleSwitchStyle}" 
                                   x:Name="LineNumbersToggle"/>
                     <TextBlock x:Uid="/Settings/TextAndEditorPage_LineNumbersSettings_Description" Style="{ThemeResource DescriptionTextBlockStyle}" Margin="0,8,0,0"/>
+                    <ToggleSwitch x:Uid="/Settings/TextAndEditorPage_MarkdownLiveStylingSettings_ToggleSwitch"
+                                  Style="{StaticResource CustomToggleSwitchStyle}"
+                                  x:Name="MarkdownLiveStylingToggle"
+                                  Margin="0,10,0,0"/>
+                    <TextBlock x:Uid="/Settings/TextAndEditorPage_MarkdownLiveStylingSettings_Description" Style="{ThemeResource DescriptionTextBlockStyle}" Margin="0,8,0,0"/>
+                    <TextBlock x:Uid="/Settings/TextAndEditorPage_TextWidthSettings_Label" Margin="0,14,0,0"/>
+                    <ComboBox x:Name="TextWidthPicker"
+                              x:Uid="/Settings/TextAndEditorPage_TextWidthSettings_ComboBox"
+                              Margin="0,8,0,0"
+                              VerticalAlignment="Center"
+                              BorderThickness="1"
+                              Height="36"
+                              MinWidth="140"
+                              Background="Transparent"/>
+                    <TextBlock x:Uid="/Settings/TextAndEditorPage_TextWidthSettings_Description" Style="{ThemeResource DescriptionTextBlockStyle}" Margin="0,8,0,0"/>
                 </StackPanel>
                 <TextBlock
                     x:Uid="/Settings/TextAndEditorPage_FontSettings_Title"
@@ -92,6 +112,15 @@
                               MinWidth="70"
                               Background="Transparent">
                     </ComboBox>
+                    <TextBlock x:Uid="/Settings/TextAndEditorPage_LineHeightSettings_Label" Margin="0,14,0,0"/>
+                    <ComboBox x:Name="LineHeightPicker"
+                              x:Uid="/Settings/TextAndEditorPage_LineHeightSettings_ComboBox"
+                              Margin="0,8,0,0"
+                              VerticalAlignment="Center"
+                              BorderThickness="1"
+                              Height="36"
+                              MinWidth="70"
+                              Background="Transparent"/>
                 </StackPanel>
                 <TextBlock
                     x:Uid="/Settings/TextAndEditorPage_FontStyleSettings_Title"

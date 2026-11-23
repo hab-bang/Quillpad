@@ -24,6 +24,7 @@ namespace Notepads.Controls.TextEditor
             AppSettingsService.OnHighlightMisspelledWordsChanged += EditorSettingsService_OnHighlightMisspelledWordsChanged;
             AppSettingsService.OnDefaultDisplayLineNumbersViewStateChanged += EditorSettingsService_OnDefaultDisplayLineNumbersViewStateChanged;
             AppSettingsService.OnDefaultLineHighlighterViewStateChanged += EditorSettingsService_OnDefaultLineHighlighterViewStateChanged;
+            AppSettingsService.OnLineHeightChanged += EditorSettingsService_OnLineHeightChanged;
 
             ThemeSettingsService.OnAccentColorChanged += ThemeSettingsService_OnAccentColorChanged;
         }
@@ -38,8 +39,20 @@ namespace Notepads.Controls.TextEditor
             AppSettingsService.OnHighlightMisspelledWordsChanged -= EditorSettingsService_OnHighlightMisspelledWordsChanged;
             AppSettingsService.OnDefaultDisplayLineNumbersViewStateChanged -= EditorSettingsService_OnDefaultDisplayLineNumbersViewStateChanged;
             AppSettingsService.OnDefaultLineHighlighterViewStateChanged -= EditorSettingsService_OnDefaultLineHighlighterViewStateChanged;
+            AppSettingsService.OnLineHeightChanged -= EditorSettingsService_OnLineHeightChanged;
 
             ThemeSettingsService.OnAccentColorChanged -= ThemeSettingsService_OnAccentColorChanged;
+        }
+
+        private async void EditorSettingsService_OnLineHeightChanged(object sender, double lineHeight)
+        {
+            await Dispatcher.CallOnUIThreadAsync(() =>
+            {
+                SetDefaultTabStopAndLineSpacing(FontFamily, FontSize);
+                ApplyLineSpacingToRtfParagraphs(FontSize);
+                UpdateLineHighlighterAndIndicator();
+                UpdateLineNumbersRendering();
+            });
         }
 
         private async void EditorSettingsService_OnFontFamilyChanged(object sender, string fontFamily)

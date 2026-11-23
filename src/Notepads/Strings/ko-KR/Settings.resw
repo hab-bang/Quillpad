@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>Jackie (Jiaqi) Liu 가 제작한 무료 오픈소스 텍스트 에디터</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad는 Jackie (Jiaqi) Liu가 설계하고 구현한 무료 오픈소스 텍스트 에디터 Notepads의 개인 포크입니다:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>문제 보고와 기능 추가 요청하기:</value>

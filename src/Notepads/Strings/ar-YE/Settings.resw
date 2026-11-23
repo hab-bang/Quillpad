@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>محرر نص مجاني ومفتوح المصدر من تصميم وتنفيذ Jackie (Jiaqi) Liu</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad نسخة شخصية مشتقة من Notepads، محرر النصوص المجاني ومفتوح المصدر من تصميم وتنفيذ Jackie (Jiaqi) Liu:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>للتبليغ عن مشكلة و طلب ميزة:</value>

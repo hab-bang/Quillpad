@@ -54,4 +54,18 @@
     <Compile Include="$(AppSource)Utilities\WorkspaceFolderLock.cs" Link="Linked\WorkspaceFolderLock.cs" />
   </ItemGroup>
 
+  <!-- Issue #10: writing features -->
+  <ItemGroup>
+    <Compile Include="$(AppSource)Utilities\MarkdownEmphasisUtility.cs" Link="Linked\MarkdownEmphasisUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\NewInstallUtility.cs" Link="Linked\NewInstallUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\WordGoalUtility.cs" Link="Linked\WordGoalUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\SmartPunctuationUtility.cs" Link="Linked\SmartPunctuationUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\Ao3HtmlConverter.cs" Link="Linked\Ao3HtmlConverter.cs" />
+    <Compile Include="$(AppSource)Utilities\OutlineUtility.cs" Link="Linked\OutlineUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\SnapshotUtility.cs" Link="Linked\SnapshotUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\FolderSearchUtility.cs" Link="Linked\FolderSearchUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\TypewriterUtility.cs" Link="Linked\TypewriterUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\ClosedTabHistory.cs" Link="Linked\ClosedTabHistory.cs" />
+  </ItemGroup>
+
 </Project>

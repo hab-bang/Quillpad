@@ -101,6 +101,12 @@ namespace Notepads.Views.Settings
             FontSizePicker.SelectedItem = AppSettingsService.EditorFontSize;
             FontStylePicker.SelectedItem = AvailableFontStyles.FirstOrDefault(style => style.FontStyle == AppSettingsService.EditorFontStyle);
             FontWeightPicker.SelectedItem = AvailableFontWeights.FirstOrDefault(weight => weight.FontWeight.Weight == AppSettingsService.EditorFontWeight.Weight);
+            MarkdownLiveStylingToggle.IsOn = AppSettingsService.IsMarkdownLiveStylingEnabled;
+            SmartPunctuationToggle.IsOn = AppSettingsService.IsSmartPunctuationEnabled;
+
+            InitializeLineHeightSettings();
+
+            InitializeTextWidthSettings();
 
             InitializeLineEndingSettings();
 
@@ -113,6 +119,60 @@ namespace Notepads.Views.Settings
             InitializeSearchEngineSettings();
 
             Loaded += TextAndEditorSettings_Loaded;
+        }
+
+        private void InitializeLineHeightSettings()
+        {
+            foreach (var lineHeight in AppSettingsService.LineHeights)
+            {
+                LineHeightPicker.Items?.Add(new ComboBoxItem
+                {
+                    Content = lineHeight.ToString("0.##", System.Globalization.CultureInfo.CurrentCulture),
+                    Tag = lineHeight,
+                });
+            }
+
+            LineHeightPicker.SelectedItem = LineHeightPicker.Items?.OfType<ComboBoxItem>()
+                .OrderBy(item => Math.Abs((double)item.Tag - AppSettingsService.EditorLineHeight))
+                .FirstOrDefault();
+        }
+
+        private void InitializeTextWidthSettings()
+        {
+            foreach (TextWidth textWidth in Enum.GetValues(typeof(TextWidth)))
+            {
+                // The same labels as the status bar menu
+                TextWidthPicker.Items?.Add(new ComboBoxItem
+                {
+                    Content = _resourceLoader.GetString($"TextEditor_TextWidthIndicator_FlyoutItem_{textWidth}/Text"),
+                    Tag = textWidth,
+                });
+            }
+
+            TextWidthPicker.SelectedItem = TextWidthPicker.Items?.OfType<ComboBoxItem>()
+                .FirstOrDefault(item => (TextWidth)item.Tag == AppSettingsService.EditorTextWidth);
+        }
+
+        private void LineHeightPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LineHeightPicker.SelectedItem is ComboBoxItem item && item.Tag is double lineHeight)
+            {
+                AppSettingsService.EditorLineHeight = lineHeight;
+            }
+        }
+
+        private void TextWidthPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TextWidthPicker.SelectedItem is ComboBoxItem item && item.Tag is TextWidth textWidth &&
+                textWidth != AppSettingsService.EditorTextWidth)
+            {
+                AppSettingsService.EditorTextWidth = textWidth;
+            }
+        }
+
+        private void MarkdownLiveStylingToggle_OnToggled(object sender, RoutedEventArgs e)
+        {
+            AppSettingsService.IsMarkdownLiveStylingEnabled = MarkdownLiveStylingToggle.IsOn;
         }
 
         private void InitializeLineEndingSettings()
@@ -228,6 +288,10 @@ namespace Notepads.Views.Settings
             FontSizePicker.SelectionChanged += FontSizePicker_OnSelectionChanged;
             FontStylePicker.SelectionChanged += FontStylePicker_OnSelectionChanged;
             FontWeightPicker.SelectionChanged += FontWeightPicker_OnSelectionChanged;
+            LineHeightPicker.SelectionChanged += LineHeightPicker_OnSelectionChanged;
+            TextWidthPicker.SelectionChanged += TextWidthPicker_OnSelectionChanged;
+            MarkdownLiveStylingToggle.Toggled += MarkdownLiveStylingToggle_OnToggled;
+            SmartPunctuationToggle.Toggled += (s, args) => AppSettingsService.IsSmartPunctuationEnabled = SmartPunctuationToggle.IsOn;
 
             CrlfRadioButton.Checked += LineEndingRadioButton_OnChecked;
             CrRadioButton.Checked += LineEndingRadioButton_OnChecked;

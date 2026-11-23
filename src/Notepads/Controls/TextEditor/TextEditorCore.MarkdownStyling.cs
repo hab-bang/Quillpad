@@ -14,6 +14,7 @@ namespace Notepads.Controls.TextEditor
     using Windows.UI.Core;
     using Windows.UI.Input;
     using Windows.UI.Text;
+    using Windows.UI.ViewManagement;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Input;
     using Windows.UI.Xaml.Media;
@@ -49,6 +50,9 @@ namespace Notepads.Controls.TextEditor
         private string[] _markdownStyledLines; // Lines as they were at the last restyle
         private MarkdownLineContext[] _markdownStyledContexts;
 
+        private static AccessibilitySettings _accessibilitySettings;
+        private static UISettings _uiSettings;
+
         private struct MarkdownPalette
         {
             public Color Base;
@@ -58,6 +62,33 @@ namespace Notepads.Controls.TextEditor
             public int BaseWeight;
             public int BoldWeight;
             public bool BaseItalic;
+
+            // True when two kinds of text share a colour, as in high contrast, where code keeps the text colour
+            public bool HasSharedColors;
+
+            /// <summary>
+            /// A colour read back from the editor cannot tell two kinds of text apart when they share it.
+            /// So the style takes the first kind with that colour, in the order ToMarkdownStyle reads them.
+            /// </summary>
+            public byte Fold(byte style)
+            {
+                var kind = (byte)(style & MarkdownLiveStyleParser.ColorMask);
+                if (kind == MarkdownLiveStyleParser.ColorBase) return style;
+
+                var color = kind == MarkdownLiveStyleParser.ColorDim ? Dim : kind == MarkdownLiveStyleParser.ColorLink ? Link : Code;
+                var folded = color == Base ? MarkdownLiveStyleParser.ColorBase
+                    : color == Dim ? MarkdownLiveStyleParser.ColorDim
+                    : color == Link ? MarkdownLiveStyleParser.ColorLink
+                    : MarkdownLiveStyleParser.ColorCode;
+
+                return (byte)((style & ~MarkdownLiveStyleParser.ColorMask) | folded);
+            }
+
+            public void Fold(byte[] styles, int length)
+            {
+                if (!HasSharedColors) return;
+                for (var i = 0; i < length; i++) styles[i] = Fold(styles[i]);
+            }
         }
 
         public bool IsMarkdownStylingEnabled
@@ -91,6 +122,14 @@ namespace Notepads.Controls.TextEditor
             TextCompositionStarted += OnTextCompositionStartedForMarkdown;
             TextCompositionEnded += OnTextCompositionEndedForMarkdown;
             AddHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks), handledEventsToo: true);
+            AccessibilitySettings.HighContrastChanged += OnHighContrastChangedForMarkdown;
+        }
+
+        private static AccessibilitySettings AccessibilitySettings => _accessibilitySettings ?? (_accessibilitySettings = new AccessibilitySettings());
+
+        private async void OnHighContrastChangedForMarkdown(AccessibilitySettings sender, object args)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, RequestFullMarkdownRestyle);
         }
 
         private void UnhookMarkdownStylingEvents()
@@ -101,6 +140,7 @@ namespace Notepads.Controls.TextEditor
             TextCompositionStarted -= OnTextCompositionStartedForMarkdown;
             TextCompositionEnded -= OnTextCompositionEndedForMarkdown;
             RemoveHandler(PointerReleasedEvent, new PointerEventHandler(OnPointerReleasedForMarkdownLinks));
+            AccessibilitySettings.HighContrastChanged -= OnHighContrastChangedForMarkdown;
         }
 
         /// <summary>
@@ -133,6 +173,11 @@ namespace Notepads.Controls.TextEditor
         /// </summary>
         private void OnFontSizeChangedForMarkdown(object sender, double fontSize)
         {
+            ApplyLineSpacingToRtfParagraphs(fontSize);
+        }
+
+        private void ApplyLineSpacingToRtfParagraphs(double fontSize)
+        {
             if (!_markdownLoadedFromRtf) return;
             var length = GetText().Length;
             if (length == 0) return;
@@ -144,7 +189,7 @@ namespace Notepads.Controls.TextEditor
             var undoDisabled = historyWasEmpty && undoLimit > 0;
             if (undoDisabled) Document.UndoLimit = 0;
 
-            Document.GetRange(0, length).ParagraphFormat.SetLineSpacing(LineSpacingRule.Exactly, (float)fontSize);
+            Document.GetRange(0, length).ParagraphFormat.SetLineSpacing(LineSpacingRule.Exactly, GetLineSpacing(fontSize));
 
             if (undoDisabled) Document.UndoLimit = undoLimit;
             else _hasWholeDocumentFormatStepInHistory = true;
@@ -169,9 +214,10 @@ namespace Notepads.Controls.TextEditor
             if (_markdownLoadedFromRtf && length > 0)
             {
                 var paragraphFormat = Document.GetRange(0, length).ParagraphFormat;
-                if (paragraphFormat.LineSpacingRule != LineSpacingRule.Exactly || Math.Abs(paragraphFormat.LineSpacing - FontSize) > 0.1)
+                var lineSpacing = GetLineSpacing(FontSize);
+                if (paragraphFormat.LineSpacingRule != LineSpacingRule.Exactly || Math.Abs(paragraphFormat.LineSpacing - lineSpacing) > 0.1)
                 {
-                    paragraphFormat.SetLineSpacing(LineSpacingRule.Exactly, (float)FontSize);
+                    paragraphFormat.SetLineSpacing(LineSpacingRule.Exactly, lineSpacing);
                 }
             }
 
@@ -228,7 +274,7 @@ namespace Notepads.Controls.TextEditor
             var dark = ActualTheme == ElementTheme.Dark;
             var baseWeight = FontWeight.Weight;
 
-            return new MarkdownPalette
+            var palette = new MarkdownPalette
             {
                 Base = (Foreground as SolidColorBrush)?.Color ?? (dark ? Colors.White : Colors.Black),
                 Dim = dark ? DarkDimColor : LightDimColor,
@@ -238,6 +284,19 @@ namespace Notepads.Controls.TextEditor
                 BoldWeight = Math.Min(900, Math.Max(700, baseWeight + 300)),
                 BaseItalic = FontStyle != FontStyle.Normal,
             };
+
+            // High contrast: the user's own colours, so the syntax stays readable. Code keeps the text colour.
+            if (AccessibilitySettings.HighContrast)
+            {
+                var uiSettings = _uiSettings ?? (_uiSettings = new UISettings());
+                palette.Dim = uiSettings.UIElementColor(UIElementType.GrayText);
+                palette.Link = uiSettings.UIElementColor(UIElementType.Hotlight);
+                palette.Code = palette.Base;
+            }
+
+            palette.HasSharedColors = palette.Dim == palette.Base || palette.Link == palette.Base || palette.Code == palette.Base ||
+                                      palette.Dim == palette.Link || palette.Dim == palette.Code || palette.Link == palette.Code;
+            return palette;
         }
 
         private void RestyleMarkdown()
@@ -312,6 +371,7 @@ namespace Notepads.Controls.TextEditor
 
                     if (styles.Length < line.Length) styles = new byte[Math.Max(line.Length, styles.Length * 2)];
                     MarkdownLiveStyleParser.StyleLine(line, contexts[i], styles);
+                    formatter.Palette.Fold(styles, line.Length);
 
                     // After a full reset every character is plain, so there is nothing to read back
                     var actual = full ? null : ReadMarkdownStyles(lineStart, line.Length, formatter.Palette);
@@ -448,6 +508,7 @@ namespace Notepads.Controls.TextEditor
                 var line = lines[lineIndex];
                 if (styles.Length < line.Length) styles = new byte[Math.Max(line.Length, styles.Length * 2)];
                 MarkdownLiveStyleParser.StyleLine(line, contexts[lineIndex], styles);
+                palette.Fold(styles, line.Length);
 
                 var i = 0;
                 while (i < line.Length)
@@ -599,11 +660,13 @@ namespace Notepads.Controls.TextEditor
             if (format.Underline == UnderlineType.Single) style |= MarkdownLiveStyleParser.Underline;
             else if (format.Underline != UnderlineType.None) return UnknownMarkdownStyle;
 
+            // Same order as MarkdownPalette.Fold
             var color = format.ForegroundColor;
-            if (color == palette.Dim) style |= MarkdownLiveStyleParser.ColorDim;
+            if (color == palette.Base) { }
+            else if (color == palette.Dim) style |= MarkdownLiveStyleParser.ColorDim;
             else if (color == palette.Link) style |= MarkdownLiveStyleParser.ColorLink;
             else if (color == palette.Code) style |= MarkdownLiveStyleParser.ColorCode;
-            else if (color != palette.Base) return UnknownMarkdownStyle;
+            else return UnknownMarkdownStyle;
 
             return style;
         }

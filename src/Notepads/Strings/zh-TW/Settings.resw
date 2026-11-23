@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>一款由 Jackie (Jiaqi) Liu 所設計的免費開源文字編輯器</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad 是 Notepads 的個人分支。Notepads 是一款由 Jackie (Jiaqi) Liu 設計與實作的免費開源文字編輯器：</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>如果您遇到問題或者有任何建議，請造訪：</value>

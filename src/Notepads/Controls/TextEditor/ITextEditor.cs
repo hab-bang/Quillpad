@@ -63,6 +63,12 @@ namespace Notepads.Controls.TextEditor
 
         bool DisplayLineHighlighter { get; set; }
 
+        /// <summary>The word count goal of this tab, or null.</summary>
+        int? WordGoal { get; set; }
+
+        /// <summary>The number of words when the tab was first shown in this run of the app.</summary>
+        int GetWordCountAtFirstOpen();
+
         void Init(TextFile textFile,
             StorageFile file,
             bool resetLastSavedSnapshot = true,
@@ -96,6 +102,9 @@ namespace Notepads.Controls.TextEditor
 
         void CopyTextToWindowsClipboard(TextControlCopyingToClipboardEventArgs args);
 
+        /// <summary>Copies the selection, or the whole text when nothing is selected, as HTML for AO3.</summary>
+        void CopyAsHtmlToWindowsClipboard();
+
         void RevertAllChanges();
 
         bool TryChangeEncoding(Encoding encoding);
@@ -108,12 +117,20 @@ namespace Notepads.Controls.TextEditor
         /// Shows the changes since the last save. With <paramref name="fileOnDiskText"/>, shows the
         /// differences from that text instead, which is the file as another app left it.
         /// </summary>
-        void OpenSideBySideDiffViewer(string fileOnDiskText = null);
+        void OpenSideBySideDiffViewer(string fileOnDiskText = null, string leftHeader = null);
+
+        /// <summary>
+        /// Replaces the whole text as one edit, so Ctrl+Z brings the old text back. Used to restore a snapshot.
+        /// </summary>
+        void RestoreText(string text);
 
         void CloseSideBySideDiffViewer();
 
         // While locked, the editor takes no typing (used while an update installs)
         void SetEditingLocked(bool locked);
+
+        /// <summary>Keeps the line with the caret in the middle of the editor.</summary>
+        void SetTypewriterMode(bool enabled);
 
         /// <summary>
         /// Returns 1-based indexing values
@@ -152,6 +169,9 @@ namespace Notepads.Controls.TextEditor
         void HideFindAndReplaceControl();
 
         void ShowGoToControl();
+
+        /// <summary>Puts the caret at the start of the line (1-based) and shows it.</summary>
+        void GoToLine(int lineNumber);
 
         void HideGoToControl();
 

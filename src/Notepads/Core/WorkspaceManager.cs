@@ -8,6 +8,7 @@ namespace Notepads.Core
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
@@ -31,6 +32,9 @@ namespace Notepads.Core
 
         // Set when the folder's state file exists but cannot be read, so it is never overwritten
         private bool _isStateUnreadable;
+
+        // Word goals by relative path. Null until read from the state file.
+        private Dictionary<string, int> _wordGoals;
 
         /// <param name="rememberFolder">
         /// True to reopen the folder on the next launch. Only one window should remember its folder.
@@ -157,6 +161,7 @@ namespace Notepads.Core
 
                 workspaceData = Deserialize(stateJson);
                 _lastStateJson = stateJson;
+                if (_wordGoals == null) _wordGoals = CopyWordGoals(workspaceData);
             }
             catch (Exception ex)
             {
@@ -210,10 +215,14 @@ namespace Notepads.Core
                 var folder = Folder;
                 if (folder == null || _isStateUnreadable) return;
 
+                // The goals of files that are not open come from the state file, so read it before writing over it
+                await LoadWordGoalsAsync(folder);
+                if (_isStateUnreadable) return;
+
                 var workspaceData = BuildWorkspaceData(folder);
 
                 // Do not create .quillpad in a folder that never had tabs to remember
-                if (workspaceData.Files.Count == 0 && _lastStateJson == null &&
+                if (workspaceData.Files.Count == 0 && workspaceData.WordGoals.Count == 0 && _lastStateJson == null &&
                     await WorkspaceUtility.ReadStateAsync(folder) == null) return;
 
                 var stateJson = JsonSerializer.Serialize(workspaceData, new JsonSerializerOptions { WriteIndented = true });
@@ -232,9 +241,91 @@ namespace Notepads.Core
             }
         }
 
+        public async Task<int?> GetWordGoalAsync(string filePath)
+        {
+            var folder = Folder;
+            var relativePath = folder == null ? null : WorkspaceUtility.GetRelativePath(folder, filePath);
+            if (relativePath == null) return null;
+
+            await _semaphoreSlim.WaitAsync();
+
+            try
+            {
+                await LoadWordGoalsAsync(folder);
+                return _wordGoals.TryGetValue(relativePath, out var goal) ? goal : (int?)null;
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+        }
+
+        public async Task<bool> TrySetWordGoalAsync(string filePath, int? goal)
+        {
+            var folder = Folder;
+            var relativePath = folder == null ? null : WorkspaceUtility.GetRelativePath(folder, filePath);
+            if (relativePath == null) return false;
+
+            await _semaphoreSlim.WaitAsync();
+
+            try
+            {
+                await LoadWordGoalsAsync(folder);
+                if (goal.HasValue) _wordGoals[relativePath] = goal.Value;
+                else _wordGoals.Remove(relativePath);
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+
+            await SaveAsync();
+            return true;
+        }
+
+        // Call with the semaphore held
+        private async Task LoadWordGoalsAsync(StorageFolder folder)
+        {
+            if (_wordGoals != null) return;
+
+            try
+            {
+                var stateJson = await WorkspaceUtility.ReadStateAsync(folder);
+                _wordGoals = stateJson == null
+                    ? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+                    : CopyWordGoals(Deserialize(stateJson));
+            }
+            catch (Exception ex)
+            {
+                _isStateUnreadable = true; // Same rule as RestoreTabsAsync: never write over a file that cannot be read
+                _wordGoals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                LoggingService.LogError($"[{nameof(WorkspaceManager)}] Failed to read workspace state, it will not be overwritten: {ex.Message}");
+            }
+        }
+
+        private static Dictionary<string, int> CopyWordGoals(WorkspaceDataV1 workspaceData)
+        {
+            var goals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            if (workspaceData.WordGoals == null) return goals;
+
+            foreach (var pair in workspaceData.WordGoals)
+            {
+                if (!string.IsNullOrEmpty(pair.Key) && pair.Value > 0) goals[pair.Key] = pair.Value;
+            }
+
+            return goals;
+        }
+
         private WorkspaceDataV1 BuildWorkspaceData(StorageFolder folder)
         {
             var workspaceData = new WorkspaceDataV1();
+
+            // Sorted, so the file only changes when a goal does
+            foreach (var pair in _wordGoals.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
+            {
+                workspaceData.WordGoals[pair.Key] = pair.Value;
+            }
+
             var selectedEditor = _notepadsCore.GetSelectedTextEditor();
 
             foreach (var editor in _notepadsCore.GetAllTextEditors())
@@ -278,6 +369,7 @@ namespace Notepads.Core
             Folder = folder;
             _lastStateJson = null;
             _isStateUnreadable = false;
+            _wordGoals = null;
             FolderChanged?.Invoke(this, EventArgs.Empty);
         }
     }

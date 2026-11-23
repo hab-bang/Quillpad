@@ -130,8 +130,8 @@
     <comment>AboutPage Disclaimer Title display text.</comment>
   </data>
   <data name="AboutPage_NotepadsShortDescription.Text" xml:space="preserve">
-    <value>Trình soạn thảo văn bản tự do và mã nguồn mở được thiết kế và triển khai bởi Jackie (Jiaqi) Liu</value>
-    <comment>AboutPage NotepadsShortDescription display text.</comment>
+    <value>Quillpad là một bản fork cá nhân của Notepads, trình soạn thảo văn bản tự do và mã nguồn mở được thiết kế và triển khai bởi Jackie (Jiaqi) Liu:</value>
+    <comment>AboutPage: Quillpad is a fork of Notepads; Jackie (Jiaqi) Liu made Notepads, not Quillpad. A link to Notepads follows.</comment>
   </data>
   <data name="AboutPage_Notepads_IssueAndFeatureRequestsTitle.Text" xml:space="preserve">
     <value>Báo lỗi và đề xuất tính năng:</value>

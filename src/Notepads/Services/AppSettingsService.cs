@@ -28,6 +28,11 @@ namespace Notepads.Services
         public static event EventHandler<bool> OnSessionBackupAndRestoreOptionChanged;
         public static event EventHandler<bool> OnHighlightMisspelledWordsChanged;
         public static event EventHandler<TextWidth> OnTextWidthChanged;
+        public static event EventHandler<double> OnLineHeightChanged;
+        public static event EventHandler<bool> OnMarkdownLiveStylingChanged;
+
+        /// <summary>Line heights offered in Settings, as a multiple of the old fixed line height.</summary>
+        public static readonly double[] LineHeights = { 1.0, 1.25, 1.5, 2.0 };
 
         private static string _editorFontFamily;
 
@@ -104,6 +109,49 @@ namespace Notepads.Services
                 _editorTextWidth = value;
                 OnTextWidthChanged?.Invoke(null, value);
                 ApplicationSettingsStore.Write(SettingsKey.EditorTextWidthStr, value.ToString());
+            }
+        }
+
+        private static double _editorLineHeight;
+
+        /// <summary>
+        /// Line height as a multiple of the font size. 1 is the line height from before this setting.
+        /// </summary>
+        public static double EditorLineHeight
+        {
+            get => _editorLineHeight;
+            set
+            {
+                _editorLineHeight = value;
+                OnLineHeightChanged?.Invoke(null, value);
+                ApplicationSettingsStore.Write(SettingsKey.EditorLineHeightDouble, value);
+            }
+        }
+
+        private static bool _isMarkdownLiveStylingEnabled;
+
+        /// <summary>Bold, italic, headings and links shown in the editor itself for markdown files.</summary>
+        public static bool IsMarkdownLiveStylingEnabled
+        {
+            get => _isMarkdownLiveStylingEnabled;
+            set
+            {
+                _isMarkdownLiveStylingEnabled = value;
+                OnMarkdownLiveStylingChanged?.Invoke(null, value);
+                ApplicationSettingsStore.Write(SettingsKey.EditorMarkdownLiveStylingBool, value);
+            }
+        }
+
+        private static bool _isSmartPunctuationEnabled;
+
+        /// <summary>Curly quotes, em dashes and ellipses while typing in .md and .txt files.</summary>
+        public static bool IsSmartPunctuationEnabled
+        {
+            get => _isSmartPunctuationEnabled;
+            set
+            {
+                _isSmartPunctuationEnabled = value;
+                ApplicationSettingsStore.Write(SettingsKey.EditorSmartPunctuationBool, value);
             }
         }
 
@@ -317,7 +365,15 @@ namespace Notepads.Services
 
         public static void Initialize()
         {
+            ApplyNewInstallDefaults();
+
             InitializeFontSettings();
+
+            InitializeLineHeightSettings();
+
+            InitializeMarkdownLiveStylingSettings();
+
+            InitializeSmartPunctuationSettings();
 
             InitializeTextWrappingSettings();
 
@@ -368,8 +424,13 @@ namespace Notepads.Services
             var tabIndents = _editorDefaultTabIndents;
             var showStatusBar = _showStatusBar;
             var highlightMisspelledWords = _isHighlightMisspelledWordsEnabled;
+            var lineHeight = _editorLineHeight;
+            var markdownLiveStyling = _isMarkdownLiveStylingEnabled;
 
             InitializeFontSettings();
+            InitializeLineHeightSettings();
+            InitializeMarkdownLiveStylingSettings();
+            InitializeSmartPunctuationSettings();
             InitializeTextWrappingSettings();
             InitializeTextWidthSettings();
             InitializeSpellingSettings();
@@ -397,6 +458,71 @@ namespace Notepads.Services
             if (tabIndents != _editorDefaultTabIndents) OnDefaultTabIndentsChanged?.Invoke(null, _editorDefaultTabIndents);
             if (showStatusBar != _showStatusBar) OnStatusBarVisibilityChanged?.Invoke(null, _showStatusBar);
             if (highlightMisspelledWords != _isHighlightMisspelledWordsEnabled) OnHighlightMisspelledWordsChanged?.Invoke(null, _isHighlightMisspelledWordsEnabled);
+            if (Math.Abs(lineHeight - _editorLineHeight) > 0.001) OnLineHeightChanged?.Invoke(null, _editorLineHeight);
+            if (markdownLiveStyling != _isMarkdownLiveStylingEnabled) OnMarkdownLiveStylingChanged?.Invoke(null, _isMarkdownLiveStylingEnabled);
+        }
+
+        /// <summary>
+        /// Quillpad is for prose, so a new install starts with session backup, spell check, a book font and
+        /// more room between lines. These go into the store, and the fallbacks below stay the old defaults,
+        /// so an existing user who never changed a setting keeps what they have.
+        /// </summary>
+        private static void ApplyNewInstallDefaults()
+        {
+            try
+            {
+                var keys = ApplicationSettingsStore.Keys;
+                var isNewInstall = NewInstallUtility.IsNewInstall(keys, SettingsKey.NewInstallDefaultsHandledBool,
+                    new[] { SettingsKey.ActiveInstanceIdStr });
+
+                if (isNewInstall)
+                {
+                    ApplicationSettingsStore.Write(SettingsKey.EditorEnableSessionBackupAndRestoreBool, true);
+                    ApplicationSettingsStore.Write(SettingsKey.EditorHighlightMisspelledWordsBool, true);
+                    ApplicationSettingsStore.Write(SettingsKey.EditorFontFamilyStr, "Georgia");
+                    ApplicationSettingsStore.Write(SettingsKey.EditorFontSizeInt, 16);
+                    ApplicationSettingsStore.Write(SettingsKey.EditorLineHeightDouble, 1.25);
+                    LoggingService.LogInfo($"[{nameof(AppSettingsService)}] New install: prose defaults applied.");
+                }
+
+                if (!keys.Contains(SettingsKey.NewInstallDefaultsHandledBool))
+                {
+                    ApplicationSettingsStore.Write(SettingsKey.NewInstallDefaultsHandledBool, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogError($"[{nameof(AppSettingsService)}] Failed to check for a new install: {ex.Message}");
+            }
+        }
+
+        private static void InitializeLineHeightSettings()
+        {
+            if (ApplicationSettingsStore.Read(SettingsKey.EditorLineHeightDouble) is double lineHeight && lineHeight >= 1.0 && lineHeight <= 3.0)
+            {
+                _editorLineHeight = lineHeight;
+            }
+            else
+            {
+                _editorLineHeight = 1.0;
+            }
+        }
+
+        private static void InitializeSmartPunctuationSettings()
+        {
+            _isSmartPunctuationEnabled = ApplicationSettingsStore.Read(SettingsKey.EditorSmartPunctuationBool) is bool enabled && enabled;
+        }
+
+        private static void InitializeMarkdownLiveStylingSettings()
+        {
+            if (ApplicationSettingsStore.Read(SettingsKey.EditorMarkdownLiveStylingBool) is bool enabled)
+            {
+                _isMarkdownLiveStylingEnabled = enabled;
+            }
+            else
+            {
+                _isMarkdownLiveStylingEnabled = true;
+            }
         }
 
         /// <summary>

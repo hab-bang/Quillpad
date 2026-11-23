@@ -113,7 +113,7 @@
                                                     <KeyboardAccelerator Key="N" Modifiers="Control" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem x:Uid="MainMenu_Button_New_Window" x:Name="MenuCreateNewWindowButton" AccessKey="N">
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_New_Window" x:Name="MenuCreateNewWindowButton" AccessKey="W">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE737;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -126,10 +126,26 @@
                                                     <KeyboardAccelerator Key="O" Modifiers="Control" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_ReopenClosedTab" x:Name="MenuReopenClosedTabButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE7A7;"/>
+                                                </MenuFlyoutItem.Icon>
+                                                <MenuFlyoutItem.KeyboardAccelerators>
+                                                    <KeyboardAccelerator Key="T" Modifiers="Control,Shift" IsEnabled="False"/>
+                                                </MenuFlyoutItem.KeyboardAccelerators>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_OpenFolder" x:Name="MenuOpenFolderButton">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE838;"/>
                                                 </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_OpenFileFromFolder" x:Name="MenuOpenFileFromFolderButton" Visibility="Collapsed">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE8E5;"/>
+                                                </MenuFlyoutItem.Icon>
+                                                <MenuFlyoutItem.KeyboardAccelerators>
+                                                    <KeyboardAccelerator Key="O" Modifiers="Control,Shift" IsEnabled="False"/>
+                                                </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_CloseFolder" x:Name="MenuCloseFolderButton" Visibility="Collapsed">
                                                 <MenuFlyoutItem.Icon>
@@ -155,6 +171,16 @@
                                                     <FontIcon Glyph="&#xEA35;"/>
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_CopyAsHtml" x:Name="MenuCopyAsHtmlButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE943;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_ExportAsHtml" x:Name="MenuExportAsHtmlButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xEDE1;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Find" x:Name="MenuFindButton" Icon="Find">
                                                 <MenuFlyoutItem.KeyboardAccelerators>
@@ -167,6 +193,15 @@
                                                 </MenuFlyoutItem.Icon>
                                                 <MenuFlyoutItem.KeyboardAccelerators>
                                                     <KeyboardAccelerator Key="F" Modifiers="Control,Shift" IsEnabled="False"/>
+                                                </MenuFlyoutItem.KeyboardAccelerators>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_FindInFolder" x:Name="MenuFindInFolderButton" Icon="Find" Visibility="Collapsed"/>
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_Outline" x:Name="MenuOutlineButton">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE8FD;" />
+                                                </MenuFlyoutItem.Icon>
+                                                <MenuFlyoutItem.KeyboardAccelerators>
+                                                    <KeyboardAccelerator Key="O" Modifiers="Menu" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutSeparator x:Name="MenuFullScreenSeparator"/>
@@ -186,6 +221,7 @@
                                                     <KeyboardAccelerator Key="F12" IsEnabled="False"/>
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem x:Uid="MainMenu_Button_TypewriterMode" x:Name="MenuTypewriterModeButton"/>
                                             <MenuFlyoutSeparator x:Name="MenuPrintSeparator"/>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Print" x:Name="MenuPrintButton" Icon="Print">
                                                 <MenuFlyoutItem.KeyboardAccelerators>
@@ -201,6 +237,11 @@
                                                 </MenuFlyoutItem.KeyboardAccelerators>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutSeparator x:Name="MenuSettingsSeparator" />
+                                            <MenuFlyoutItem x:Uid="MainMenu_Button_KeyboardShortcuts" x:Name="MenuKeyboardShortcutsButton" KeyboardAcceleratorTextOverride="Ctrl+/">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE765;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutItem x:Uid="MainMenu_Button_Settings" x:Name="MenuSettingsButton" Icon="Setting">
                                                 <MenuFlyoutItem.KeyboardAccelerators>
                                                     <KeyboardAccelerator Key="F1" IsEnabled="False"/>
@@ -219,21 +260,35 @@
                         </controls:SetsView.SetsStartHeader>
 
                         <controls:SetsView.SetsActionHeader>
-                            <Button x:Name="NewSetButton"
-                                    Grid.Column="0"
-                                    IsTabStop="False"
-                                    Width="42"
-                                    Height="{StaticResource SetsViewItemHeaderMinHeight}"
-                                    Margin="-1,0,0,0"
-                                    BorderThickness="0"
-                                    Background="Transparent"
-                                    Style="{ThemeResource ButtonRevealStyle}">
-                                    <Viewbox MaxWidth="14"
-                                        MaxHeight="14">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                            Glyph="&#xE710;" />
-                                    </Viewbox>
-                            </Button>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="NewSetButton"
+                                        IsTabStop="False"
+                                        Width="42"
+                                        Height="{StaticResource SetsViewItemHeaderMinHeight}"
+                                        Margin="-1,0,0,0"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Style="{ThemeResource ButtonRevealStyle}">
+                                        <Viewbox MaxWidth="14"
+                                            MaxHeight="14">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE710;" />
+                                        </Viewbox>
+                                </Button>
+                                <Button x:Name="TabListButton"
+                                        IsTabStop="False"
+                                        Width="32"
+                                        Height="{StaticResource SetsViewItemHeaderMinHeight}"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Style="{ThemeResource ButtonRevealStyle}">
+                                        <Viewbox MaxWidth="10"
+                                            MaxHeight="10">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                Glyph="&#xE70D;" />
+                                        </Viewbox>
+                                </Button>
+                            </StackPanel>
                         </controls:SetsView.SetsActionHeader>
 
                         <controls:SetsView.SetsPaddingHeader>
@@ -392,7 +447,14 @@
                         <MenuFlyout x:Name="WorkspaceIndicatorFlyout" Placement="TopEdgeAlignedLeft" Closing="StatusBarFlyout_OnClosing">
                             <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenFile"
                                             Icon="OpenFile"
-                                            Click="WorkspaceIndicatorOpenFile_OnClick"/>
+                                            Click="WorkspaceIndicatorOpenFile_OnClick">
+                                <MenuFlyoutItem.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="O" Modifiers="Control,Shift" IsEnabled="False"/>
+                                </MenuFlyoutItem.KeyboardAccelerators>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_FindInFolder"
+                                            Icon="Find"
+                                            Click="WorkspaceIndicatorFindInFolder_OnClick"/>
                             <MenuFlyoutItem x:Uid="WorkspaceIndicator_MenuFlyoutItem_OpenInFileExplorer"
                                             Click="WorkspaceIndicatorOpenInFileExplorer_OnClick">
                                 <MenuFlyoutItem.Icon>
@@ -563,7 +625,21 @@
                            Tapped="StatusBarComponent_OnTapped">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout x:Name="WordCountFlyout" Placement="TopEdgeAlignedRight" Closing="StatusBarFlyout_OnClosing">
-                            <TextBlock x:Name="WordCountFlyoutText" FontSize="12" LineHeight="20" IsTextSelectionEnabled="True"/>
+                            <StackPanel MinWidth="200">
+                                <TextBlock x:Name="WordCountFlyoutText" FontSize="12" LineHeight="20" IsTextSelectionEnabled="True"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBox x:Name="WordGoalTextBox"
+                                             x:Uid="TextEditor_WordCountFlyout_GoalTextBox"
+                                             Width="110"
+                                             InputScope="Number"
+                                             IsSpellCheckEnabled="False"
+                                             KeyDown="WordGoalTextBox_OnKeyDown"/>
+                                    <Button x:Uid="TextEditor_WordCountFlyout_SetGoalButton"
+                                            Margin="8,0,0,0"
+                                            Click="SetWordGoalButton_OnClick"/>
+                                </StackPanel>
+                                <TextBlock x:Uid="TextEditor_WordCountFlyout_GoalHint" FontSize="12" Opacity="0.7" Margin="0,6,0,0" TextWrapping="Wrap" MaxWidth="240"/>
+                            </StackPanel>
                         </Flyout>
                     </FlyoutBase.AttachedFlyout>
                 </TextBlock>

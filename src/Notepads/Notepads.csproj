@@ -159,6 +159,10 @@
     <Compile Include="Controls\Dialog\RevertAllChangesConfirmationDialog.cs" />
     <Compile Include="Controls\Dialog\SetCloseSaveReminderDialog.cs" />
     <Compile Include="Controls\Dialog\WorkspaceFileOpenDialog.cs" />
+    <Compile Include="Controls\Dialog\FolderSearchDialog.cs" />
+    <Compile Include="Controls\Dialog\KeyboardShortcutsDialog.cs" />
+    <Compile Include="Utilities\ClosedTabHistory.cs" />
+    <Compile Include="Utilities\FolderSearchUtility.cs" />
     <Compile Include="Controls\Dialog\WorkspaceSaveReminderDialog.cs" />
     <Compile Include="Controls\FindAndReplace\FindAndReplaceControl.xaml.cs">
       <DependentUpon>FindAndReplaceControl.xaml</DependentUpon>
@@ -285,9 +289,25 @@
     <Compile Include="Utilities\SearchEngineUtility.cs" />
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
+    <Compile Include="Utilities\MarkdownEmphasisUtility.cs" />
+    <Compile Include="Utilities\NewInstallUtility.cs" />
+    <Compile Include="Utilities\WordGoalUtility.cs" />
+    <Compile Include="Utilities\SmartPunctuationUtility.cs" />
+    <Compile Include="Utilities\Ao3HtmlConverter.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.Html.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.Outline.cs" />
+    <Compile Include="Views\MainPage\NotepadsMainPage.TabList.cs" />
+    <Compile Include="Utilities\OutlineUtility.cs" />
+    <Compile Include="Utilities\SnapshotUtility.cs" />
+    <Compile Include="Services\SnapshotService.cs" />
+    <Compile Include="Services\WordGoalStore.cs" />
     <Compile Include="Utilities\WorkspaceUtility.cs" />
     <Compile Include="Utilities\MarkdownLiveStyleParser.cs" />
     <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />
+    <Compile Include="Controls\TextEditor\TextEditorCore.Emphasis.cs" />
+    <Compile Include="Controls\TextEditor\TextEditorCore.SmartPunctuation.cs" />
+    <Compile Include="Controls\TextEditor\TextEditorCore.Typewriter.cs" />
+    <Compile Include="Utilities\TypewriterUtility.cs" />
     <Compile Include="Utilities\SessionUtility.cs" />
     <Compile Include="Models\TextFile.cs" />
     <Compile Include="Models\WorkspaceFile.cs" />

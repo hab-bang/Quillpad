@@ -574,8 +574,8 @@
     <comment>TextEditor: TextWidthIndicator "Half" FlyoutItem display text, also shown in the status bar. Text uses a centered column of half the window width.</comment>
   </data>
   <data name="TextEditor_TextWidthIndicator_ToolTip" xml:space="preserve">
-    <value>Text width</value>
-    <comment>TextEditor: TextWidthIndicator tooltip in the status bar.</comment>
+    <value>Text width (Alt+W)</value>
+    <comment>TextEditor: TextWidthIndicator tooltip in the status bar. Alt+W is the shortcut that switches the width.</comment>
   </data>
   <data name="GoTo_GoToBarLabel.Text" xml:space="preserve">
     <value>Go To:</value>
@@ -912,5 +912,425 @@
   <data name="FolderOpenInAnotherWindowDialog_Content" xml:space="preserve">
     <value>"{0}" is open in another Quillpad window. Two windows on one folder would write over each other's list of open tabs, so use that window, or close the folder there first.</value>
     <comment>FolderOpenInAnotherWindowDialog: "Content" display text, {0} stands for the folder name. You can change the order but DO NOT REMOVE it from the string.</comment>
+  </data>
+  <data name="MainMenu_Button_ToolTip" xml:space="preserve">
+    <value>Menu (Alt+F)</value>
+    <comment>MainMenu: tooltip of the menu button at the top left. Alt+F is the shortcut that opens the menu.</comment>
+  </data>
+  <data name="TextEditor_WordCountIndicator_GoalText" xml:space="preserve">
+    <value>{0} / {1} words</value>
+    <comment>TextEditor: WordCountIndicator text in the status bar when the file has a word goal. {0} is the word count, {1} is the goal. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_Goal" xml:space="preserve">
+    <value>Goal: {0} words ({1}%)</value>
+    <comment>TextEditor: WordCountFlyout line with the word goal. {0} is the goal, {1} is the percent reached. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_SessionWords" xml:space="preserve">
+    <value>This session: {0} words</value>
+    <comment>TextEditor: WordCountFlyout line with the words written since the file was opened in this run. {0} is a signed number like +412. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalTextBox.PlaceholderText" xml:space="preserve">
+    <value>Word goal</value>
+    <comment>TextEditor: WordCountFlyout box where the user types a word goal.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalTextBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Word goal</value>
+    <comment>TextEditor: WordCountFlyout word goal box, name for screen readers.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_SetGoalButton.Content" xml:space="preserve">
+    <value>Set goal</value>
+    <comment>TextEditor: WordCountFlyout button that saves the word goal.</comment>
+  </data>
+  <data name="TextEditor_WordCountFlyout_GoalHint.Text" xml:space="preserve">
+    <value>Leave the box empty to remove the goal.</value>
+    <comment>TextEditor: WordCountFlyout hint under the word goal box.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_InvalidWordGoal" xml:space="preserve">
+    <value>Type the goal as a number of words, like 3000.</value>
+    <comment>TextEditor: notification when the word goal is not a number.</comment>
+  </data>
+  <data name="TextEditor_ContextFlyout_CopyAsHtmlButtonDisplayText" xml:space="preserve">
+    <value>Copy as HTML</value>
+    <comment>TextEditor: context menu item that copies the whole text as HTML for AO3.</comment>
+  </data>
+  <data name="TextEditor_ContextFlyout_CopySelectionAsHtmlButtonDisplayText" xml:space="preserve">
+    <value>Copy selection as HTML</value>
+    <comment>TextEditor: context menu item that copies the selected text as HTML for AO3.</comment>
+  </data>
+  <data name="MainMenu_Button_CopyAsHtml.Text" xml:space="preserve">
+    <value>Copy as HTML</value>
+    <comment>MainMenu: button that copies the selection, or the whole file, as HTML for AO3.</comment>
+  </data>
+  <data name="MainMenu_Button_ExportAsHtml.Text" xml:space="preserve">
+    <value>Export as HTML</value>
+    <comment>MainMenu: button that saves the file as an HTML file.</comment>
+  </data>
+  <data name="ExportAsHtml_FileTypeName" xml:space="preserve">
+    <value>HTML file</value>
+    <comment>Export as HTML: name of the file type in the save dialog.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlCopied" xml:space="preserve">
+    <value>Copied as HTML</value>
+    <comment>TextEditor: notification after Copy as HTML.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlExported" xml:space="preserve">
+    <value>Exported as HTML</value>
+    <comment>TextEditor: notification after Export as HTML.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_HtmlExportFailed" xml:space="preserve">
+    <value>Could not export as HTML: {0}</value>
+    <comment>TextEditor: notification when Export as HTML fails. {0} is the error message. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="MainMenu_Button_Outline.Text" xml:space="preserve">
+    <value>Outline</value>
+    <comment>MainMenu: button that lists the headings and scene breaks of the file.</comment>
+  </data>
+  <data name="MainMenu_Button_OpenFileFromFolder.Text" xml:space="preserve">
+    <value>Open File from Folder</value>
+    <comment>MainMenu: button that lists the files of the open folder, with a filter. Shown only while a folder is open.</comment>
+  </data>
+  <data name="Outline_EmptyText" xml:space="preserve">
+    <value>No headings or scene breaks</value>
+    <comment>Outline: shown when the file has no markdown headings and no scene breaks.</comment>
+  </data>
+  <data name="Outline_SceneBreakText" xml:space="preserve">
+    <value>Scene break</value>
+    <comment>Outline: a scene break (*** or ---) with no text after it.</comment>
+  </data>
+  <data name="Outline_SceneBreakWithTextText" xml:space="preserve">
+    <value>Scene break: {0}</value>
+    <comment>Outline: a scene break. {0} is the start of the text after it. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Workspace_NotificationMsg_NoFolderOpen" xml:space="preserve">
+    <value>Open a folder first, from the main menu.</value>
+    <comment>Notification for Ctrl+Shift+O when no folder is open.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_TakeSnapshotButtonDisplayText" xml:space="preserve">
+    <value>Take snapshot</value>
+    <comment>Tab context menu: keeps a copy of the tab's text, to compare or restore later.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotsButtonDisplayText" xml:space="preserve">
+    <value>Snapshots</value>
+    <comment>Tab context menu: submenu with the snapshots of the tab's file, newest first.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotCompareButtonDisplayText" xml:space="preserve">
+    <value>Compare</value>
+    <comment>Tab context menu: shows the differences between a snapshot and the text now.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_SnapshotRestoreButtonDisplayText" xml:space="preserve">
+    <value>Restore</value>
+    <comment>Tab context menu: puts the snapshot's text back in the tab.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeReplaceAll" xml:space="preserve">
+    <value>{0} (before Replace All)</value>
+    <comment>Tab context menu: a snapshot taken automatically before Replace All. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeReload" xml:space="preserve">
+    <value>{0} (before reload)</value>
+    <comment>Tab context menu: a snapshot taken automatically before the file was reloaded from disk. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="Tab_ContextFlyout_Snapshot_BeforeRestore" xml:space="preserve">
+    <value>{0} (before restore)</value>
+    <comment>Tab context menu: a snapshot taken automatically before another snapshot was restored. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="DiffViewer_Header_Snapshot" xml:space="preserve">
+    <value>Snapshot {0}</value>
+    <comment>DiffViewer: header of the left side when it shows a snapshot. {0} is the date and time. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotTaken" xml:space="preserve">
+    <value>Snapshot taken</value>
+    <comment>Notification after Take snapshot.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotUnchanged" xml:space="preserve">
+    <value>No changes since the last snapshot</value>
+    <comment>Notification when Take snapshot finds the same text as the newest snapshot.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotRestored" xml:space="preserve">
+    <value>Snapshot restored. Ctrl+Z brings back the text before it.</value>
+    <comment>Notification after a snapshot was restored.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotUnreadable" xml:space="preserve">
+    <value>This snapshot could not be read</value>
+    <comment>Notification when a snapshot file is gone or cannot be read.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_SnapshotSameAsText" xml:space="preserve">
+    <value>This snapshot is the same as the text now</value>
+    <comment>Notification when Compare or Restore picks a snapshot equal to the current text.</comment>
+  </data>
+  <data name="FindAndReplace_MatchCount_None" xml:space="preserve">
+    <value>No matches</value>
+    <comment>FindAndReplace: match count next to the search text when nothing matches.</comment>
+  </data>
+  <data name="FindAndReplace_MatchCount_One" xml:space="preserve">
+    <value>{0} match</value>
+    <comment>FindAndReplace: match count when there is one match. {0} is the number. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="FindAndReplace_MatchCount_Many" xml:space="preserve">
+    <value>{0} matches</value>
+    <comment>FindAndReplace: match count when there are several matches. {0} is the number. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="FindAndReplace_MatchCount_Current" xml:space="preserve">
+    <value>{0} of {1}</value>
+    <comment>FindAndReplace: match count when a match is selected. {0} is the selected match, {1} the number of matches. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="MainMenu_Button_FindInFolder.Text" xml:space="preserve">
+    <value>Find in Folder</value>
+    <comment>MainMenu: button that searches every file of the open folder. Shown only while a folder is open.</comment>
+  </data>
+  <data name="WorkspaceIndicator_MenuFlyoutItem_FindInFolder.Text" xml:space="preserve">
+    <value>Find in Folder</value>
+    <comment>WorkspaceIndicator menu: searches every file of the open folder.</comment>
+  </data>
+  <data name="FolderSearchDialog_Title" xml:space="preserve">
+    <value>Find in {0}</value>
+    <comment>FolderSearchDialog: title. {0} is the folder name. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="FolderSearchDialog_QueryPlaceholderText" xml:space="preserve">
+    <value>Text to find, then Enter</value>
+    <comment>FolderSearchDialog: placeholder of the search box.</comment>
+  </data>
+  <data name="FolderSearchDialog_PrimaryButtonText" xml:space="preserve">
+    <value>Open</value>
+    <comment>FolderSearchDialog: button that opens the selected result.</comment>
+  </data>
+  <data name="FolderSearchDialog_NoResultsText" xml:space="preserve">
+    <value>No file in the folder has this text.</value>
+    <comment>FolderSearchDialog: shown when the search finds nothing.</comment>
+  </data>
+  <data name="FolderSearchDialog_TooManyResultsText" xml:space="preserve">
+    <value>Only the first {0} results are shown.</value>
+    <comment>FolderSearchDialog: shown when the search stops at the result limit. {0} is the limit. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="MainMenu_Button_TypewriterMode.Text" xml:space="preserve">
+    <value>Typewriter Mode</value>
+    <comment>MainMenu: on/off item that keeps the line with the caret in the middle of the editor, for this window.</comment>
+  </data>
+  <data name="MainMenu_Button_ReopenClosedTab.Text" xml:space="preserve">
+    <value>Reopen Closed Tab</value>
+    <comment>MainMenu: opens the file of the tab closed last.</comment>
+  </data>
+  <data name="MainMenu_Button_KeyboardShortcuts.Text" xml:space="preserve">
+    <value>Keyboard Shortcuts</value>
+    <comment>MainMenu: shows the list of keyboard shortcuts.</comment>
+  </data>
+  <data name="TextEditor_NotificationMsg_NoClosedTab" xml:space="preserve">
+    <value>No closed tab to reopen</value>
+    <comment>Notification for Ctrl+Shift+T when no closed tab can be reopened.</comment>
+  </data>
+  <data name="KeyboardShortcutsDialog_Title" xml:space="preserve">
+    <value>Keyboard shortcuts</value>
+    <comment>KeyboardShortcutsDialog: title.</comment>
+  </data>
+  <data name="KeyboardShortcutsDialog_CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+    <comment>KeyboardShortcutsDialog: close button.</comment>
+  </data>
+  <data name="Shortcut_NewTab" xml:space="preserve">
+    <value>New tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_NewWindow" xml:space="preserve">
+    <value>New window</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_OpenFile" xml:space="preserve">
+    <value>Open a file</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_OpenFileFromFolder" xml:space="preserve">
+    <value>Open a file from the open folder</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_SaveAs" xml:space="preserve">
+    <value>Save as</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_CloseTab" xml:space="preserve">
+    <value>Close the tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ReopenClosedTab" xml:space="preserve">
+    <value>Reopen the tab closed last</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_SwitchTab" xml:space="preserve">
+    <value>Next or previous tab</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_GoToTab" xml:space="preserve">
+    <value>Go to tab 1 to 9</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Find" xml:space="preserve">
+    <value>Find</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Replace" xml:space="preserve">
+    <value>Find and replace</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_FindNext" xml:space="preserve">
+    <value>Find next or previous</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_GoToLine" xml:space="preserve">
+    <value>Go to a line</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Outline" xml:space="preserve">
+    <value>Outline: headings and scene breaks</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_BoldItalic" xml:space="preserve">
+    <value>Bold or italic in markdown files</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_UndoRedo" xml:space="preserve">
+    <value>Undo or redo</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_DuplicateLine" xml:space="preserve">
+    <value>Duplicate the line or selection</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_JoinLines" xml:space="preserve">
+    <value>Join lines</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_MoveLine" xml:space="preserve">
+    <value>Move the line up or down</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_InsertDateTime" xml:space="preserve">
+    <value>Insert the date and time</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Zoom" xml:space="preserve">
+    <value>Zoom in, zoom out, reset the zoom</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_WordWrap" xml:space="preserve">
+    <value>Word wrap on or off</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_TextWidth" xml:space="preserve">
+    <value>Change the text width</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Preview" xml:space="preserve">
+    <value>Markdown preview</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ShowChanges" xml:space="preserve">
+    <value>Show the changes since the last save</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Reload" xml:space="preserve">
+    <value>Reload the file from disk</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Rename" xml:space="preserve">
+    <value>Rename the file</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Print" xml:space="preserve">
+    <value>Print, or print all tabs</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_StatusBar" xml:space="preserve">
+    <value>Status bar menu</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Menu" xml:space="preserve">
+    <value>Main menu</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_Settings" xml:space="preserve">
+    <value>Settings</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_FullScreen" xml:space="preserve">
+    <value>Full screen</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_CompactOverlay" xml:space="preserve">
+    <value>Compact overlay (always on top)</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="Shortcut_ShortcutList" xml:space="preserve">
+    <value>This list</value>
+    <comment>Keyboard shortcut list: what the keys do.</comment>
+  </data>
+  <data name="App_TabListButton_ToolTip" xml:space="preserve">
+    <value>All tabs</value>
+    <comment>Tooltip of the button after the tabs that lists every open tab.</comment>
+  </data>
+  <data name="App_NewTabButton_ToolTip" xml:space="preserve">
+    <value>New tab (Ctrl+N)</value>
+    <comment>Tooltip of the + button that opens a new tab.</comment>
+  </data>
+  <data name="App_TabList_ModifiedTabText" xml:space="preserve">
+    <value>{0} (unsaved)</value>
+    <comment>Tab list: a tab with unsaved changes. {0} is the file name. DO NOT REMOVE it.</comment>
+  </data>
+  <data name="MainMenu_Button_Name" xml:space="preserve">
+    <value>Menu</value>
+    <comment>Name of the menu button at the top left, for screen readers.</comment>
+  </data>
+  <data name="App_NewTabButton_Name" xml:space="preserve">
+    <value>New tab</value>
+    <comment>Name of the + button that opens a new tab, for screen readers.</comment>
+  </data>
+  <data name="DiffViewer_DismissButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close (Esc)</value>
+    <comment>DiffViewer: tooltip of the button that closes the changes view.</comment>
+  </data>
+  <data name="DiffViewer_DismissButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close</value>
+    <comment>DiffViewer: name of the close button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ToggleReplaceModeButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Toggle Replace Mode</value>
+    <comment>FindAndReplace: name of the button that shows or hides the replace bar, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchOptionButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search options</value>
+    <comment>FindAndReplace: name of the search options button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchBackwardButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find Previous</value>
+    <comment>FindAndReplace: name of the Find Previous button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_SearchForwardButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find Next</value>
+    <comment>FindAndReplace: name of the Find Next button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_DismissButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close</value>
+    <comment>FindAndReplace and GoTo: name of the close button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ReplaceButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Replace</value>
+    <comment>FindAndReplace: name of the Replace button, for screen readers.</comment>
+  </data>
+  <data name="FindAndReplace_ReplaceAllButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Replace All</value>
+    <comment>FindAndReplace: name of the Replace All button, for screen readers.</comment>
+  </data>
+  <data name="GoTo_SearchButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Go to line</value>
+    <comment>GoTo: name of the Go button, for screen readers.</comment>
+  </data>
+  <data name="UpdateService_Error_GitHubAnswer" xml:space="preserve">
+    <value>GitHub answered {0} {1}</value>
+    <comment>Update check error. {0} is the HTTP status code, {1} its reason, like 404 Not Found. DO NOT REMOVE them.</comment>
+  </data>
+  <data name="UpdateService_Error_UnexpectedTag" xml:space="preserve">
+    <value>The latest release has an unexpected tag: {0}</value>
+    <comment>Update check error. {0} is the release tag found on GitHub. DO NOT REMOVE it.</comment>
   </data>
 </root>

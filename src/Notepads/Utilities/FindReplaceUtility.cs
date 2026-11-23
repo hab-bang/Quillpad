@@ -122,6 +122,27 @@ namespace Notepads.Utilities
         }
 
         /// <summary>
+        /// The number of matches, for the find bar. <paramref name="current"/> is the 1-based number of the
+        /// match that is selected now, or 0 when the selection is not a match. Throws like <see cref="FindAll"/>.
+        /// </summary>
+        public static int CountMatches(string text, SearchContext searchContext, int selectionStart, int selectionLength, out int current)
+        {
+            var matches = FindAll(text, searchContext, string.Empty);
+            current = 0;
+
+            for (var i = 0; i < matches.Count; i++)
+            {
+                if (matches[i].Start == selectionStart && matches[i].Length == selectionLength)
+                {
+                    current = i + 1;
+                    break;
+                }
+            }
+
+            return matches.Count;
+        }
+
+        /// <summary>
         /// The replacements that change the text. Rewriting a match with the same text changes nothing,
         /// but the editor would still give the new characters one format.
         /// </summary>

@@ -34,5 +34,21 @@ namespace Notepads.Utilities
                     return 1.0;
             }
         }
+
+        /// <summary>
+        /// The width after <paramref name="textWidth"/>, narrower each time, then back to full. Used by Alt+W.
+        /// </summary>
+        public static TextWidth Next(TextWidth textWidth)
+        {
+            switch (textWidth)
+            {
+                case TextWidth.Full:
+                    return TextWidth.ThreeQuarters;
+                case TextWidth.ThreeQuarters:
+                    return TextWidth.Half;
+                default:
+                    return TextWidth.Full;
+            }
+        }
     }
 }

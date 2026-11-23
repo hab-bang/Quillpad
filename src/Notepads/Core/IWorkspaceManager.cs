@@ -50,5 +50,14 @@ namespace Notepads.Core
 
         /// <summary>Saves the open tabs that belong to the workspace folder into that folder.</summary>
         Task SaveAsync();
+
+        /// <summary>The word goal of a file in the workspace folder, or null when it has none or is outside the folder.</summary>
+        Task<int?> GetWordGoalAsync(string filePath);
+
+        /// <summary>
+        /// Keeps the word goal of a file in the workspace folder, null to remove it, and saves the workspace.
+        /// Returns false when the file is not in the folder.
+        /// </summary>
+        Task<bool> TrySetWordGoalAsync(string filePath, int? goal);
     }
 }

@@ -28,6 +28,8 @@ namespace Notepads.Core
         private MenuFlyoutItem _copyFullPath;
         private MenuFlyoutItem _openContainingFolder;
         private MenuFlyoutItem _rename;
+        private MenuFlyoutItem _takeSnapshot;
+        private MenuFlyoutSubItem _snapshots;
 
         private string _filePath;
         private string _containingFolderPath;
@@ -51,6 +53,9 @@ namespace Notepads.Core
             Items.Add(OpenContainingFolder);
             Items.Add(new MenuFlyoutSeparator());
             Items.Add(Rename);
+            Items.Add(new MenuFlyoutSeparator());
+            Items.Add(TakeSnapshot);
+            Items.Add(Snapshots);
 
             var style = new Style(typeof(MenuFlyoutPresenter));
             style.Setters.Add(new Setter(Control.BorderThicknessProperty, 0));
@@ -85,6 +90,123 @@ namespace Notepads.Core
             {
                 OpenContainingFolder.Visibility = Visibility.Collapsed;
             }
+
+            TakeSnapshot.IsEnabled = !string.IsNullOrEmpty(_textEditor.GetText());
+            LoadSnapshotItems();
+        }
+
+        private MenuFlyoutItem TakeSnapshot
+        {
+            get
+            {
+                if (_takeSnapshot != null) return _takeSnapshot;
+
+                _takeSnapshot = new MenuFlyoutItem
+                {
+                    Text = _resourceLoader.GetString("Tab_ContextFlyout_TakeSnapshotButtonDisplayText"),
+                    Icon = new FontIcon { Glyph = "\uE722" }, // Camera
+                };
+                _takeSnapshot.Click += async (sender, args) =>
+                {
+                    var taken = await SnapshotService.TakeSnapshotAsync(_textEditor.EditingFilePath, _textEditor.Id, _textEditor.GetText(), SnapshotKind.Manual);
+                    NotificationCenter.Instance.PostNotification(_resourceLoader.GetString(taken
+                        ? "TextEditor_NotificationMsg_SnapshotTaken"
+                        : "TextEditor_NotificationMsg_SnapshotUnchanged"), 1500);
+                };
+                return _takeSnapshot;
+            }
+        }
+
+        private MenuFlyoutSubItem Snapshots
+        {
+            get
+            {
+                if (_snapshots != null) return _snapshots;
+
+                _snapshots = new MenuFlyoutSubItem
+                {
+                    Text = _resourceLoader.GetString("Tab_ContextFlyout_SnapshotsButtonDisplayText"),
+                    Icon = new FontIcon { Glyph = "\uE81C" }, // History
+                };
+                return _snapshots;
+            }
+        }
+
+        // The list is read from disk each time the menu opens, and fills in when the read is done
+        private async void LoadSnapshotItems()
+        {
+            Snapshots.Items?.Clear();
+            Snapshots.IsEnabled = false;
+
+            var snapshots = await SnapshotService.GetSnapshotsAsync(_textEditor.EditingFilePath, _textEditor.Id);
+
+            Snapshots.Items?.Clear();
+            foreach (var snapshot in snapshots)
+            {
+                Snapshots.Items?.Add(CreateSnapshotItem(snapshot));
+            }
+
+            Snapshots.IsEnabled = snapshots.Count > 0;
+        }
+
+        private MenuFlyoutSubItem CreateSnapshotItem(SnapshotInfo snapshot)
+        {
+            var time = snapshot.TimeUtc.ToLocalTime().ToString("G", System.Globalization.CultureInfo.CurrentCulture);
+            var text = snapshot.Kind == SnapshotKind.Manual
+                ? time
+                : string.Format(_resourceLoader.GetString($"Tab_ContextFlyout_Snapshot_{snapshot.Kind}"), time);
+
+            var item = new MenuFlyoutSubItem { Text = text };
+
+            var compare = new MenuFlyoutItem { Text = _resourceLoader.GetString("Tab_ContextFlyout_SnapshotCompareButtonDisplayText") };
+            compare.Click += async (sender, args) =>
+            {
+                var snapshotText = await ReadSnapshotAsync(snapshot);
+                if (snapshotText == null) return;
+
+                _notepadsCore.SwitchTo(_textEditor);
+                _textEditor.CloseSideBySideDiffViewer();
+                _textEditor.OpenSideBySideDiffViewer(snapshotText, string.Format(_resourceLoader.GetString("DiffViewer_Header_Snapshot"), time));
+            };
+
+            var restore = new MenuFlyoutItem { Text = _resourceLoader.GetString("Tab_ContextFlyout_SnapshotRestoreButtonDisplayText") };
+            restore.Click += async (sender, args) =>
+            {
+                var snapshotText = await ReadSnapshotAsync(snapshot);
+                if (snapshotText == null) return;
+
+                // The text being replaced gets a snapshot too, besides Ctrl+Z
+                await SnapshotService.TakeSnapshotAsync(_textEditor.EditingFilePath, _textEditor.Id, _textEditor.GetText(), SnapshotKind.BeforeRestore);
+
+                _notepadsCore.SwitchTo(_textEditor);
+                _textEditor.RestoreText(snapshotText);
+                _notepadsCore.FocusOnSelectedTextEditor();
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_SnapshotRestored"), 2500);
+            };
+
+            item.Items?.Add(compare);
+            item.Items?.Add(restore);
+            return item;
+        }
+
+        // Null, with a message, when the snapshot is gone or holds the text the tab has now
+        private async Task<string> ReadSnapshotAsync(SnapshotInfo snapshot)
+        {
+            var snapshotText = await SnapshotService.ReadSnapshotAsync(_textEditor.EditingFilePath, _textEditor.Id, snapshot);
+
+            if (snapshotText == null)
+            {
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_SnapshotUnreadable"), 2500);
+                return null;
+            }
+
+            if (string.Equals(LineEndingUtility.ApplyLineEnding(snapshotText, LineEnding.Cr), _textEditor.GetText(), StringComparison.Ordinal))
+            {
+                NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_SnapshotSameAsText"), 2000);
+                return null;
+            }
+
+            return snapshotText;
         }
 
         private void TabContextFlyout_Closed(object sender, object e)
