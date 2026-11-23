@@ -159,6 +159,7 @@ namespace Notepads.Controls.TextEditor
 
             HookExternalEvents();
             HookMarkdownStylingEvents();
+            HookSmartPunctuationEvents();
 
             Window.Current.CoreWindow.Activated += OnCoreWindowActivated;
         }
@@ -206,6 +207,7 @@ namespace Notepads.Controls.TextEditor
             LostFocus -= OnLostFocus;
             Loaded -= OnLoaded;
             UnhookMarkdownStylingEvents();
+            UnhookSmartPunctuationEvents();
 
             if (_contentScrollViewer != null)
             {

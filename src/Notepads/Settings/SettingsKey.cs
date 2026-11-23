@@ -44,6 +44,7 @@ namespace Notepads.Settings
         internal static string EditorTextWidthStr = "EditorTextWidthStr";
         internal static string EditorLineHeightDouble = "EditorLineHeightDouble";
         internal static string EditorMarkdownLiveStylingBool = "EditorMarkdownLiveStylingBool";
+        internal static string EditorSmartPunctuationBool = "EditorSmartPunctuationBool";
 
         // Written once, after the defaults for a new install were handled (see NewInstallUtility)
         internal static string NewInstallDefaultsHandledBool = "NewInstallDefaultsHandledBool";

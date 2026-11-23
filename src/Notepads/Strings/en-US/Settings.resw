@@ -449,4 +449,16 @@
     <value>Line height</value>
     <comment>TextAndEditorPage LineHeightSettings list name for screen readers.</comment>
   </data>
+  <data name="TextAndEditorPage_SmartPunctuationSettings_ToggleSwitch.OnContent" xml:space="preserve">
+    <value>Smart quotes and dashes</value>
+    <comment>TextAndEditorPage SmartPunctuationSettings ToggleSwitch On display text.</comment>
+  </data>
+  <data name="TextAndEditorPage_SmartPunctuationSettings_ToggleSwitch.OffContent" xml:space="preserve">
+    <value>Smart quotes and dashes</value>
+    <comment>TextAndEditorPage SmartPunctuationSettings ToggleSwitch Off display text.</comment>
+  </data>
+  <data name="TextAndEditorPage_SmartPunctuationSettings_Description.Text" xml:space="preserve">
+    <value>In .md and .txt files, -- becomes an em dash, ... becomes an ellipsis, and straight quotes become curly quotes as you type. Ctrl+Z right after gives back what you typed. Code is left as it is.</value>
+    <comment>TextAndEditorPage SmartPunctuationSettings Description display text. Keep --, ... and Ctrl+Z as they are.</comment>
+  </data>
 </root>

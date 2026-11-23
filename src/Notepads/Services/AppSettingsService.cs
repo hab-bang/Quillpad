@@ -142,6 +142,19 @@ namespace Notepads.Services
             }
         }
 
+        private static bool _isSmartPunctuationEnabled;
+
+        /// <summary>Curly quotes, em dashes and ellipses while typing in .md and .txt files.</summary>
+        public static bool IsSmartPunctuationEnabled
+        {
+            get => _isSmartPunctuationEnabled;
+            set
+            {
+                _isSmartPunctuationEnabled = value;
+                ApplicationSettingsStore.Write(SettingsKey.EditorSmartPunctuationBool, value);
+            }
+        }
+
         private static bool _editorDisplayLineHighlighter;
 
         public static bool EditorDisplayLineHighlighter
@@ -360,6 +373,8 @@ namespace Notepads.Services
 
             InitializeMarkdownLiveStylingSettings();
 
+            InitializeSmartPunctuationSettings();
+
             InitializeTextWrappingSettings();
 
             InitializeTextWidthSettings();
@@ -415,6 +430,7 @@ namespace Notepads.Services
             InitializeFontSettings();
             InitializeLineHeightSettings();
             InitializeMarkdownLiveStylingSettings();
+            InitializeSmartPunctuationSettings();
             InitializeTextWrappingSettings();
             InitializeTextWidthSettings();
             InitializeSpellingSettings();
@@ -490,6 +506,11 @@ namespace Notepads.Services
             {
                 _editorLineHeight = 1.0;
             }
+        }
+
+        private static void InitializeSmartPunctuationSettings()
+        {
+            _isSmartPunctuationEnabled = ApplicationSettingsStore.Read(SettingsKey.EditorSmartPunctuationBool) is bool enabled && enabled;
         }
 
         private static void InitializeMarkdownLiveStylingSettings()

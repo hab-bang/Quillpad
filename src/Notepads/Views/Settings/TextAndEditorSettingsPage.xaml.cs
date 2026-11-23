@@ -102,6 +102,7 @@ namespace Notepads.Views.Settings
             FontStylePicker.SelectedItem = AvailableFontStyles.FirstOrDefault(style => style.FontStyle == AppSettingsService.EditorFontStyle);
             FontWeightPicker.SelectedItem = AvailableFontWeights.FirstOrDefault(weight => weight.FontWeight.Weight == AppSettingsService.EditorFontWeight.Weight);
             MarkdownLiveStylingToggle.IsOn = AppSettingsService.IsMarkdownLiveStylingEnabled;
+            SmartPunctuationToggle.IsOn = AppSettingsService.IsSmartPunctuationEnabled;
 
             InitializeLineHeightSettings();
 
@@ -290,6 +291,7 @@ namespace Notepads.Views.Settings
             LineHeightPicker.SelectionChanged += LineHeightPicker_OnSelectionChanged;
             TextWidthPicker.SelectionChanged += TextWidthPicker_OnSelectionChanged;
             MarkdownLiveStylingToggle.Toggled += MarkdownLiveStylingToggle_OnToggled;
+            SmartPunctuationToggle.Toggled += (s, args) => AppSettingsService.IsSmartPunctuationEnabled = SmartPunctuationToggle.IsOn;
 
             CrlfRadioButton.Checked += LineEndingRadioButton_OnChecked;
             CrRadioButton.Checked += LineEndingRadioButton_OnChecked;
