@@ -574,8 +574,8 @@
     <comment>TextEditor: TextWidthIndicator "Half" FlyoutItem display text, also shown in the status bar. Text uses a centered column of half the window width.</comment>
   </data>
   <data name="TextEditor_TextWidthIndicator_ToolTip" xml:space="preserve">
-    <value>Text width</value>
-    <comment>TextEditor: TextWidthIndicator tooltip in the status bar.</comment>
+    <value>Text width (Alt+W)</value>
+    <comment>TextEditor: TextWidthIndicator tooltip in the status bar. Alt+W is the shortcut that switches the width.</comment>
   </data>
   <data name="GoTo_GoToBarLabel.Text" xml:space="preserve">
     <value>Go To:</value>

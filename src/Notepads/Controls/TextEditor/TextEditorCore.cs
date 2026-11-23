@@ -857,8 +857,13 @@ namespace Notepads.Controls.TextEditor
         {
             Document.DefaultTabStop = (float)FontUtility.GetTextSize(font, fontSize, "text").Width;
             var format = Document.GetDefaultParagraphFormat();
-            format.SetLineSpacing(LineSpacingRule.Exactly, (float)fontSize);
+            format.SetLineSpacing(LineSpacingRule.Exactly, GetLineSpacing(fontSize));
             Document.SetDefaultParagraphFormat(format);
+        }
+
+        private static float GetLineSpacing(double fontSize)
+        {
+            return (float)(fontSize * AppSettingsService.EditorLineHeight);
         }
 
         private void EnterWithAutoIndentation()

@@ -57,6 +57,7 @@
   <!-- Issue #10: writing features -->
   <ItemGroup>
     <Compile Include="$(AppSource)Utilities\MarkdownEmphasisUtility.cs" Link="Linked\MarkdownEmphasisUtility.cs" />
+    <Compile Include="$(AppSource)Utilities\NewInstallUtility.cs" Link="Linked\NewInstallUtility.cs" />
   </ItemGroup>
 
 </Project>

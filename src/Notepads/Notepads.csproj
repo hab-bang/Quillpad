@@ -286,6 +286,7 @@
     <Compile Include="Utilities\TextWidthUtility.cs" />
     <Compile Include="Utilities\WordCountUtility.cs" />
     <Compile Include="Utilities\MarkdownEmphasisUtility.cs" />
+    <Compile Include="Utilities\NewInstallUtility.cs" />
     <Compile Include="Utilities\WorkspaceUtility.cs" />
     <Compile Include="Utilities\MarkdownLiveStyleParser.cs" />
     <Compile Include="Controls\TextEditor\TextEditorCore.MarkdownStyling.cs" />

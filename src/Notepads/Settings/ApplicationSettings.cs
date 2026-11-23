@@ -25,6 +25,9 @@ namespace Notepads.Settings
             return obj;
         }
 
+        public static System.Collections.Generic.ICollection<string> Keys =>
+            Windows.Storage.ApplicationData.Current.LocalSettings.Values.Keys;
+
         public static void Write(string key, object obj)
         {
             ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;

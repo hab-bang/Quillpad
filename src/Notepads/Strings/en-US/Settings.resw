@@ -417,4 +417,36 @@
     <value>Exit app when closing last tab</value>
     <comment>AdvancedPage AppLifecyclePreferenceSettings ExitingLastTabClosesWindowToggleSwitch On display text.</comment>
   </data>
+  <data name="TextAndEditorPage_MarkdownLiveStylingSettings_ToggleSwitch.OnContent" xml:space="preserve">
+    <value>Show markdown styling in the editor</value>
+    <comment>TextAndEditorPage MarkdownLiveStylingSettings ToggleSwitch On display text.</comment>
+  </data>
+  <data name="TextAndEditorPage_MarkdownLiveStylingSettings_ToggleSwitch.OffContent" xml:space="preserve">
+    <value>Show markdown styling in the editor</value>
+    <comment>TextAndEditorPage MarkdownLiveStylingSettings ToggleSwitch Off display text.</comment>
+  </data>
+  <data name="TextAndEditorPage_MarkdownLiveStylingSettings_Description.Text" xml:space="preserve">
+    <value>In .md files, bold, italic, headings and links look styled while you type. The characters stay as you typed them. Files over 100,000 characters stay plain.</value>
+    <comment>TextAndEditorPage MarkdownLiveStylingSettings Description display text.</comment>
+  </data>
+  <data name="TextAndEditorPage_TextWidthSettings_Label.Text" xml:space="preserve">
+    <value>Text width</value>
+    <comment>TextAndEditorPage TextWidthSettings label above the list of widths.</comment>
+  </data>
+  <data name="TextAndEditorPage_TextWidthSettings_ComboBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Text width</value>
+    <comment>TextAndEditorPage TextWidthSettings list name for screen readers.</comment>
+  </data>
+  <data name="TextAndEditorPage_TextWidthSettings_Description.Text" xml:space="preserve">
+    <value>How much of the window the text uses. Alt+W switches between the widths.</value>
+    <comment>TextAndEditorPage TextWidthSettings Description display text. Alt+W is a keyboard shortcut.</comment>
+  </data>
+  <data name="TextAndEditorPage_LineHeightSettings_Label.Text" xml:space="preserve">
+    <value>Line height</value>
+    <comment>TextAndEditorPage LineHeightSettings label above the list of line heights.</comment>
+  </data>
+  <data name="TextAndEditorPage_LineHeightSettings_ComboBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Line height</value>
+    <comment>TextAndEditorPage LineHeightSettings list name for screen readers.</comment>
+  </data>
 </root>

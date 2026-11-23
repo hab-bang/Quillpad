@@ -100,7 +100,7 @@
             }
 
             TextEditorCore.FileType = FileType;
-            TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile;
+            TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile && AppSettingsService.IsMarkdownLiveStylingEnabled;
 
             // Hide content preview if current file type is not supported for previewing
             if (!FileTypeUtility.IsPreviewSupported(FileType))
@@ -221,6 +221,7 @@
             _keyboardCommandHandler = GetKeyboardCommandHandler();
 
             ThemeSettingsService.OnThemeChanged += ThemeSettingsService_OnThemeChanged;
+            AppSettingsService.OnMarkdownLiveStylingChanged += AppSettingsService_OnMarkdownLiveStylingChanged;
 
             HookTextWidthEvents();
 
@@ -253,6 +254,7 @@
             }
 
             ThemeSettingsService.OnThemeChanged -= ThemeSettingsService_OnThemeChanged;
+            AppSettingsService.OnMarkdownLiveStylingChanged -= AppSettingsService_OnMarkdownLiveStylingChanged;
 
             UnhookTextWidthEvents();
 
@@ -312,6 +314,14 @@
                         await Dispatcher.CallOnUIThreadAsync(() => { SideBySideDiffViewer.Focus(); });
                     });
                 }
+            });
+        }
+
+        private async void AppSettingsService_OnMarkdownLiveStylingChanged(object sender, bool enabled)
+        {
+            await Dispatcher.CallOnUIThreadAsync(() =>
+            {
+                TextEditorCore.IsMarkdownStylingEnabled = FileType == FileType.MarkdownFile && enabled;
             });
         }
 

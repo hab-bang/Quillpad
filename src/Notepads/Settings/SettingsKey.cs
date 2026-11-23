@@ -42,5 +42,10 @@ namespace Notepads.Settings
         internal static string EditorDefaultDisplayLineNumbersBool = "EditorDefaultDisplayLineNumbersBool";
         internal static string EditorEnableSmartCopyBool = "EditorEnableSmartCopyBool";
         internal static string EditorTextWidthStr = "EditorTextWidthStr";
+        internal static string EditorLineHeightDouble = "EditorLineHeightDouble";
+        internal static string EditorMarkdownLiveStylingBool = "EditorMarkdownLiveStylingBool";
+
+        // Written once, after the defaults for a new install were handled (see NewInstallUtility)
+        internal static string NewInstallDefaultsHandledBool = "NewInstallDefaultsHandledBool";
     }
 }
