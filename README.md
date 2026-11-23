@@ -79,7 +79,7 @@ The counts are per file. The check fails when a count goes up. It also fails whe
 | `method-length` | A method, constructor, accessor or local function over 60 lines. |
 | `parameters` | More than 5 parameters, or more than 1 `bool` parameter. |
 | `file-length` | A file over 500 lines. The baseline holds its line count, so it may not grow. |
-| `duplicate` | A method body (3 or more statements) or a run of 5 or more statements that is the same as code elsewhere after local names and literals are normalized. |
+| `duplicate` | A method body (3 or more statements) or a run of 5 or more statements that is the same as code elsewhere after variable names and literals are normalized. A variable is a local, a parameter, or another name that starts with a lower-case letter or `_`. Member, type and method names stay. |
 | `catch-all` | `catch (Exception)` or a bare `catch` without a `when` filter. |
 | `empty-catch` | A `catch` block with no statements. A comment alone doesn't count as one. |
 | `comment-run` | 3 or more `//` comment lines in a row. `///` docs and the license header don't count. |
